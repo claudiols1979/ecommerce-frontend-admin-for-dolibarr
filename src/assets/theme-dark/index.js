@@ -8,7 +8,7 @@
 
 Coded by www.creative-tim.com
 
- =========================================================
+=========================================================
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
@@ -78,11 +78,14 @@ import buttonBase from "assets/theme-dark/components/buttonBase";
 import icon from "assets/theme-dark/components/icon";
 import svgIcon from "assets/theme-dark/components/svgIcon";
 import link from "assets/theme-dark/components/link";
-import dialog from "assets/theme-dark/components/dialog";
-import dialogTitle from "assets/theme-dark/components/dialog/dialogTitle";
-import dialogContent from "assets/theme-dark/components/dialog/dialogContent";
-import dialogContentText from "assets/theme-dark/components/dialog/dialogContentText";
-import dialogActions from "assets/theme-dark/components/dialog/dialogActions";
+
+// NOTE: We are intentionally NOT importing the individual dialog component styles here
+// as they are likely the source of the conflict.
+// import dialog from "assets/theme-dark/components/dialog";
+// import dialogTitle from "assets/theme-dark/components/dialog/dialogTitle";
+// import dialogContent from "assets/theme-dark/components/dialog/dialogContent";
+// import dialogContentText from "assets/theme-dark/components/dialog/dialogContentText";
+// import dialogActions from "assets/theme-dark/components/dialog/dialogActions";
 
 export default createTheme({
   breakpoints: { ...breakpoints },
@@ -149,10 +152,53 @@ export default createTheme({
     MuiIcon: { ...icon },
     MuiSvgIcon: { ...svgIcon },
     MuiLink: { ...link },
-    MuiDialog: { ...dialog },
-    MuiDialogTitle: { ...dialogTitle },
-    MuiDialogContent: { ...dialogContent },
-    MuiDialogContentText: { ...dialogContentText },
-    MuiDialogActions: { ...dialogActions },
+    // **IMPORTANT FIX START: Override MuiDialog directly here**
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          // Keep dark background for dialog paper (or try a very obvious one like black)
+          backgroundColor: colors.dark.main,
+          // Since default text is white, try to force black text for visibility
+          // This will help diagnose if the background is truly staying white
+          color: colors.dark.main, // Setting paper's default text color to a dark one
+          borderRadius: borders.borderRadius.lg,
+          boxShadow: boxShadows.xxl,
+        },
+      },
+    },
+    MuiDialogTitle: {
+      styleOverrides: {
+        root: {
+          // Explicitly set title text to black in dark mode
+          color: colors.dark.main, // Force dark color
+          "& h2": {
+            color: colors.dark.main, // Force dark color for nested h2
+          },
+        },
+      },
+    },
+    MuiDialogContent: {
+      styleOverrides: {
+        root: {
+          // Ensure no conflicting styles here
+        },
+      },
+    },
+    MuiDialogContentText: {
+      styleOverrides: {
+        root: {
+          // Explicitly set content text to black in dark mode
+          color: colors.dark.main, // Force dark color
+        },
+      },
+    },
+    MuiDialogActions: {
+      styleOverrides: {
+        root: {
+          // You can add specific styles for actions here if needed
+        },
+      },
+    },
+    // **IMPORTANT FIX END**
   },
 });

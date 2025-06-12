@@ -8,7 +8,7 @@
 
 Coded by www.creative-tim.com
 
- =========================================================
+=========================================================
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
@@ -30,7 +30,8 @@ import Icon from "@mui/material/Icon";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
-import MDInput from "components/MDInput";
+import MDInput from "components/MDInput"; // Assuming MDInput is used elsewhere
+import MDTypography from "components/MDTypography";
 
 // Material Dashboard 2 React example components
 import Breadcrumbs from "examples/Breadcrumbs";
@@ -53,12 +54,20 @@ import {
   setOpenConfigurator,
 } from "context";
 
+import { useAuth } from "contexts/AuthContext";
+
+// IMPORT YOUR ROUTES HERE:
+import routes from "routes"; // <--- ADD THIS LINE
+
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode } = controller;
   const [openMenu, setOpenMenu] = useState(false);
-  const route = useLocation().pathname.split("/").slice(1);
+  const location = useLocation(); // Get the full location object
+
+  const { user, logout } = useAuth();
+  const userName = user ? user.firstName : "Usuario";
 
   useEffect(() => {
     // Setting the navbar type
@@ -68,21 +77,13 @@ function DashboardNavbar({ absolute, light, isMini }) {
       setNavbarType("static");
     }
 
-    // A function that sets the transparent state of the navbar.
     function handleTransparentNavbar() {
       setTransparentNavbar(dispatch, (fixedNavbar && window.scrollY === 0) || !fixedNavbar);
     }
 
-    /** 
-     The event listener that's calling the handleTransparentNavbar function when 
-     scrolling the window.
-    */
     window.addEventListener("scroll", handleTransparentNavbar);
-
-    // Call the handleTransparentNavbar function to set the state with the initial value.
     handleTransparentNavbar();
 
-    // Remove event listener on cleanup
     return () => window.removeEventListener("scroll", handleTransparentNavbar);
   }, [dispatch, fixedNavbar]);
 
@@ -123,6 +124,18 @@ function DashboardNavbar({ absolute, light, isMini }) {
     },
   });
 
+  // --- Breadcrumbs Title Logic ---
+  // Find the current route object from the 'routes' array based on the current pathname
+  const currentRoute = routes.find((r) => r.route === location.pathname);
+
+  // Determine the breadcrumb title: use the 'name' from routes.js, fallback to URL segment
+  const breadcrumbTitle = currentRoute
+    ? currentRoute.name // Use the 'name' defined in routes.js (e.g., "Panel")
+    : location.pathname.split("/").pop(); // Fallback to "dashboard" if not found (will be capitalized by Breadcrumbs component)
+
+  // Extract path segments for Breadcrumbs component
+  const pathSegments = location.pathname.split("/").slice(1);
+
   return (
     <AppBar
       position={absolute ? "absolute" : navbarType}
@@ -131,19 +144,25 @@ function DashboardNavbar({ absolute, light, isMini }) {
     >
       <Toolbar sx={(theme) => navbarContainer(theme)}>
         <MDBox color="inherit" mb={{ xs: 1, md: 0 }} sx={(theme) => navbarRow(theme, { isMini })}>
-          <Breadcrumbs icon="home" title={route[route.length - 1]} route={route} light={light} />
+          {/* Use the dynamically determined breadcrumbTitle here */}
+          <Breadcrumbs icon="home" title={breadcrumbTitle} route={pathSegments} light={light} />
         </MDBox>
         {isMini ? null : (
           <MDBox sx={(theme) => navbarRow(theme, { isMini })}>
-            <MDBox pr={1}>
-              <MDInput label="Search here" />
-            </MDBox>
+            <MDBox pr={1}>{/* <MDInput label="Search here" /> */}</MDBox>
             <MDBox color={light ? "white" : "inherit"}>
-              <Link to="/authentication/sign-in/basic">
-                <IconButton sx={navbarIconButton} size="small" disableRipple>
-                  <Icon sx={iconsStyle}>account_circle</Icon>
+              {/* {user ? ( // If user is logged in, show logout icon
+                <IconButton sx={navbarIconButton} size="small" disableRipple onClick={logout}>
+                  <Icon sx={iconsStyle}>logout</Icon>
                 </IconButton>
-              </Link>
+              ) : (
+                // If user is not logged in, show account_circle and link to sign-in
+                <Link to="/authentication/sign-in">
+                  <IconButton sx={navbarIconButton} size="small" disableRipple>
+                    <Icon sx={iconsStyle}>account_circle</Icon>
+                  </IconButton>
+                </Link>
+              )} */}
               <IconButton
                 size="small"
                 disableRipple
@@ -155,7 +174,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   {miniSidenav ? "menu_open" : "menu"}
                 </Icon>
               </IconButton>
-              <IconButton
+              {/* <IconButton
                 size="small"
                 disableRipple
                 color="inherit"
@@ -163,8 +182,20 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 onClick={handleConfiguratorOpen}
               >
                 <Icon sx={iconsStyle}>settings</Icon>
-              </IconButton>
-              <IconButton
+              </IconButton> */}
+              {user ? ( // If user is logged in, show logout icon
+                <IconButton sx={navbarIconButton} size="small" disableRipple onClick={logout}>
+                  <Icon sx={iconsStyle}>logout</Icon>
+                </IconButton>
+              ) : (
+                // If user is not logged in, show account_circle and link to sign-in
+                <Link to="/authentication/sign-in">
+                  <IconButton sx={navbarIconButton} size="small" disableRipple>
+                    <Icon sx={iconsStyle}>account_circle</Icon>
+                  </IconButton>
+                </Link>
+              )}
+              {/* <IconButton
                 size="small"
                 disableRipple
                 color="inherit"
@@ -175,8 +206,8 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 onClick={handleOpenMenu}
               >
                 <Icon sx={iconsStyle}>notifications</Icon>
-              </IconButton>
-              {renderMenu()}
+              </IconButton> */}
+              {/* {renderMenu()} */}
             </MDBox>
           </MDBox>
         )}

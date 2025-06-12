@@ -8,7 +8,7 @@
 
 Coded by www.creative-tim.com
 
- =========================================================
+=========================================================
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
@@ -47,11 +47,16 @@ import {
   setWhiteSidenav,
 } from "context";
 
+import { useAuth } from "contexts/AuthContext";
+
 function Sidenav({ color, brand, brandName, routes, ...rest }) {
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode, sidenavColor } = controller;
   const location = useLocation();
-  const collapseName = location.pathname.replace("/", "");
+  // Removed `collapseName` as it's no longer needed for `startsWith` comparison
+  // const collapseName = location.pathname.replace("/", "");
+
+  const { user } = useAuth();
 
   let textColor = "white";
 
@@ -71,7 +76,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
       setWhiteSidenav(dispatch, window.innerWidth < 1200 ? false : whiteSidenav);
     }
 
-    /** 
+    /**
      The event listener that's calling the handleMiniSidenav function when resizing the window.
     */
     window.addEventListener("resize", handleMiniSidenav);
@@ -81,13 +86,19 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
 
     // Remove event listener on cleanup
     return () => window.removeEventListener("resize", handleMiniSidenav);
-  }, [dispatch, location]);
+  }, [dispatch, location]); // Added location to dependencies for re-evaluation on path change
 
   // Render all the routes from the routes.js (All the visible items on the Sidenav)
   const renderRoutes = routes.map(({ type, name, icon, title, noCollapse, key, href, route }) => {
     let returnValue;
 
     if (type === "collapse") {
+      // **IMPORTANT FIX START**
+      // Determine active state based on whether the current pathname starts with the route
+      // This handles sub-routes like /products/details/123 still highlighting /products
+      const isActive = location.pathname.startsWith(route) && route !== "/"; // Exclude "/" to prevent always highlighting Dashboard
+      const isDashboardActive = location.pathname === "/" && route === "/dashboard"; // Specific check for dashboard home
+
       returnValue = href ? (
         <Link
           href={href}
@@ -99,15 +110,20 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
           <SidenavCollapse
             name={name}
             icon={icon}
-            active={key === collapseName}
+            active={isActive || isDashboardActive} // Pass the calculated active state
             noCollapse={noCollapse}
           />
         </Link>
       ) : (
         <NavLink key={key} to={route}>
-          <SidenavCollapse name={name} icon={icon} active={key === collapseName} />
+          <SidenavCollapse
+            name={name}
+            icon={icon}
+            active={isActive || isDashboardActive} // Pass the calculated active state
+          />
         </NavLink>
       );
+      // **IMPORTANT FIX END**
     } else if (type === "title") {
       returnValue = (
         <MDTypography
@@ -166,9 +182,21 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
             width={!brandName && "100%"}
             sx={(theme) => sidenavLogoLabel(theme, { miniSidenav })}
           >
-            <MDTypography component="h6" variant="button" fontWeight="medium" color={textColor}>
+            <MDTypography component="h4" variant="h3" fontWeight="bold" color={textColor}>
               {brandName}
             </MDTypography>
+
+            {user && ( // Only render if the 'user' object exists
+              <MDTypography
+                component="h5"
+                variant="h5"
+                fontWeight="regular"
+                color={textColor}
+                mt={0.5}
+              >
+                Bienvenido {user.firstName || "Guest"}
+              </MDTypography>
+            )}
           </MDBox>
         </MDBox>
       </MDBox>
@@ -179,19 +207,6 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
         }
       />
       <List>{renderRoutes}</List>
-      <MDBox p={2} mt="auto">
-        <MDButton
-          component="a"
-          href="https://www.creative-tim.com/product/material-dashboard-pro-react"
-          target="_blank"
-          rel="noreferrer"
-          variant="gradient"
-          color={sidenavColor}
-          fullWidth
-        >
-          upgrade to pro
-        </MDButton>
-      </MDBox>
     </SidenavRoot>
   );
 }

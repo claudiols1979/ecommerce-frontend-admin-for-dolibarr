@@ -21,13 +21,39 @@ import App from "App";
 // Material Dashboard 2 React Context Provider
 import { MaterialUIControllerProvider } from "context";
 
+// Import your AuthProvider
+import { AuthProvider } from "./contexts/AuthContext";
+
+import { DashboardProvider } from "./contexts/DashboardContext";
+import { ProductProvider } from "./contexts/ProductContext";
+
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const container = document.getElementById("app");
 const root = createRoot(container);
 
 root.render(
   <BrowserRouter>
     <MaterialUIControllerProvider>
-      <App />
+      <AuthProvider>
+        <DashboardProvider>
+          <ProductProvider>
+            <App />
+          </ProductProvider>
+        </DashboardProvider>
+        <ToastContainer
+          position="top-right" // Position of the toast notifications
+          autoClose={5000} // Close after 5 seconds
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+      </AuthProvider>
     </MaterialUIControllerProvider>
   </BrowserRouter>
 );

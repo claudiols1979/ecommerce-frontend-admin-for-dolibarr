@@ -13,7 +13,7 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-import { useState } from "react";
+import { useState } from "react"; // Already present, but good to confirm
 
 // react-router-dom components
 import { Link } from "react-router-dom";
@@ -41,10 +41,47 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 // Images
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 
+// --- NEW: Import useAuth hook from your contexts directory ---
+import { useAuth } from "contexts/AuthContext";
+
 function Basic() {
+  // The component is named Basic, not BasicSignIn
   const [rememberMe, setRememberMe] = useState(false);
 
+  // --- NEW: State for form inputs ---
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  // --- NEW: State for loading indicator and error messages ---
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // --- NEW: Get the login function from AuthContext ---
+  const { login } = useAuth();
+
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
+
+  // --- NEW: Handle form submission ---
+  const handleSubmit = async (event) => {
+    event.preventDefault(); // Prevent the default browser form submission
+    setLoading(true); // Show loading state
+    setError(null); // Clear any previous errors
+
+    try {
+      // Call the login function from AuthContext
+      const result = await login(email, password);
+      if (!result.success) {
+        // If login failed (e.g., wrong credentials), display the message from the backend
+        setError(result.message);
+      }
+      // If login was successful, the AuthProvider already handles redirection to /dashboard
+    } catch (err) {
+      // Catch any unexpected network errors or other issues
+      console.error("An unexpected error occurred during login:", err);
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false); // Hide loading state
+    }
+  };
 
   return (
     <BasicLayout image={bgImage}>
@@ -61,54 +98,76 @@ function Basic() {
           textAlign="center"
         >
           <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
-            Sign in
+            Iniciar Sesión
           </MDTypography>
-          <Grid container spacing={3} justifyContent="center" sx={{ mt: 1, mb: 2 }}>
-            <Grid item xs={2}>
-              <MDTypography component={MuiLink} href="#" variant="body1" color="white">
-                <FacebookIcon color="inherit" />
-              </MDTypography>
-            </Grid>
-            <Grid item xs={2}>
-              <MDTypography component={MuiLink} href="#" variant="body1" color="white">
-                <GitHubIcon color="inherit" />
-              </MDTypography>
-            </Grid>
-            <Grid item xs={2}>
-              <MDTypography component={MuiLink} href="#" variant="body1" color="white">
-                <GoogleIcon color="inherit" />
-              </MDTypography>
-            </Grid>
-          </Grid>
+          <MDTypography display="block" variant="button" color="white" my={1}>
+            Ingresa tu correo electrónico y contraseña
+          </MDTypography>
+          {/* Social login buttons are usually not integrated with custom backend auth; 
+              you can remove them if you don't plan to use social login.
+              For now, I'll keep them as they are in your original file.
+          */}
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
-          <MDBox component="form" role="form">
+          {/* --- NEW: Add onSubmit handler to the form --- */}
+          <MDBox component="form" role="form" onSubmit={handleSubmit}>
             <MDBox mb={2}>
-              <MDInput type="email" label="Email" fullWidth />
+              <MDInput
+                type="email"
+                label="Email"
+                fullWidth
+                value={email} // --- NEW: Bind value to component state ---
+                onChange={(e) => setEmail(e.target.value)} // --- NEW: Update state on input change ---
+                required // --- NEW: Add HTML5 required validation for basic checks ---
+              />
             </MDBox>
             <MDBox mb={2}>
-              <MDInput type="password" label="Password" fullWidth />
+              <MDInput
+                type="password"
+                label="Contraseña" // Changed label to Spanish for consistency
+                fullWidth
+                value={password} // --- NEW: Bind value to component state ---
+                onChange={(e) => setPassword(e.target.value)} // --- NEW: Update state on input change ---
+                required // --- NEW: Add HTML5 required validation for basic checks ---
+              />
             </MDBox>
             <MDBox display="flex" alignItems="center" ml={-1}>
-              <Switch checked={rememberMe} onChange={handleSetRememberMe} />
-              <MDTypography
+              {/* <Switch checked={rememberMe} onChange={handleSetRememberMe} /> */}
+              {/* <MDTypography
                 variant="button"
                 fontWeight="regular"
                 color="text"
                 onClick={handleSetRememberMe}
                 sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
               >
-                &nbsp;&nbsp;Remember me
-              </MDTypography>
+                &nbsp;&nbsp;Recordarme
+              </MDTypography> */}
             </MDBox>
+
+            {/* --- NEW: Display error message if present --- */}
+            {error && (
+              <MDBox mt={2} mb={1}>
+                <MDTypography variant="caption" color="error" fontWeight="medium">
+                  {error}
+                </MDTypography>
+              </MDBox>
+            )}
+
             <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth>
-                sign in
+              <MDButton
+                variant="gradient"
+                color="info"
+                fullWidth
+                type="submit" // --- NEW: Set button type to "submit" for form handling ---
+                disabled={loading} // --- NEW: Disable button while loading ---
+              >
+                {loading ? "Iniciando sesión..." : "Iniciar Sesión"}{" "}
+                {/* --- NEW: Change button text based on loading state --- */}
               </MDButton>
             </MDBox>
             <MDBox mt={3} mb={1} textAlign="center">
               <MDTypography variant="button" color="text">
-                Don&apos;t have an account?{" "}
+                ¿No tienes una cuenta? {/* Changed text to Spanish for consistency */}
                 <MDTypography
                   component={Link}
                   to="/authentication/sign-up"
@@ -117,7 +176,7 @@ function Basic() {
                   fontWeight="medium"
                   textGradient
                 >
-                  Sign up
+                  Regístrate
                 </MDTypography>
               </MDTypography>
             </MDBox>

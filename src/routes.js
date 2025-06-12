@@ -1,109 +1,106 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
+// frontend/src/routes.js
 
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
+// @mui icons - assuming these are used by your Sidenav
+import Icon from "@mui/material/Icon";
 
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-/** 
-  All of the routes for the Material Dashboard 2 React are added here,
-  You can add a new route, customize the routes and delete the routes here.
-
-  Once you add a new route on this file it will be visible automatically on
-  the Sidenav.
-
-  For adding a new route you can follow the existing routes in the routes array.
-  1. The `type` key with the `collapse` value is used for a route.
-  2. The `type` key with the `title` value is used for a title inside the Sidenav. 
-  3. The `type` key with the `divider` value is used for a divider between Sidenav items.
-  4. The `name` key is used for the name of the route on the Sidenav.
-  5. The `key` key is used for the key of the route (It will help you with the key prop inside a loop).
-  6. The `icon` key is used for the icon of the route on the Sidenav, you have to add a node.
-  7. The `collapse` key is used for making a collapsible item on the Sidenav that has other routes
-  inside (nested routes), you need to pass the nested routes inside an array as a value for the `collapse` key.
-  8. The `route` key is used to store the route location which is used for the react router.
-  9. The `href` key is used to store the external links location.
-  10. The `title` key is only for the item with the type of `title` and its used for the title text on the Sidenav.
-  10. The `component` key is used to store the component of its route.
-*/
-
-// Material Dashboard 2 React layouts
+// Import your layout components
+// Adjust these paths if your actual component files are located elsewhere
 import Dashboard from "layouts/dashboard";
-import Tables from "layouts/tables";
-import Billing from "layouts/billing";
-import RTL from "layouts/rtl";
-import Notifications from "layouts/notifications";
+
 import Profile from "layouts/profile";
+import Products from "layouts/products";
+import Orders from "layouts/orders";
+import CreateOrder from "layouts/orders/templates/CreateOrder";
+import EditOrder from "layouts/orders/templates/EditOrder";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 
-// @mui icons
-import Icon from "@mui/material/Icon";
-
+// --- Route Definitions ---
+// Each object represents a route in your application.
+//
+// Properties:
+//   - type: "collapse" for sidebar items, "title" for group headings, etc. (as per MD2R convention)
+//   - name: The text displayed in the sidebar (if type="collapse")
+//   - key: Unique identifier for the route (important for React lists)
+//   - icon: The MUI Icon component for the sidebar item
+//   - route: The URL path for the route
+//   - component: The React component to render when this route is active
+//   - allowedRoles: (REQUIRED for protected routes) An array of strings specifying
+//                   which user roles can access this route. These strings MUST
+//                   match the 'role' property in your user object from AuthContext.
+//                   (NOT PRESENT for public routes)
 const routes = [
+  // --- Authenticated & Role-Based Routes ---
+  // These routes require a user to be logged in AND have one of the specified roles.
   {
     type: "collapse",
-    name: "Dashboard",
+    name: "Panel",
     key: "dashboard",
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
+    // Roles with double quotes for Prettier compliance
+    allowedRoles: ["Administrador", "Editor"], // All authenticated users
   },
   {
     type: "collapse",
-    name: "Tables",
-    key: "tables",
-    icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/tables",
-    component: <Tables />,
+    name: "Productos",
+    key: "productos",
+    icon: <Icon fontSize="small">inventory</Icon>,
+    route: "/products",
+    component: <Products />,
+    // Roles with double quotes for Prettier compliance
+    allowedRoles: ["Administrador", "Editor"], // All authenticated users
   },
   {
     type: "collapse",
-    name: "Billing",
-    key: "billing",
-    icon: <Icon fontSize="small">receipt_long</Icon>,
-    route: "/billing",
-    component: <Billing />,
+    name: "Pedidos",
+    key: "pedidos",
+    icon: <Icon fontSize="small">shopping_cart</Icon>, // Using shopping_cart icon for orders
+    route: "/orders",
+    component: <Orders />,
+    allowedRoles: ["Administrador", "Editor", "ReVendedor"], // Assuming all authenticated users can view orders initially
+  },
+  {
+    type: "hidden", // Hidden from Sidenav
+    name: "Crear Orden",
+    key: "create-order",
+    icon: <Icon fontSize="small">add_shopping_cart</Icon>,
+    route: "/orders/create", // Route for creating new orders
+    component: <CreateOrder />,
+    allowedRoles: ["Administrador", "Revendedor"], // Admins and Resellers can create orders
+  },
+  {
+    type: "hidden", // Hidden from Sidenav
+    name: "Editar Orden",
+    key: "edit-order",
+    icon: <Icon fontSize="small">edit</Icon>,
+    route: "/orders/edit/:id", // Dynamic route for editing a specific order
+    component: <EditOrder />,
+    allowedRoles: ["Administrador", "Editor"], // Only Admins and Editors can edit orders
   },
   {
     type: "collapse",
-    name: "RTL",
-    key: "rtl",
-    icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
-    route: "/rtl",
-    component: <RTL />,
-  },
-  {
-    type: "collapse",
-    name: "Notifications",
-    key: "notifications",
-    icon: <Icon fontSize="small">notifications</Icon>,
-    route: "/notifications",
-    component: <Notifications />,
-  },
-  {
-    type: "collapse",
-    name: "Profile",
+    name: "Perfil",
     key: "profile",
     icon: <Icon fontSize="small">person</Icon>,
     route: "/profile",
     component: <Profile />,
+    // Roles with double quotes
+    allowedRoles: ["Administrador", "Editor", "Revendedor"], // All authenticated users
   },
+
+  // --- Public Routes (No 'allowedRoles' property) ---
+  // These routes are accessible to anyone, regardless of authentication status.
+  // They will typically NOT appear in the sidebar once a user is logged in.
   {
-    type: "collapse",
+    type: "collapse", // Can still be 'collapse' for unauthenticated sidebar display
     name: "Sign In",
     key: "sign-in",
     icon: <Icon fontSize="small">login</Icon>,
     route: "/authentication/sign-in",
     component: <SignIn />,
+    // IMPORTANT: No 'allowedRoles' property means it's a public route
   },
   {
     type: "collapse",
@@ -112,6 +109,7 @@ const routes = [
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/authentication/sign-up",
     component: <SignUp />,
+    // IMPORTANT: No 'allowedRoles' property means it's a public route
   },
 ];
 

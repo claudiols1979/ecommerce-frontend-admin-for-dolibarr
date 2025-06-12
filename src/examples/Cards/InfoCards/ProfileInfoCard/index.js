@@ -33,7 +33,7 @@ import MDTypography from "components/MDTypography";
 import colors from "assets/theme/base/colors";
 import typography from "assets/theme/base/typography";
 
-function ProfileInfoCard({ title, description, info, social, action, shadow }) {
+function ProfileInfoCard({ title, description, info, social, shadow }) {
   const labels = [];
   const values = [];
   const { socialMediaColors } = colors;
@@ -90,11 +90,11 @@ function ProfileInfoCard({ title, description, info, social, action, shadow }) {
         <MDTypography variant="h6" fontWeight="medium" textTransform="capitalize">
           {title}
         </MDTypography>
-        <MDTypography component={Link} to={action.route} variant="body2" color="secondary">
+        {/* <MDTypography component={Link} to={action.route} variant="body2" color="secondary">
           <Tooltip title={action.tooltip} placement="top">
             <Icon>edit</Icon>
           </Tooltip>
-        </MDTypography>
+        </MDTypography> */}
       </MDBox>
       <MDBox p={2}>
         <MDBox mb={2} lineHeight={1}>
@@ -107,12 +107,12 @@ function ProfileInfoCard({ title, description, info, social, action, shadow }) {
         </MDBox>
         <MDBox>
           {renderItems}
-          <MDBox display="flex" py={1} pr={2}>
+          {/* <MDBox display="flex" py={1} pr={2}>
             <MDTypography variant="button" fontWeight="bold" textTransform="capitalize">
               social: &nbsp;
             </MDTypography>
             {renderSocial}
-          </MDBox>
+          </MDBox> */}
         </MDBox>
       </MDBox>
     </Card>

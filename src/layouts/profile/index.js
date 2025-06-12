@@ -8,19 +8,15 @@
 
 Coded by www.creative-tim.com
 
- =========================================================
+=========================================================
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
 // @mui material components
 import Grid from "@mui/material/Grid";
-import Divider from "@mui/material/Divider";
-
-// @mui icons
-import FacebookIcon from "@mui/icons-material/Facebook";
-import TwitterIcon from "@mui/icons-material/Twitter";
-import InstagramIcon from "@mui/icons-material/Instagram";
+// Card import is no longer needed as the order section is removed
+// import Card from "@mui/material/Card";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -31,167 +27,137 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import ProfileInfoCard from "examples/Cards/InfoCards/ProfileInfoCard";
-import ProfilesList from "examples/Lists/ProfilesList";
-import DefaultProjectCard from "examples/Cards/ProjectCards/DefaultProjectCard";
 
 // Overview page components
 import Header from "layouts/profile/components/Header";
-import PlatformSettings from "layouts/profile/components/PlatformSettings";
 
-// Data
-import profilesListData from "layouts/profile/data/profilesListData";
+// React hooks for state and effect
+import { useState, useEffect } from "react"; // useMemo is no longer needed as no filtering is done
 
-// Images
-import homeDecor1 from "assets/images/home-decor-1.jpg";
-import homeDecor2 from "assets/images/home-decor-2.jpg";
-import homeDecor3 from "assets/images/home-decor-3.jpg";
-import homeDecor4 from "assets/images/home-decor-4.jpeg";
-import team1 from "assets/images/team-1.jpg";
-import team2 from "assets/images/team-2.jpg";
-import team3 from "assets/images/team-3.jpg";
-import team4 from "assets/images/team-4.jpg";
+// Import custom hooks from your contexts
+import { useAuth } from "contexts/AuthContext";
+// DashboardContext is no longer directly used in this file as orders are removed
+// import { useDashboard } from "contexts/DashboardContext";
 
 function Overview() {
+  // Using the custom hook to get user data from AuthContext
+  const { user, loading: authLoading, error: authError, isAuthenticated } = useAuth();
+  // DashboardContext is no longer used for orders, so we remove its destructuring
+  // const { dashboardData, loading: dashboardLoading, error: dashboardError } = useDashboard();
+
+  // State for component-specific loading and error, derived only from AuthContext now
+  const [componentLoading, setComponentLoading] = useState(true);
+  const [componentError, setComponentError] = useState(null);
+
+  // The logic for fetching and filtering orders is entirely removed.
+  // No need for loggedInUserId or userOrders useMemo.
+
+  // Simplified useEffect to handle overall loading and error states,
+  // now only dependent on the AuthContext.
+  useEffect(() => {
+    // Determine overall loading state based on authentication loading
+    if (authLoading) {
+      setComponentLoading(true);
+    } else {
+      setComponentLoading(false);
+    }
+
+    // Determine overall error state based on authentication error
+    if (authError) {
+      setComponentError(authError);
+    } else {
+      setComponentError(null);
+    }
+  }, [authLoading, authError]);
+
+  // Handle loading state: Show a loading message while user data is being fetched
+  if (componentLoading) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <MDBox mb={2} display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+          <MDTypography variant="h5" color="text">
+            Cargando perfil de usuario...
+          </MDTypography>
+        </MDBox>
+        <Footer />
+      </DashboardLayout>
+    );
+  }
+
+  // Handle error state: Display an error message if there's an issue fetching user data
+  if (componentError) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <MDBox
+          mb={2}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="200px"
+          flexDirection="column"
+        >
+          <MDTypography variant="h5" color="error" mb={1}>
+            Error: {componentError.message || String(componentError)}
+          </MDTypography>
+          <MDTypography variant="body2" color="text">
+            Por favor, intente recargar la página.
+          </MDTypography>
+        </MDBox>
+        <Footer />
+      </DashboardLayout>
+    );
+  }
+
+  // If user data is not available after loading, or not authenticated,
+  // prompt the user to log in.
+  if (!user || !isAuthenticated) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <MDBox mb={2} display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+          <MDTypography variant="h5" color="text">
+            No se encontraron datos de usuario. Por favor, inicie sesión.
+          </MDTypography>
+        </MDBox>
+        <Footer />
+      </DashboardLayout>
+    );
+  }
+
+  // Combine first and last name for display in the ProfileInfoCard
+  const userFullNameForDisplay = `${user.firstName || ""} ${user.lastName || ""}`.trim();
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <MDBox mb={2} />
+      <MDBox mb={2} /> {/* Provides some vertical spacing below the navbar */}
       <Header>
         <MDBox mt={5} mb={3}>
-          <Grid container spacing={1}>
-            <Grid item xs={12} md={6} xl={4}>
-              <PlatformSettings />
-            </Grid>
-            <Grid item xs={12} md={6} xl={4} sx={{ display: "flex" }}>
-              <Divider orientation="vertical" sx={{ ml: -2, mr: 1 }} />
+          {" "}
+          {/* Provides margin top and bottom for the content */}
+          {/* Main Grid container to hold the profile information. */}
+          {/* justifyContent="center" is applied here to horizontally center the Grid items. */}
+          <Grid container spacing={3} justifyContent="left">
+            {/* Grid item for the ProfileInfoCard */}
+            <Grid item xs={12} md={8} xl={6} sx={{ display: "flex" }}>
               <ProfileInfoCard
-                title="profile information"
-                description="Hi, I’m Alec Thompson, Decisions: If you can’t decide, the answer is no. If two equally difficult paths, choose the one more painful in the short term (pain avoidance is creating an illusion of equality)."
+                title="información del perfil"
+                description={`${user.role} del sistema.`}
                 info={{
-                  fullName: "Alec M. Thompson",
-                  mobile: "(44) 123 1234 123",
-                  email: "alecthompson@mail.com",
-                  location: "USA",
+                  Nombre: userFullNameForDisplay,
+                  Correo: user.email,
+                  Ubicación: "Costa Rica", // Hardcoded location as per previous requirements
                 }}
-                social={[
-                  {
-                    link: "https://www.facebook.com/CreativeTim/",
-                    icon: <FacebookIcon />,
-                    color: "facebook",
-                  },
-                  {
-                    link: "https://twitter.com/creativetim",
-                    icon: <TwitterIcon />,
-                    color: "twitter",
-                  },
-                  {
-                    link: "https://www.instagram.com/creativetimofficial/",
-                    icon: <InstagramIcon />,
-                    color: "instagram",
-                  },
-                ]}
-                action={{ route: "", tooltip: "Edit Profile" }}
+                social={[]} // Pass an empty array to satisfy ProfileInfoCard's social prop expectation
+                action={{ route: "", tooltip: "Editar Perfil" }}
                 shadow={false}
               />
-              <Divider orientation="vertical" sx={{ mx: 0 }} />
             </Grid>
-            <Grid item xs={12} xl={4}>
-              <ProfilesList title="conversations" profiles={profilesListData} shadow={false} />
-            </Grid>
-          </Grid>
-        </MDBox>
-        <MDBox pt={2} px={2} lineHeight={1.25}>
-          <MDTypography variant="h6" fontWeight="medium">
-            Projects
-          </MDTypography>
-          <MDBox mb={1}>
-            <MDTypography variant="button" color="text">
-              Architects design houses
-            </MDTypography>
-          </MDBox>
-        </MDBox>
-        <MDBox p={2}>
-          <Grid container spacing={6}>
-            <Grid item xs={12} md={6} xl={3}>
-              <DefaultProjectCard
-                image={homeDecor1}
-                label="project #2"
-                title="modern"
-                description="As Uber works through a huge amount of internal management turmoil."
-                action={{
-                  type: "internal",
-                  route: "/pages/profile/profile-overview",
-                  color: "info",
-                  label: "view project",
-                }}
-                authors={[
-                  { image: team1, name: "Elena Morison" },
-                  { image: team2, name: "Ryan Milly" },
-                  { image: team3, name: "Nick Daniel" },
-                  { image: team4, name: "Peterson" },
-                ]}
-              />
-            </Grid>
-            <Grid item xs={12} md={6} xl={3}>
-              <DefaultProjectCard
-                image={homeDecor2}
-                label="project #1"
-                title="scandinavian"
-                description="Music is something that everyone has their own specific opinion about."
-                action={{
-                  type: "internal",
-                  route: "/pages/profile/profile-overview",
-                  color: "info",
-                  label: "view project",
-                }}
-                authors={[
-                  { image: team3, name: "Nick Daniel" },
-                  { image: team4, name: "Peterson" },
-                  { image: team1, name: "Elena Morison" },
-                  { image: team2, name: "Ryan Milly" },
-                ]}
-              />
-            </Grid>
-            <Grid item xs={12} md={6} xl={3}>
-              <DefaultProjectCard
-                image={homeDecor3}
-                label="project #3"
-                title="minimalist"
-                description="Different people have different taste, and various types of music."
-                action={{
-                  type: "internal",
-                  route: "/pages/profile/profile-overview",
-                  color: "info",
-                  label: "view project",
-                }}
-                authors={[
-                  { image: team4, name: "Peterson" },
-                  { image: team3, name: "Nick Daniel" },
-                  { image: team2, name: "Ryan Milly" },
-                  { image: team1, name: "Elena Morison" },
-                ]}
-              />
-            </Grid>
-            <Grid item xs={12} md={6} xl={3}>
-              <DefaultProjectCard
-                image={homeDecor4}
-                label="project #4"
-                title="gothic"
-                description="Why would anyone pick blue over pink? Pink is obviously a better color."
-                action={{
-                  type: "internal",
-                  route: "/pages/profile/profile-overview",
-                  color: "info",
-                  label: "view project",
-                }}
-                authors={[
-                  { image: team4, name: "Peterson" },
-                  { image: team3, name: "Nick Daniel" },
-                  { image: team2, name: "Ryan Milly" },
-                  { image: team1, name: "Elena Morison" },
-                ]}
-              />
-            </Grid>
+
+            {/* The entire "Latest Orders" Grid item, along with all its content and logic,
+                has been completely removed from this file. */}
           </Grid>
         </MDBox>
       </Header>
