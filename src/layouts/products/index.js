@@ -17,7 +17,6 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
-
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -50,23 +49,23 @@ function Products() {
 
   // Determine if the current user can create/edit/delete products
   const canManageProducts = user?.role === "Administrador" || user?.role === "Editor";
-  const canViewAllProducts = user?.role === "Administrador" || user?.role === "Editor" || user?.role === "Revendedor";
-
+  const canViewAllProducts =
+    user?.role === "Administrador" || user?.role === "Editor" || user?.role === "Revendedor";
 
   // Effect to filter products whenever `products` or `searchTerm` changes
   useEffect(() => {
     if (products.length > 0) {
       const lowerCaseSearchTerm = searchTerm.toLowerCase();
 
-      const newFilteredProducts = products.filter(product => {
+      const newFilteredProducts = products.filter((product) => {
         // Filter by product name, code, brand, or labels
         const matchesName = product.name?.toLowerCase().includes(lowerCaseSearchTerm);
         const matchesCode = product.code?.toLowerCase().includes(lowerCaseSearchTerm);
         const matchesBrand = product.brand?.toLowerCase().includes(lowerCaseSearchTerm); // ADDED: Filter by brand
-        const matchesLabels = product.labels?.some(label =>
+        const matchesLabels = product.labels?.some((label) =>
           label.toLowerCase().includes(lowerCaseSearchTerm)
         );
-        
+
         return matchesName || matchesCode || matchesBrand || matchesLabels; // UPDATED: Include matchesBrand
       });
       setFilteredProducts(newFilteredProducts);
@@ -74,7 +73,6 @@ function Products() {
       setFilteredProducts([]); // If no products, clear filtered list
     }
   }, [products, searchTerm]);
-
 
   // Modified handleDeleteProduct to open MUI dialog
   const handleDeleteProduct = (id) => {
@@ -118,13 +116,17 @@ function Products() {
         <MDBox display="flex" alignItems="center">
           <MDBox
             component="img"
-            src={row.original.imageUrls && row.original.imageUrls.length > 0 ? row.original.imageUrls[0].secure_url : "https://placehold.co/40x40/cccccc/000000?text=No+Image"}
+            src={
+              row.original.imageUrls && row.original.imageUrls.length > 0
+                ? row.original.imageUrls[0].secure_url
+                : "https://placehold.co/40x40/cccccc/000000?text=No+Image"
+            }
             alt={row.original.name}
             width="40px"
             height="40px"
             borderRadius="md"
             mr={2}
-            sx={{ objectFit: 'cover' }}
+            sx={{ objectFit: "cover" }}
           />
           <MDBox>
             {/* Make the product name a Link to the details page */}
@@ -134,7 +136,7 @@ function Products() {
               variant="button"
               fontWeight="medium"
               color="info" // Added color for link appearance
-              sx={{ '&:hover': { textDecoration: 'underline' } }} // Underline on hover
+              sx={{ "&:hover": { textDecoration: "underline" } }} // Underline on hover
             >
               {row.original.name}
             </MDTypography>
@@ -150,7 +152,8 @@ function Products() {
     {
       Header: "Precio (Cat1)",
       accessor: "resellerPrices.cat1",
-      Cell: ({ cell: { value } }) => value ? value.toLocaleString('es-CR', { style: 'currency', currency: 'CRC' }) : 'N/A',
+      Cell: ({ cell: { value } }) =>
+        value ? value.toLocaleString("es-CR", { style: "currency", currency: "CRC" }) : "N/A",
     },
     {
       Header: "Stock",
@@ -160,7 +163,11 @@ function Products() {
           <MDTypography variant="caption" color="text" fontWeight="medium">
             {value} unidades
           </MDTypography>
-          <MDProgress variant="gradient" value={(value / 100) * 100} color={value > 20 ? "success" : (value > 5 ? "warning" : "error")} />
+          <MDProgress
+            variant="gradient"
+            value={(value / 100) * 100}
+            color={value > 20 ? "success" : value > 5 ? "warning" : "error"}
+          />
         </MDBox>
       ),
     },
@@ -189,7 +196,9 @@ function Products() {
                 fontWeight="medium"
                 sx={{ cursor: "pointer", marginRight: 1 }}
               >
-                <Icon color="info" sx={{ fontSize: '24px' }}>edit</Icon>
+                <Icon color="info" sx={{ fontSize: "24px" }}>
+                  edit
+                </Icon>
               </MDTypography>
               {/* Delete Icon - Always visible if canManageProducts is true */}
               <MDTypography
@@ -201,7 +210,9 @@ function Products() {
                 fontWeight="medium"
                 sx={{ cursor: "pointer" }}
               >
-                <Icon color="error" sx={{ fontSize: '24px' }}>delete</Icon>
+                <Icon color="error" sx={{ fontSize: "24px" }}>
+                  delete
+                </Icon>
               </MDTypography>
             </>
           )}
@@ -217,7 +228,9 @@ function Products() {
         <DashboardNavbar />
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
           <CircularProgress color="info" />
-          <MDTypography variant="h5" ml={2}>Cargando productos...</MDTypography>
+          <MDTypography variant="h5" ml={2}>
+            Cargando productos...
+          </MDTypography>
         </Box>
         <Footer />
       </DashboardLayout>
@@ -234,7 +247,12 @@ function Products() {
               {error.message || "Error al cargar los productos."}
             </MDTypography>
           </MDAlert>
-          <MDButton onClick={() => navigate("/dashboard")} variant="gradient" color="info" sx={{ mt: 2 }}>
+          <MDButton
+            onClick={() => navigate("/dashboard")}
+            variant="gradient"
+            color="info"
+            sx={{ mt: 2 }}
+          >
             Volver al Dashboard
           </MDButton>
         </MDBox>
@@ -253,7 +271,12 @@ function Products() {
               No tienes permiso para ver esta página.
             </MDTypography>
           </MDAlert>
-          <MDButton onClick={() => navigate("/dashboard")} variant="gradient" color="info" sx={{ mt: 2 }}>
+          <MDButton
+            onClick={() => navigate("/dashboard")}
+            variant="gradient"
+            color="info"
+            sx={{ mt: 2 }}
+          >
             Volver al Dashboard
           </MDButton>
         </MDBox>
@@ -290,18 +313,7 @@ function Products() {
                     component={Link}
                     to="/products/create"
                     variant="gradient"
-                    // Force black background and white text for universal visibility
-                    sx={(theme) => ({
-                      backgroundColor: '#000000', // Black background
-                      color: '#FFFFFF',          // White text
-                      '&:hover': {
-                        backgroundColor: '#333333', // Darker gray on hover
-                      },
-                      // Ensure the Icon also picks up the white color
-                      '& .MuiIcon-root': {
-                        color: '#FFFFFF',
-                      },
-                    })}
+                    bgColor="info" // Changed from "dark" to "info" for better visibility
                   >
                     <Icon sx={{ fontWeight: "bold" }}>add</Icon>
                     &nbsp;añadir producto
@@ -312,7 +324,7 @@ function Products() {
                 {/* Search Input */}
                 <MDBox mb={3}>
                   <TextField
-                    label="Buscar por nombre, código, marca o etiquetas"
+                    label="Buscar por nombre, código o marca"
                     variant="outlined"
                     fullWidth
                     value={searchTerm}
@@ -321,7 +333,6 @@ function Products() {
                 </MDBox>
 
                 {/* Removed Bulk Actions section */}
-
 
                 <DataTable
                   table={{ columns, rows: filteredProducts }}
@@ -345,28 +356,50 @@ function Products() {
         aria-describedby="delete-dialog-description"
         PaperProps={{
           sx: (theme) => ({
-            backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : theme.palette.background.paper,
-            color: theme.palette.mode === 'dark' ? '#E0E0E0' : theme.palette.text.primary,
+            backgroundColor:
+              theme.palette.mode === "dark" ? "#1A2027" : theme.palette.background.paper,
+            color: theme.palette.mode === "dark" ? "#E0E0E0" : theme.palette.text.primary,
           }),
         }}
       >
         <DialogTitle id="delete-dialog-title">
-          <MDTypography variant="h6" color={theme => theme.palette.mode === 'dark' ? '#E0E0E0' : theme.palette.text.primary}>
+          <MDTypography
+            variant="h6"
+            color={(theme) =>
+              theme.palette.mode === "dark" ? "#E0E0E0" : theme.palette.text.primary
+            }
+          >
             {"Confirmar Eliminación"}
           </MDTypography>
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="delete-dialog-description">
-            <MDTypography variant="body2" color={theme => theme.palette.mode === 'dark' ? '#E0E0E0' : theme.palette.text.primary}>
+            <MDTypography
+              variant="body2"
+              color={(theme) =>
+                theme.palette.mode === "dark" ? "#E0E0E0" : theme.palette.text.primary
+              }
+            >
               ¿Estás seguro de que quieres eliminar este producto? Esta acción no se puede deshacer.
             </MDTypography>
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <MDButton onClick={handleCloseDeleteDialog} color="dark" variant="text" disabled={loading}>
+          <MDButton
+            onClick={handleCloseDeleteDialog}
+            color="dark"
+            variant="text"
+            disabled={loading}
+          >
             Cancelar
           </MDButton>
-          <MDButton onClick={handleConfirmDelete} color="error" variant="gradient" autoFocus disabled={loading}>
+          <MDButton
+            onClick={handleConfirmDelete}
+            color="error"
+            variant="gradient"
+            autoFocus
+            disabled={loading}
+          >
             Eliminar
           </MDButton>
         </DialogActions>

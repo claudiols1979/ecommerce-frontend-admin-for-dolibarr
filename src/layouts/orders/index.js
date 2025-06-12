@@ -1,7 +1,9 @@
+// frontend/src/layouts/orders/index.js
+
 /* eslint-disable react/prop-types */
 /* eslint-disable react/function-component-definition */
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -12,11 +14,12 @@ import Icon from "@mui/material/Icon";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
+import DialogActions from "@mui/material/DialogActions"; // CORRECTED IMPORT PATH
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import PropTypes from "prop-types"; // Import PropTypes
+import PropTypes from "prop-types";
+import TextField from "@mui/material/TextField";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -100,22 +103,18 @@ OrderStatusBadge.propTypes = {
 
 // Helper for Action Buttons (Edit / Cancel or Restore)
 const ActionButtons = ({ orderId, orderStatus, onStatusChangeClick }) => {
-  const navigate = useNavigate();
   const { user } = useAuth(); // To check user role for permissions
 
   const canEdit = user?.role === "Administrador" || user?.role === "Editor";
   const canChangeStatus = user?.role === "Administrador" || user?.role === "Editor";
 
-  // Conditions for Edit Icon
   const isEditEnabled = ["pending", "placed", "processing", "shipped"].includes(orderStatus);
-
-  // Conditions for Cancel/Restore Icon
   const isCancelOrRestoreEnabled = ["pending", "placed", "processing", "cancelled"].includes(
     orderStatus
   );
 
   const iconForStatusChange = orderStatus === "cancelled" ? "restore_from_trash" : "cancel";
-  const iconColorForStatusChange = orderStatus === "cancelled" ? "success" : "error"; // Restore is success, cancel is error
+  const iconColorForStatusChange = orderStatus === "cancelled" ? "success" : "error";
 
   return (
     <MDBox display="flex" alignItems="center" lineHeight={1}>
@@ -134,7 +133,6 @@ const ActionButtons = ({ orderId, orderStatus, onStatusChangeClick }) => {
           </Icon>
         </MDTypography>
       ) : (
-        // Grey out if not editable
         <MDTypography
           variant="caption"
           color="text"
@@ -152,7 +150,7 @@ const ActionButtons = ({ orderId, orderStatus, onStatusChangeClick }) => {
           href="#"
           onClick={(e) => {
             e.preventDefault();
-            onStatusChangeClick(orderId, orderStatus); // Pass orderId and currentStatus
+            onStatusChangeClick(orderId, orderStatus);
           }}
           variant="caption"
           color="text"
@@ -164,7 +162,6 @@ const ActionButtons = ({ orderId, orderStatus, onStatusChangeClick }) => {
           </Icon>
         </MDTypography>
       ) : (
-        // Grey out if not allowed to change status
         <MDTypography
           variant="caption"
           color="text"
@@ -181,34 +178,82 @@ const ActionButtons = ({ orderId, orderStatus, onStatusChangeClick }) => {
 ActionButtons.propTypes = {
   orderId: PropTypes.string.isRequired,
   orderStatus: PropTypes.string.isRequired,
-  onStatusChangeClick: PropTypes.func.isRequired, // Changed prop name
+  onStatusChangeClick: PropTypes.func.isRequired,
 };
 
 // Main Orders component
 function Orders() {
   const navigate = useNavigate();
-  // Changed from deleteOrder to updateOrder
-  const { orders, loading: ordersLoading, error: ordersError, updateOrder } = useOrders();
+  const {
+    orders,
+    loading: ordersLoading,
+    error: ordersError,
+    updateOrder,
+    getOrders,
+  } = useOrders();
   const { user } = useAuth();
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredOrders, setFilteredOrders] = useState([]);
 
   const [openStatusChangeDialog, setOpenStatusChangeDialog] = useState(false);
   const [statusChangeData, setStatusChangeData] = useState({
     orderId: null,
     currentStatus: null,
     targetStatus: null,
+    message: "",
   });
 
-  // Handle opening the status change confirmation dialog
-  const handleOpenStatusChangeDialog = (orderId, currentStatus) => {
+  // Effect to fetch all orders initially when the component mounts
+  useEffect(() => {
+    if (user && user.token) {
+      getOrders();
+    }
+  }, [user, getOrders]);
+
+  // Effect to filter orders whenever `orders` (from context) or `searchTerm` changes
+  useEffect(() => {
+    if (orders && orders.length > 0) {
+      const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
+      const newFilteredOrders = orders.filter((order) => {
+        // Filter by order number, customer name, customer phone, customer email, or order ID (_id)
+        const matchesOrderNumber = order.orderNumber?.toLowerCase().includes(lowerCaseSearchTerm);
+        const matchesOrderId = order._id?.toLowerCase().includes(lowerCaseSearchTerm); // Filter by MongoDB _id
+        const matchesCustomerFirstName = order.user?.firstName
+          ?.toLowerCase()
+          .includes(lowerCaseSearchTerm);
+        const matchesCustomerLastName = order.user?.lastName
+          ?.toLowerCase()
+          .includes(lowerCaseSearchTerm);
+        const matchesCustomerPhoneNumber = order.user?.phoneNumber
+          ?.toLowerCase()
+          .includes(lowerCaseSearchTerm);
+        const matchesCustomerEmail = order.user?.email?.toLowerCase().includes(lowerCaseSearchTerm);
+
+        return (
+          matchesOrderNumber ||
+          matchesOrderId ||
+          matchesCustomerFirstName ||
+          matchesCustomerLastName ||
+          matchesCustomerPhoneNumber ||
+          matchesCustomerEmail
+        );
+      });
+      setFilteredOrders(newFilteredOrders);
+    } else {
+      setFilteredOrders([]);
+    }
+  }, [orders, searchTerm]);
+
+  const handleOpenStatusChangeDialog = useCallback((orderId, currentStatus) => {
     let newTargetStatus;
     let confirmationMessage;
 
     if (currentStatus === "cancelled") {
-      // If currently cancelled, the action is to restore
-      newTargetStatus = "pending"; // Or 'placed', depending on desired restore state
+      newTargetStatus = "pending";
       confirmationMessage = "¿Estás seguro de que quieres restaurar este pedido a 'Pendiente'?";
     } else {
-      // For any other editable status, the action is to cancel
       newTargetStatus = "cancelled";
       confirmationMessage =
         "¿Estás seguro de que quieres cancelar este pedido? Esta acción puede afectar el stock.";
@@ -221,15 +266,13 @@ function Orders() {
       message: confirmationMessage,
     });
     setOpenStatusChangeDialog(true);
-  };
+  }, []);
 
-  // Handle closing the status change confirmation dialog
   const handleCloseStatusChangeDialog = () => {
     setOpenStatusChangeDialog(false);
     setStatusChangeData({ orderId: null, currentStatus: null, targetStatus: null, message: "" });
   };
 
-  // Handle confirming the status change
   const handleConfirmStatusChange = async () => {
     handleCloseStatusChangeDialog();
     try {
@@ -248,6 +291,7 @@ function Orders() {
           statusTranslations[statusChangeData.targetStatus]
         } exitosamente!`
       );
+      getOrders(); // After status change, re-fetch all orders to ensure local list is up-to-date
     } catch (err) {
       toast.error(err.message || "Error al cambiar el estado del pedido.");
       console.error("Error changing order status:", err);
@@ -260,17 +304,15 @@ function Orders() {
       { Header: "cliente", accessor: "customer", width: "25%", align: "left" },
       { Header: "total", accessor: "totalPrice", align: "right" },
       { Header: "estado", accessor: "status", align: "center" },
-      { Header: "fecha", accessor: "orderDate", align: "center" }, // NEW: Date column
-      { Header: "realizado por", accessor: "orderedBy", align: "left" }, // NEW: Ordered By column
+      { Header: "fecha", accessor: "orderDate", align: "center" },
+      { Header: "realizado por", accessor: "orderedBy", align: "left" },
       { Header: "acción", accessor: "action", align: "center" },
     ],
     []
   );
 
-  console.log("orders: ", orders);
-
   const rows = useMemo(() => {
-    return orders.map((order) => ({
+    return filteredOrders.map((order) => ({
       orderNumber: <OrderNumberCell orderId={order._id} orderNumber={order.orderNumber} />,
       customer: (
         <MDTypography variant="caption" color="text" fontWeight="medium">
@@ -283,13 +325,11 @@ function Orders() {
         </MDTypography>
       ),
       status: <OrderStatusBadge status={order.status} />,
-      // NEW: Populate orderDate
       orderDate: (
         <MDTypography variant="caption" color="text" fontWeight="medium">
           {new Date(order.createdAt).toLocaleDateString("es-CR")}
         </MDTypography>
       ),
-      // NEW: Populate orderedBy
       orderedBy: (
         <MDTypography variant="caption" color="text" fontWeight="medium">
           {order.user?.email || "N/A"}
@@ -303,9 +343,10 @@ function Orders() {
         />
       ),
     }));
-  }, [orders, user, handleOpenStatusChangeDialog]); // Add handleOpenStatusChangeDialog to dependencies
+  }, [filteredOrders, user, handleOpenStatusChangeDialog]);
 
-  if (ordersLoading) {
+  // Show full-page loading spinner only for the initial load of all orders
+  if (ordersLoading && orders.length === 0 && searchTerm === "") {
     return (
       <DashboardLayout>
         <DashboardNavbar />
@@ -320,6 +361,7 @@ function Orders() {
     );
   }
 
+  // Error state display
   if (ordersError) {
     return (
       <DashboardLayout>
@@ -369,9 +411,9 @@ function Orders() {
                 alignItems="center"
               >
                 <MDTypography variant="h6" color="white">
-                  Órdenes
+                  Gestión de Órdenes
                 </MDTypography>
-                {/* {(user?.role === "Administrador" || user?.role === "Revendedor") && (
+                {(user?.role === "Administrador" || user?.role === "Revendedor") && (
                   <MDButton
                     variant="gradient"
                     color="dark"
@@ -380,14 +422,27 @@ function Orders() {
                     <Icon sx={{ fontWeight: "bold" }}>add</Icon>
                     &nbsp;Crear Nuevo Pedido
                   </MDButton>
-                )} */}
+                )}
               </MDBox>
-              <MDBox pt={3}>
+              <MDBox p={3}>
+                {/* Search Input for client-side filtering */}
+                <MDBox mb={3} display="flex" alignItems="center">
+                  <TextField
+                    label="Buscar número de pedido, nombre del cliente, o correo electrónico"
+                    variant="outlined"
+                    fullWidth
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  {ordersLoading && ( // Only show a small spinner if a background fetch is happening
+                    <CircularProgress size={24} sx={{ ml: 2 }} color="info" />
+                  )}
+                </MDBox>
                 <DataTable
                   table={{ columns, rows }}
                   isSorted={false}
-                  entriesPerPage={false}
-                  showTotalEntries={false}
+                  entriesPerPage={true}
+                  showTotalEntries={true}
                   noEndBorder
                 />
               </MDBox>
