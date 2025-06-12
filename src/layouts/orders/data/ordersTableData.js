@@ -108,7 +108,7 @@ export default function ordersTableData(orders, currentUser, onStatusChange) {
         <ResellerCell
           firstName={order.user?.firstName || "N/A"}
           lastName={order.user?.lastName || "N/A"}
-          email={order.user?.email || "N/A"}
+          email={order.customerDetails?.email || "N/A"}
         />
       ),
       orderDate: (

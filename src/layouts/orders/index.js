@@ -316,7 +316,7 @@ function Orders() {
       orderNumber: <OrderNumberCell orderId={order._id} orderNumber={order.orderNumber} />,
       customer: (
         <MDTypography variant="caption" color="text" fontWeight="medium">
-          {order.user?.firstName} {order.user?.lastName} ({order.user?.phoneNumber})
+          {order.user?.firstName} {order.user?.lastName} ({order.customerDetails?.phoneNumber})
         </MDTypography>
       ),
       totalPrice: (

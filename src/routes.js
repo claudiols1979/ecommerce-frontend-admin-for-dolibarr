@@ -12,6 +12,7 @@ import Products from "layouts/products";
 import Orders from "layouts/orders";
 import CreateOrder from "layouts/orders/templates/CreateOrder";
 import EditOrder from "layouts/orders/templates/EditOrder";
+import Resellers from "layouts/resellers";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 
@@ -78,6 +79,16 @@ const routes = [
     route: "/orders/edit/:id", // Dynamic route for editing a specific order
     component: <EditOrder />,
     allowedRoles: ["Administrador", "Editor"], // Only Admins and Editors can edit orders
+  },
+  {
+    type: "collapse",
+    name: "Revendedores",
+    key: "revendedores",
+    icon: <Icon fontSize="small">person_add</Icon>,
+    route: "/revendedores",
+    component: <Resellers />,
+    // Roles with double quotes
+    allowedRoles: ["Administrador", "Editor", "Revendedor"], // All authenticated users
   },
   {
     type: "collapse",
