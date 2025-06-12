@@ -250,7 +250,9 @@ function MainAppContent() {
                         <Route
                           path="/dashboard"
                           element={
-                            <ProtectedRoute allowedRoles={["Administrador", "Editor", "Revendedor"]}>
+                            <ProtectedRoute
+                              allowedRoles={["Administrador", "Editor", "Revendedor"]}
+                            >
                               <Dashboard />
                             </ProtectedRoute>
                           }
@@ -260,7 +262,9 @@ function MainAppContent() {
                         <Route
                           path="/profile"
                           element={
-                            <ProtectedRoute allowedRoles={["Administrador", "Editor", "Revendedor"]}>
+                            <ProtectedRoute
+                              allowedRoles={["Administrador", "Editor", "Revendedor"]}
+                            >
                               <Profile />
                             </ProtectedRoute>
                           }
@@ -270,7 +274,9 @@ function MainAppContent() {
                         <Route
                           path="/products"
                           element={
-                            <ProtectedRoute allowedRoles={["Administrador", "Editor", "Revendedor"]}>
+                            <ProtectedRoute
+                              allowedRoles={["Administrador", "Editor", "Revendedor"]}
+                            >
                               <Products />
                             </ProtectedRoute>
                           }
@@ -294,7 +300,9 @@ function MainAppContent() {
                         <Route
                           path="/products/details/:id"
                           element={
-                            <ProtectedRoute allowedRoles={["Administrador", "Editor", "Revendedor"]}>
+                            <ProtectedRoute
+                              allowedRoles={["Administrador", "Editor", "Revendedor"]}
+                            >
                               <ProductDetail />
                             </ProtectedRoute>
                           }
@@ -304,7 +312,9 @@ function MainAppContent() {
                         <Route
                           path="/orders"
                           element={
-                            <ProtectedRoute allowedRoles={["Administrador", "Editor", "Revendedor"]}>
+                            <ProtectedRoute
+                              allowedRoles={["Administrador", "Editor", "Revendedor"]}
+                            >
                               <Orders />
                             </ProtectedRoute>
                           }
@@ -320,7 +330,9 @@ function MainAppContent() {
                         <Route
                           path="/orders/details/:id"
                           element={
-                            <ProtectedRoute allowedRoles={["Administrador", "Editor", "Revendedor"]}>
+                            <ProtectedRoute
+                              allowedRoles={["Administrador", "Editor", "Revendedor"]}
+                            >
                               <OrderDetail />
                             </ProtectedRoute>
                           }
@@ -362,7 +374,9 @@ function MainAppContent() {
                         <Route
                           path="/resellers/details/:id"
                           element={
-                            <ProtectedRoute allowedRoles={["Administrador", "Editor", "Revendedor"]}>
+                            <ProtectedRoute
+                              allowedRoles={["Administrador", "Editor", "Revendedor"]}
+                            >
                               <ResellerDetail />
                             </ProtectedRoute>
                           }
@@ -591,7 +605,9 @@ export default function App() {
       <ProductProvider>
         <OrderProvider>
           <DashboardProvider>
-            <ResellerProvider> {/* NEW: Wrap with ResellerProvider */}
+            <ResellerProvider>
+              {" "}
+              {/* NEW: Wrap with ResellerProvider */}
               <MainAppContent />
             </ResellerProvider>
           </DashboardProvider>

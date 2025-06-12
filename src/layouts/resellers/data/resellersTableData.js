@@ -68,7 +68,12 @@ ResellerCategoryCell.propTypes = {
 };
 
 // Component for Action Buttons (Edit, Delete - Reset Code is removed)
-const ActionButtons = ({ resellerId, onDeleteReseller, canManageResellers, canDeleteResellers }) => {
+const ActionButtons = ({
+  resellerId,
+  onDeleteReseller,
+  canManageResellers,
+  canDeleteResellers,
+}) => {
   // Add these console logs for debugging
   console.log(`ActionButtons for ID ${resellerId}:`);
   console.log(`  canManageResellers: ${canManageResellers}`);
@@ -190,7 +195,8 @@ export const resellersTableRows = (
     resellerCategory: reseller.resellerCategory,
     phoneNumber: reseller.phoneNumber,
     address: reseller.address,
-    actions: ( // Render the ActionButtons component here
+    // Render the ActionButtons component here
+    actions: (
       <ActionButtons
         resellerId={reseller._id}
         onDeleteReseller={handleDeleteReseller}

@@ -36,7 +36,10 @@ function ResellerDetail() {
   const [fetchError, setFetchError] = useState(null);
 
   // Access control: Admins, Editors, and the specific Reseller themselves can view
-  const canViewDetails = user?.role === "Administrador" || user?.role === "Editor" || (user?._id === id && user?.role === "Revendedor");
+  const canViewDetails =
+    user?.role === "Administrador" ||
+    user?.role === "Editor" ||
+    (user?._id === id && user?.role === "Revendedor");
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -66,7 +69,8 @@ function ResellerDetail() {
   }, [id, getResellerById, canViewDetails]); // Add canViewDetails to dependencies
 
   // Handle loading and error states for initial fetch
-  if (loading && !reseller && !fetchError) { // Only show loading if no data & no error yet
+  if (loading && !reseller && !fetchError) {
+    // Only show loading if no data & no error yet
     return (
       <DashboardLayout>
         <DashboardNavbar />
@@ -130,22 +134,22 @@ function ResellerDetail() {
                 </MDTypography>
                 {/* Edit button */}
                 {(user?.role === "Administrador" || user?.role === "Editor") && (
-                    <MDButton
-                        component={Link} // Link component needed for navigation
-                        to={`/resellers/edit/${reseller._id}`}
-                        variant="gradient"
-                        color="dark"
-                        sx={{
-                            backgroundColor: 'black',
-                            color: 'white',
-                            '&:hover': {
-                                backgroundColor: '#333',
-                            },
-                        }}
-                    >
-                        <Icon sx={{ fontWeight: "bold", color: 'white' }}>edit</Icon>
-                        &nbsp;Editar
-                    </MDButton>
+                  <MDButton
+                    component={Link} // Link component needed for navigation
+                    to={`/resellers/edit/${reseller._id}`}
+                    variant="gradient"
+                    color="dark"
+                    sx={{
+                      backgroundColor: "black",
+                      color: "white",
+                      "&:hover": {
+                        backgroundColor: "#333",
+                      },
+                    }}
+                  >
+                    <Icon sx={{ fontWeight: "bold", color: "white" }}>edit</Icon>
+                    &nbsp;Editar
+                  </MDButton>
                 )}
               </MDBox>
               <MDBox p={3}>
@@ -173,7 +177,9 @@ function ResellerDetail() {
                     <MDTypography variant="body2" color="text" fontWeight="bold">
                       Categoría:
                     </MDTypography>
-                    <MDTypography variant="body2">{reseller.resellerCategory?.toUpperCase()}</MDTypography>
+                    <MDTypography variant="body2">
+                      {reseller.resellerCategory?.toUpperCase()}
+                    </MDTypography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <MDTypography variant="body2" color="text" fontWeight="bold">
