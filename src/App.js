@@ -351,7 +351,7 @@ function MainAppContent() {
                         />
 
                         {/* Fallback route for authenticated users - ensure it's the LAST route */}
-                        <Route path="*" element={<Navigate to="/products" replace />} />
+                        <Route path="*" element={<Navigate to="/dashboard" replace />} />
                       </Routes>
                     </>
                   }
@@ -500,7 +500,7 @@ function MainAppContent() {
                       />
 
                       {/* Fallback route for authenticated users - ensure it's the LAST route */}
-                      <Route path="*" element={<Navigate to="/products" replace />} />
+                      <Route path="*" element={<Navigate to="/dashboard" replace />} />
                     </Routes>
                   </>
                 }
