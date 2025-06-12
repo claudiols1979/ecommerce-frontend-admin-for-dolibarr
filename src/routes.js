@@ -88,7 +88,7 @@ const routes = [
     route: "/revendedores",
     component: <Resellers />,
     // Roles with double quotes
-    allowedRoles: ["Administrador", "Editor", "Revendedor"], // All authenticated users
+    allowedRoles: ["Administrador", "Editor"], // All authenticated users
   },
   {
     type: "collapse",

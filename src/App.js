@@ -62,6 +62,9 @@ import CreateOrder from "layouts/orders/templates/CreateOrder"; // FIXED PATH
 import EditOrder from "layouts/orders/templates/EditOrder"; // FIXED PATH
 import OrderDetail from "layouts/orders/templates/OrderDetail";
 
+// Resellers-related components
+import Resellers from "layouts/resellers";
+
 // Main application content component (wrapped by all necessary Providers)
 function MainAppContent() {
   const [controller, dispatch] = useMaterialUIController();
@@ -349,6 +352,14 @@ function MainAppContent() {
                             </ProtectedRoute>
                           }
                         />
+                        <Route
+                          path="/revendedores"
+                          element={
+                            <ProtectedRoute allowedRoles={["Administrador", "Editor"]}>
+                              <Resellers />
+                            </ProtectedRoute>
+                          }
+                        />
 
                         {/* Fallback route for authenticated users - ensure it's the LAST route */}
                         <Route path="*" element={<Navigate to="/dashboard" replace />} />
@@ -498,7 +509,14 @@ function MainAppContent() {
                           </ProtectedRoute>
                         }
                       />
-
+                      <Route
+                        path="/revendedores"
+                        element={
+                          <ProtectedRoute allowedRoles={["Administrador", "Editor"]}>
+                            <Resellers />
+                          </ProtectedRoute>
+                        }
+                      />
                       {/* Fallback route for authenticated users - ensure it's the LAST route */}
                       <Route path="*" element={<Navigate to="/dashboard" replace />} />
                     </Routes>
