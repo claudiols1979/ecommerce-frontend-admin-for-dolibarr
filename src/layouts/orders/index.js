@@ -413,16 +413,6 @@ function Orders() {
                 <MDTypography variant="h6" color="white">
                   Gestión de Órdenes
                 </MDTypography>
-                {(user?.role === "Administrador" || user?.role === "Revendedor") && (
-                  <MDButton
-                    variant="gradient"
-                    color="dark"
-                    onClick={() => navigate("/orders/create")}
-                  >
-                    <Icon sx={{ fontWeight: "bold" }}>add</Icon>
-                    &nbsp;Crear Nuevo Pedido
-                  </MDButton>
-                )}
               </MDBox>
               <MDBox p={3}>
                 {/* Search Input for client-side filtering */}
