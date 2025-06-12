@@ -26,6 +26,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 
 import { DashboardProvider } from "./contexts/DashboardContext";
 import { ProductProvider } from "./contexts/ProductContext";
+import { ResellerProvider } from "./contexts/ResellerContext";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -39,7 +40,9 @@ root.render(
       <AuthProvider>
         <DashboardProvider>
           <ProductProvider>
-            <App />
+            <ResellerProvider>
+              <App />
+            </ResellerProvider>
           </ProductProvider>
         </DashboardProvider>
         <ToastContainer

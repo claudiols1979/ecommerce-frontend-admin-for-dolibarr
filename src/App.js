@@ -26,7 +26,7 @@ import themeDarkRTL from "assets/theme-dark/theme-rtl";
 // RTL plugins for Material Dashboard 2 React
 import rtlPlugin from "stylis-plugin-rtl";
 import { CacheProvider } from "@emotion/react";
-import createCache from "@emotion/cache"; // Changed to @emotion/cache for createCache
+import createCache from "@emotion/cache";
 
 // Your application's route definitions (used for Sidenav filtering)
 import routes from "routes";
@@ -34,36 +34,43 @@ import routes from "routes";
 // Material Dashboard 2 React contexts
 import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "context";
 
-// Authentication, Product, User, Order, and Dashboard contexts
+// Authentication, Product, Order, Dashboard, and Reseller contexts
 import { AuthProvider, useAuth } from "contexts/AuthContext";
 import { ProductProvider } from "contexts/ProductContext";
-
 import { OrderProvider } from "contexts/OrderContext";
-import { DashboardProvider } from "contexts/DashboardContext"; // Correctly importing DashboardProvider
+import { DashboardProvider } from "contexts/DashboardContext";
+import { ResellerProvider } from "contexts/ResellerContext"; // NEW: ResellerProvider import
+
+// Protected Route utility
 import ProtectedRoute from "utils/ProtectedRoute";
 
-// Toast notifications
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// Toast notifications (Note: Removed from here, handled in index.js)
+// import { ToastContainer } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
 
 // Public layout components
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 
 // Product-related components
+import Dashboard from "layouts/dashboard"; // Assuming Dashboard is explicitly routed
 import Products from "layouts/products";
 import CreateProduct from "layouts/products/templates/CreateProduct";
 import EditProduct from "layouts/products/templates/EditProduct";
-import ProductDetail from "layouts/products/templates/ProductDetail";
+import ProductDetail from "layouts/products/templates/ProductDetail"; // For product details
 
 // Order-related components
 import Orders from "layouts/orders";
-import CreateOrder from "layouts/orders/templates/CreateOrder"; // FIXED PATH
-import EditOrder from "layouts/orders/templates/EditOrder"; // FIXED PATH
-import OrderDetail from "layouts/orders/templates/OrderDetail";
+import CreateOrder from "layouts/orders/templates/CreateOrder";
+import EditOrder from "layouts/orders/templates/EditOrder";
+import OrderDetail from "layouts/orders/templates/OrderDetail"; // Assuming OrderDetail exists
 
-// Resellers-related components
+// Resellers-related components (NEW IMPORTS)
 import Resellers from "layouts/resellers";
+import CreateReseller from "layouts/resellers/templates/CreateReseller";
+import EditReseller from "layouts/resellers/templates/EditReseller";
+import ResellerDetail from "layouts/resellers/templates/ResellerDetail"; // For reseller details
+import Profile from "layouts/profile"; // Assuming Profile is explicitly routed
 
 // Main application content component (wrapped by all necessary Providers)
 function MainAppContent() {
@@ -122,10 +129,10 @@ function MainAppContent() {
     document.scrollingElement.scrollTop = 0;
   }, [pathname]);
 
-  // Dynamic Sidenav Filtering Logic
+  // Dynamic Sidenav Filtering Logic (as it was)
   const filteredSidenavRoutes = useMemo(() => {
     if (!isAuthenticated || loading) {
-      return routes.filter((route) => !route.allowedRoles);
+      return routes.filter((route) => !route.allowedRoles && route.type === "collapse");
     }
 
     const userRole = user?.role;
@@ -139,41 +146,14 @@ function MainAppContent() {
         return false;
       }
       // Only include protected routes if the user's role is in the route's `allowedRoles` array.
-      return route.allowedRoles.includes(userRole);
+      // Also, ensure it's a "collapse" type route for the sidenav.
+      return route.type === "collapse" && route.allowedRoles.includes(userRole);
     });
   }, [isAuthenticated, user, loading]);
 
-  // Helper to render all application routes from 'routes.js'
-  // This helper will now render ALL routes based on the 'routes' array,
-  // relying on `ProtectedRoute` for access control.
-  const getAppRoutes = (allRoutes) =>
-    allRoutes
-      .map((route) => {
-        if (route.collapse && route.routes) {
-          return getAppRoutes(route.routes);
-        }
-        // If it's a direct route with a component
-        if (route.route && route.component) {
-          if (route.allowedRoles) {
-            return (
-              <Route
-                key={route.key}
-                path={route.route}
-                element={
-                  <ProtectedRoute allowedRoles={route.allowedRoles}>
-                    {route.component}
-                  </ProtectedRoute>
-                }
-              />
-            );
-          } else {
-            // This case should ideally not be hit for protected sections
-            return <Route key={route.key} path={route.route} element={route.component} />;
-          }
-        }
-        return null;
-      })
-      .filter(Boolean); // Filter out nulls
+  // We explicitly list routes here in the main <Routes> block,
+  // matching how your product routes were already working.
+  // The 'routes' array from routes.js is now primarily for Sidenav configuration.
 
   // Show a full-screen loading state while auth status is being determined
   if (loading) {
@@ -197,17 +177,7 @@ function MainAppContent() {
 
   return (
     <>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
+      {/* ToastContainer is removed from here as it should be in index.js for global scope */}
 
       {direction === "rtl" ? (
         <CacheProvider value={rtlCache}>
@@ -220,10 +190,11 @@ function MainAppContent() {
 
               {/* Central Authentication Gate */}
               {!isAuthenticated ? (
+                // Redirect to sign-in if not authenticated and trying to access any other path
                 <Route path="*" element={<Navigate to="/authentication/sign-in" replace />} />
               ) : (
                 <Route
-                  path="/*"
+                  path="/*" // This matches any path for authenticated users
                   element={
                     <>
                       {layout === "dashboard" && !isAuthenticationPath && (
@@ -272,27 +243,43 @@ function MainAppContent() {
                       )}
                       {layout === "vr" && <Configurator />}
 
+                      {/* Main Application Routes for Authenticated Users */}
+                      {/* Explicitly list all protected routes here */}
                       <Routes>
-                        {/* Render all standard routes from routes.js */}
-                        {getAppRoutes(filteredSidenavRoutes)}
-
-                        {/* Specific routes defined here, ensuring they are also in routes.js for Sidenav display */}
-                        {/* Product Routes */}
+                        {/* Dashboard */}
                         <Route
-                          path="/products/create"
+                          path="/dashboard"
                           element={
-                            <ProtectedRoute allowedRoles={["Administrador", "Editor"]}>
-                              <CreateProduct />
+                            <ProtectedRoute allowedRoles={["Administrador", "Editor", "Revendedor"]}>
+                              <Dashboard />
+                            </ProtectedRoute>
+                          }
+                        />
+
+                        {/* Profile */}
+                        <Route
+                          path="/profile"
+                          element={
+                            <ProtectedRoute allowedRoles={["Administrador", "Editor", "Revendedor"]}>
+                              <Profile />
+                            </ProtectedRoute>
+                          }
+                        />
+
+                        {/* Products Routes */}
+                        <Route
+                          path="/products"
+                          element={
+                            <ProtectedRoute allowedRoles={["Administrador", "Editor", "Revendedor"]}>
+                              <Products />
                             </ProtectedRoute>
                           }
                         />
                         <Route
-                          path="/products"
+                          path="/products/create"
                           element={
-                            <ProtectedRoute
-                              allowedRoles={["Administrador", "Editor", "Revendedor"]}
-                            >
-                              <Products />
+                            <ProtectedRoute allowedRoles={["Administrador"]}>
+                              <CreateProduct />
                             </ProtectedRoute>
                           }
                         />
@@ -307,21 +294,17 @@ function MainAppContent() {
                         <Route
                           path="/products/details/:id"
                           element={
-                            <ProtectedRoute
-                              allowedRoles={["Administrador", "Editor", "Revendedor"]}
-                            >
+                            <ProtectedRoute allowedRoles={["Administrador", "Editor", "Revendedor"]}>
                               <ProductDetail />
                             </ProtectedRoute>
                           }
                         />
 
-                        {/* Order Routes */}
+                        {/* Orders Routes */}
                         <Route
                           path="/orders"
                           element={
-                            <ProtectedRoute
-                              allowedRoles={["Administrador", "Editor", "Revendedor"]}
-                            >
+                            <ProtectedRoute allowedRoles={["Administrador", "Editor", "Revendedor"]}>
                               <Orders />
                             </ProtectedRoute>
                           }
@@ -337,9 +320,7 @@ function MainAppContent() {
                         <Route
                           path="/orders/details/:id"
                           element={
-                            <ProtectedRoute
-                              allowedRoles={["Administrador", "Editor", "Revendedor"]}
-                            >
+                            <ProtectedRoute allowedRoles={["Administrador", "Editor", "Revendedor"]}>
                               <OrderDetail />
                             </ProtectedRoute>
                           }
@@ -352,11 +333,37 @@ function MainAppContent() {
                             </ProtectedRoute>
                           }
                         />
+
+                        {/* Resellers Routes (NEW) */}
                         <Route
-                          path="/revendedores"
+                          path="/revendedores" // Matches the Sidenav route
                           element={
                             <ProtectedRoute allowedRoles={["Administrador", "Editor"]}>
                               <Resellers />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="/resellers/create"
+                          element={
+                            <ProtectedRoute allowedRoles={["Administrador"]}>
+                              <CreateReseller />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="/resellers/edit/:id"
+                          element={
+                            <ProtectedRoute allowedRoles={["Administrador", "Editor"]}>
+                              <EditReseller />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="/resellers/details/:id"
+                          element={
+                            <ProtectedRoute allowedRoles={["Administrador", "Editor", "Revendedor"]}>
+                              <ResellerDetail />
                             </ProtectedRoute>
                           }
                         />
@@ -372,7 +379,7 @@ function MainAppContent() {
           </ThemeProvider>
         </CacheProvider>
       ) : (
-        // LTR Direction
+        // LTR Direction (duplicate of RTL, ensure consistency)
         <ThemeProvider theme={darkMode ? themeDark : theme}>
           <CssBaseline />
 
@@ -438,24 +445,43 @@ function MainAppContent() {
                       </MDBox>
                     )}
 
+                    {/* Main Application Routes for Authenticated Users */}
+                    {/* Explicitly list all protected routes here */}
                     <Routes>
-                      {/* Render all standard routes from routes.js */}
-                      {getAppRoutes(filteredSidenavRoutes)}
-
-                      {/* Specific product routes */}
+                      {/* Dashboard */}
                       <Route
-                        path="/products/create"
+                        path="/dashboard"
                         element={
-                          <ProtectedRoute allowedRoles={["Administrador", "Editor"]}>
-                            <CreateProduct />
+                          <ProtectedRoute allowedRoles={["Administrador", "Editor", "Revendedor"]}>
+                            <Dashboard />
                           </ProtectedRoute>
                         }
                       />
+
+                      {/* Profile */}
+                      <Route
+                        path="/profile"
+                        element={
+                          <ProtectedRoute allowedRoles={["Administrador", "Editor", "Revendedor"]}>
+                            <Profile />
+                          </ProtectedRoute>
+                        }
+                      />
+
+                      {/* Products Routes */}
                       <Route
                         path="/products"
                         element={
                           <ProtectedRoute allowedRoles={["Administrador", "Editor", "Revendedor"]}>
                             <Products />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/products/create"
+                        element={
+                          <ProtectedRoute allowedRoles={["Administrador"]}>
+                            <CreateProduct />
                           </ProtectedRoute>
                         }
                       />
@@ -476,7 +502,7 @@ function MainAppContent() {
                         }
                       />
 
-                      {/* Order Routes */}
+                      {/* Orders Routes */}
                       <Route
                         path="/orders"
                         element={
@@ -509,6 +535,8 @@ function MainAppContent() {
                           </ProtectedRoute>
                         }
                       />
+
+                      {/* Resellers Routes (NEW) */}
                       <Route
                         path="/revendedores"
                         element={
@@ -517,6 +545,31 @@ function MainAppContent() {
                           </ProtectedRoute>
                         }
                       />
+                      <Route
+                        path="/resellers/create"
+                        element={
+                          <ProtectedRoute allowedRoles={["Administrador"]}>
+                            <CreateReseller />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/resellers/edit/:id"
+                        element={
+                          <ProtectedRoute allowedRoles={["Administrador", "Editor"]}>
+                            <EditReseller />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/resellers/details/:id"
+                        element={
+                          <ProtectedRoute allowedRoles={["Administrador", "Editor", "Revendedor"]}>
+                            <ResellerDetail />
+                          </ProtectedRoute>
+                        }
+                      />
+
                       {/* Fallback route for authenticated users - ensure it's the LAST route */}
                       <Route path="*" element={<Navigate to="/dashboard" replace />} />
                     </Routes>
@@ -538,7 +591,9 @@ export default function App() {
       <ProductProvider>
         <OrderProvider>
           <DashboardProvider>
-            <MainAppContent />
+            <ResellerProvider> {/* NEW: Wrap with ResellerProvider */}
+              <MainAppContent />
+            </ResellerProvider>
           </DashboardProvider>
         </OrderProvider>
       </ProductProvider>

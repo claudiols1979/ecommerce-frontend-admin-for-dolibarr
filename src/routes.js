@@ -12,6 +12,8 @@ import Products from "layouts/products";
 import Orders from "layouts/orders";
 import CreateOrder from "layouts/orders/templates/CreateOrder";
 import EditOrder from "layouts/orders/templates/EditOrder";
+import CreateReseller from "layouts/resellers/templates/CreateReseller";
+import EditReseller from "layouts/resellers/templates/EditReseller";
 import Resellers from "layouts/resellers";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
@@ -89,6 +91,24 @@ const routes = [
     component: <Resellers />,
     // Roles with double quotes
     allowedRoles: ["Administrador", "Editor"], // All authenticated users
+  },
+  {
+    type: "hidden", // Hidden from Sidenav
+    name: "Crear Revendedor", // NEW ROUTE
+    key: "create-reseller",
+    icon: <Icon fontSize="small">person_add</Icon>, // Re-use icon if needed for internal reference
+    route: "/resellers/create",
+    component: <CreateReseller />,
+    allowedRoles: ["Administrador"], // Only Admin can create
+  },
+  {
+    type: "hidden", // Hidden from Sidenav
+    name: "Editar Revendedor", // NEW ROUTE
+    key: "edit-reseller",
+    icon: <Icon fontSize="small">edit</Icon>, // Re-use icon if needed for internal reference
+    route: "/resellers/edit/:id", // Dynamic route for editing a specific reseller
+    component: <EditReseller />,
+    allowedRoles: ["Administrador", "Editor"], // Admin and Editor can edit
   },
   {
     type: "collapse",
