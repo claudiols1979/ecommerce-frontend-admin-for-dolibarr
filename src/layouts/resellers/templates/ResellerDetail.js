@@ -10,12 +10,19 @@ import Card from "@mui/material/Card";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
-import Icon from "@mui/material/Icon"; // Ensure Icon is imported for the Edit button
+import Icon from "@mui/material/Icon";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
+
+// @mui dialog components for confirmation
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 
 // Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -29,27 +36,29 @@ import { useAuth } from "contexts/AuthContext";
 function ResellerDetail() {
   const { id } = useParams(); // Get reseller ID from URL
   const navigate = useNavigate();
-  const { getResellerById, loading } = useResellers(); // Use loading from context for API calls
+  const { getResellerById, resetResellerCode, loading: contextLoading } = useResellers(); // Renamed to contextLoading
   const { user } = useAuth();
 
   const [reseller, setReseller] = useState(null);
   const [fetchError, setFetchError] = useState(null);
+  const [isActionLoading, setIsActionLoading] = useState(false); // New state for action-specific loading
+
+  // Dialog states for reset code confirmation
+  const [openResetDialog, setOpenResetDialog] = useState(false);
+  const [resellerIdToReset, setResellerIdToReset] = useState(null);
 
   // Access control: Admins, Editors, and the specific Reseller themselves can view
-  const canViewDetails =
-    user?.role === "Administrador" ||
-    user?.role === "Editor" ||
-    (user?._id === id && user?.role === "Revendedor");
+  const canViewDetails = user?.role === "Administrador" || user?.role === "Editor" || (user?._id === id && user?.role === "Revendedor");
+  const isAdmin = user?.role === "Administrador"; // For reset code functionality
 
   useEffect(() => {
     const fetchDetails = async () => {
-      // It's crucial to check canViewDetails before attempting to fetch
       if (!canViewDetails) {
         setFetchError("No tienes permiso para ver los detalles de este revendedor.");
-        // Do not attempt fetch if not authorized
         return;
       }
       try {
+        // Use contextLoading for the initial fetch, not isActionLoading
         const data = await getResellerById(id);
         if (data) {
           setReseller(data);
@@ -66,11 +75,50 @@ function ResellerDetail() {
     if (id) {
       fetchDetails();
     }
-  }, [id, getResellerById, canViewDetails]); // Add canViewDetails to dependencies
+  }, [id, getResellerById, canViewDetails]);
 
-  // Handle loading and error states for initial fetch
-  if (loading && !reseller && !fetchError) {
-    // Only show loading if no data & no error yet
+  // Handle opening the reset confirmation dialog
+  const handleResetCodeRequest = (resellerId) => {
+    setResellerIdToReset(resellerId);
+    setOpenResetDialog(true);
+  };
+
+  // Handle closing the reset confirmation dialog
+  const handleCloseResetDialog = () => {
+    setOpenResetDialog(false);
+    setResellerIdToReset(null);
+  };
+
+  // Handle confirming the reset action
+  const handleConfirmReset = async () => {
+    setOpenResetDialog(false); // Close dialog immediately
+    setIsActionLoading(true); // Start action-specific loading
+    if (resellerIdToReset) {
+      try {
+        if (!isAdmin) {
+          toast.error("No tienes permiso para restablecer códigos de revendedor.");
+          return;
+        }
+        const newCode = await resetResellerCode(resellerIdToReset);
+        if (newCode) {
+          toast.success(`Código de revendedor restablecido: ${newCode}`);
+          // Update the reseller in current state so it reflects immediately
+          setReseller(prevReseller => ({ ...prevReseller, resellerCode: newCode }));
+          // Optionally, navigate back to the list page after a short delay
+          // navigate("/revendedores"); // If you always want to go back
+        }
+      } catch (err) {
+        toast.error(err.message || "Error al restablecer el código del revendedor.");
+      } finally {
+        setIsActionLoading(false); // End action-specific loading
+        setResellerIdToReset(null);
+      }
+    }
+  };
+
+
+  // Show loading for initial data fetch
+  if (contextLoading && !reseller && !fetchError) {
     return (
       <DashboardLayout>
         <DashboardNavbar />
@@ -132,25 +180,53 @@ function ResellerDetail() {
                 <MDTypography variant="h6" color="white">
                   Detalles del Revendedor
                 </MDTypography>
-                {/* Edit button */}
-                {(user?.role === "Administrador" || user?.role === "Editor") && (
-                  <MDButton
-                    component={Link} // Link component needed for navigation
-                    to={`/resellers/edit/${reseller._id}`}
-                    variant="gradient"
-                    color="dark"
-                    sx={{
-                      backgroundColor: "black",
-                      color: "white",
-                      "&:hover": {
-                        backgroundColor: "#333",
-                      },
-                    }}
-                  >
-                    <Icon sx={{ fontWeight: "bold", color: "white" }}>edit</Icon>
-                    &nbsp;Editar
-                  </MDButton>
-                )}
+                <MDBox display="flex" gap={1}> {/* Use MDBox with gap for multiple buttons */}
+                    {/* Edit button */}
+                    {(user?.role === "Administrador" || user?.role === "Editor") && (
+                        <MDButton
+                            component={Link}
+                            to={`/resellers/edit/${reseller._id}`}
+                            variant="gradient"
+                            bgColor="dark"
+                            sx={{
+                                backgroundColor: 'black',
+                                color: 'white',
+                                '&:hover': {
+                                    backgroundColor: '#333',
+                                },
+                            }}
+                        >
+                            <Icon sx={{ fontWeight: "bold", color: 'white' }}>edit</Icon>
+                            &nbsp;Editar
+                        </MDButton>
+                    )}
+
+                    {/* Reset Code Button (Admin only) */}
+                    {isAdmin && (
+                        <MDButton
+                            variant="gradient"
+                            bgColor="warning" // Use a warning color for reset
+                            sx={{
+                                backgroundColor: '#ffc107', // Gold-ish color for warning
+                                color: 'black',
+                                '&:hover': {
+                                    backgroundColor: '#e0a800', // Darker gold on hover
+                                },
+                            }}
+                            onClick={() => handleResetCodeRequest(reseller._id)}
+                            disabled={isActionLoading} // Disable while action is in progress
+                        >
+                            {isActionLoading ? (
+                                <CircularProgress size={24} color="inherit" />
+                            ) : (
+                                <>
+                                    <Icon sx={{ fontWeight: "bold", color: 'black' }}>vpn_key</Icon>
+                                    &nbsp;Restablecer Código
+                                </>
+                            )}
+                        </MDButton>
+                    )}
+                </MDBox>
               </MDBox>
               <MDBox p={3}>
                 <Grid container spacing={2}>
@@ -177,9 +253,7 @@ function ResellerDetail() {
                     <MDTypography variant="body2" color="text" fontWeight="bold">
                       Categoría:
                     </MDTypography>
-                    <MDTypography variant="body2">
-                      {reseller.resellerCategory?.toUpperCase()}
-                    </MDTypography>
+                    <MDTypography variant="body2">{reseller.resellerCategory?.toUpperCase()}</MDTypography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <MDTypography variant="body2" color="text" fontWeight="bold">
@@ -218,6 +292,67 @@ function ResellerDetail() {
         </Grid>
       </MDBox>
       <Footer />
+
+      {/* Reset Code Confirmation Dialog */}
+      <Dialog
+        open={openResetDialog}
+        onClose={handleCloseResetDialog}
+        aria-labelledby="reset-dialog-title"
+        aria-describedby="reset-dialog-description"
+        PaperProps={{
+          sx: (theme) => ({
+            backgroundColor:
+              theme.palette.mode === "dark" ? "#1A2027" : theme.palette.background.paper,
+            color: theme.palette.mode === "dark" ? "#E0E0E0" : theme.palette.text.primary,
+          }),
+        }}
+      >
+        <DialogTitle id="reset-dialog-title">
+          <MDTypography
+            variant="h6"
+            color={(theme) =>
+              theme.palette.mode === "dark" ? "#E0E0E0" : theme.palette.text.primary
+            }
+          >
+            {"Confirmar Restablecimiento de Código"}
+          </MDTypography>
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="reset-dialog-description">
+            <MDTypography
+              variant="body2"
+              color={(theme) =>
+                theme.palette.mode === "dark" ? "#E0E0E0" : theme.palette.text.primary
+              }
+            >
+              ¿Estás seguro de que quieres restablecer el código de revendedor para{" "}
+              <MDTypography component="span" fontWeight="bold" color="info">
+                {reseller?.firstName} {reseller?.lastName}
+              </MDTypography>
+              ? El código actual será invalidado y se generará uno nuevo.
+            </MDTypography>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <MDButton
+            onClick={handleCloseResetDialog}
+            color="dark"
+            variant="text"
+            disabled={isActionLoading}
+          >
+            Cancelar
+          </MDButton>
+          <MDButton
+            onClick={handleConfirmReset}
+            color="warning" // Warning color for reset confirmation
+            variant="gradient"
+            autoFocus
+            disabled={isActionLoading}
+          >
+            Restablecer Código
+          </MDButton>
+        </DialogActions>
+      </Dialog>
     </DashboardLayout>
   );
 }
