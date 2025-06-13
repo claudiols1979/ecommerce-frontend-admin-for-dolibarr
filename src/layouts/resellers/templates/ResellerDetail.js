@@ -48,7 +48,10 @@ function ResellerDetail() {
   const [resellerIdToReset, setResellerIdToReset] = useState(null);
 
   // Access control: Admins, Editors, and the specific Reseller themselves can view
-  const canViewDetails = user?.role === "Administrador" || user?.role === "Editor" || (user?._id === id && user?.role === "Revendedor");
+  const canViewDetails =
+    user?.role === "Administrador" ||
+    user?.role === "Editor" ||
+    (user?._id === id && user?.role === "Revendedor");
   const isAdmin = user?.role === "Administrador"; // For reset code functionality
 
   useEffect(() => {
@@ -103,7 +106,7 @@ function ResellerDetail() {
         if (newCode) {
           toast.success(`Código de revendedor restablecido: ${newCode}`);
           // Update the reseller in current state so it reflects immediately
-          setReseller(prevReseller => ({ ...prevReseller, resellerCode: newCode }));
+          setReseller((prevReseller) => ({ ...prevReseller, resellerCode: newCode }));
           // Optionally, navigate back to the list page after a short delay
           // navigate("/revendedores"); // If you always want to go back
         }
@@ -115,7 +118,6 @@ function ResellerDetail() {
       }
     }
   };
-
 
   // Show loading for initial data fetch
   if (contextLoading && !reseller && !fetchError) {
@@ -180,52 +182,53 @@ function ResellerDetail() {
                 <MDTypography variant="h6" color="white">
                   Detalles del Revendedor
                 </MDTypography>
-                <MDBox display="flex" gap={1}> {/* Use MDBox with gap for multiple buttons */}
-                    {/* Edit button */}
-                    {(user?.role === "Administrador" || user?.role === "Editor") && (
-                        <MDButton
-                            component={Link}
-                            to={`/resellers/edit/${reseller._id}`}
-                            variant="gradient"
-                            bgColor="dark"
-                            sx={{
-                                backgroundColor: 'black',
-                                color: 'white',
-                                '&:hover': {
-                                    backgroundColor: '#333',
-                                },
-                            }}
-                        >
-                            <Icon sx={{ fontWeight: "bold", color: 'white' }}>edit</Icon>
-                            &nbsp;Editar
-                        </MDButton>
-                    )}
-
-                    {/* Reset Code Button (Admin only) */}
-                    {isAdmin && (
-                        <MDButton
-                            variant="gradient"
-                            bgColor="warning" // Use a warning color for reset
-                            sx={{
-                                backgroundColor: '#ffc107', // Gold-ish color for warning
-                                color: 'black',
-                                '&:hover': {
-                                    backgroundColor: '#e0a800', // Darker gold on hover
-                                },
-                            }}
-                            onClick={() => handleResetCodeRequest(reseller._id)}
-                            disabled={isActionLoading} // Disable while action is in progress
-                        >
-                            {isActionLoading ? (
-                                <CircularProgress size={24} color="inherit" />
-                            ) : (
-                                <>
-                                    <Icon sx={{ fontWeight: "bold", color: 'black' }}>vpn_key</Icon>
-                                    &nbsp;Restablecer Código
-                                </>
-                            )}
-                        </MDButton>
-                    )}
+                <MDBox display="flex" gap={1}>
+                  {" "}
+                  {/* Use MDBox with gap for multiple buttons */}
+                  {/* Edit button */}
+                  {(user?.role === "Administrador" || user?.role === "Editor") && (
+                    <MDButton
+                      component={Link}
+                      to={`/resellers/edit/${reseller._id}`}
+                      variant="gradient"
+                      bgColor="dark"
+                      sx={{
+                        backgroundColor: "black",
+                        color: "white",
+                        "&:hover": {
+                          backgroundColor: "#333",
+                        },
+                      }}
+                    >
+                      <Icon sx={{ fontWeight: "bold", color: "white" }}>edit</Icon>
+                      &nbsp;Editar
+                    </MDButton>
+                  )}
+                  {/* Reset Code Button (Admin only) */}
+                  {isAdmin && (
+                    <MDButton
+                      variant="gradient"
+                      bgColor="warning" // Use a warning color for reset
+                      sx={{
+                        backgroundColor: "#ffc107", // Gold-ish color for warning
+                        color: "black",
+                        "&:hover": {
+                          backgroundColor: "#e0a800", // Darker gold on hover
+                        },
+                      }}
+                      onClick={() => handleResetCodeRequest(reseller._id)}
+                      disabled={isActionLoading} // Disable while action is in progress
+                    >
+                      {isActionLoading ? (
+                        <CircularProgress size={24} color="inherit" />
+                      ) : (
+                        <>
+                          <Icon sx={{ fontWeight: "bold", color: "black" }}>vpn_key</Icon>
+                          &nbsp;Restablecer Código
+                        </>
+                      )}
+                    </MDButton>
+                  )}
                 </MDBox>
               </MDBox>
               <MDBox p={3}>
@@ -253,7 +256,9 @@ function ResellerDetail() {
                     <MDTypography variant="body2" color="text" fontWeight="bold">
                       Categoría:
                     </MDTypography>
-                    <MDTypography variant="body2">{reseller.resellerCategory?.toUpperCase()}</MDTypography>
+                    <MDTypography variant="body2">
+                      {reseller.resellerCategory?.toUpperCase()}
+                    </MDTypography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <MDTypography variant="body2" color="text" fontWeight="bold">
