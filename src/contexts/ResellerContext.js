@@ -62,7 +62,7 @@ export const ResellerProvider = ({ children }) => {
       console.log("ResellerContext: Fetched Resellers Data:", data);
 
       if (Array.isArray(data)) {
-        setResellers(data);        
+        setResellers(data);
       } else {
         console.error("ResellerContext: Expected array of resellers but received:", data);
         throw new Error("Formato de datos de revendedores inesperado.");

@@ -113,13 +113,13 @@ function Orders() {
     }
   };
 
-
   const { columns, rows } = useMemo(() => {
     return ordersTableData(orders, user, handleStatusChange);
   }, [orders, user, handleStatusChange]); // Re-generate table data when orders or user changes
 
   // Display loading, error, or data
-  if (loading && orders.length === 0) { // Only show full-screen loading if no data
+  if (loading && orders.length === 0) {
+    // Only show full-screen loading if no data
     return (
       <DashboardLayout>
         <DashboardNavbar />
@@ -142,7 +142,12 @@ function Orders() {
           <MDTypography variant="h5" color="error" gutterBottom>
             {error.message}
           </MDTypography>
-          <MDButton onClick={() => fetchOrders(page, limit, sort, search)} variant="gradient" color="info" sx={{ mt: 2 }}>
+          <MDButton
+            onClick={() => fetchOrders(page, limit, sort, search)}
+            variant="gradient"
+            color="info"
+            sx={{ mt: 2 }}
+          >
             Reintentar
           </MDButton>
         </MDBox>
@@ -194,7 +199,13 @@ function Orders() {
                 ) : null} */}
               </MDBox>
               <MDBox pt={3}>
-                <MDBox display="flex" justifyContent="space-between" alignItems="center" px={3} mb={3}>
+                <MDBox
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  px={3}
+                  mb={3}
+                >
                   <MDBox display="flex" alignItems="center" gap={2}>
                     {/* Search Input */}
                     <TextField
@@ -207,11 +218,7 @@ function Orders() {
                     {/* Sort By Select */}
                     <FormControl variant="outlined" sx={{ minWidth: 150 }}>
                       <InputLabel>Ordenar Por</InputLabel>
-                      <Select
-                        value={sort}
-                        onChange={handleSortChange}
-                        label="Ordenar Por"
-                      >
+                      <Select value={sort} onChange={handleSortChange} label="Ordenar Por">
                         <MenuItem value="createdAt_desc">Fecha (Más Reciente)</MenuItem>
                         <MenuItem value="createdAt_asc">Fecha (Más Antigua)</MenuItem>
                         <MenuItem value="totalPrice_desc">Total (Mayor a Menor)</MenuItem>
@@ -224,11 +231,7 @@ function Orders() {
                     {/* Items Per Page Select */}
                     <FormControl variant="outlined" sx={{ minWidth: 80 }}>
                       <InputLabel>Mostrar</InputLabel>
-                      <Select
-                        value={limit}
-                        onChange={handleLimitChange}
-                        label="Mostrar"
-                      >
+                      <Select value={limit} onChange={handleLimitChange} label="Mostrar">
                         <MenuItem value={5}>5</MenuItem>
                         <MenuItem value={10}>10</MenuItem>
                         <MenuItem value={20}>20</MenuItem>

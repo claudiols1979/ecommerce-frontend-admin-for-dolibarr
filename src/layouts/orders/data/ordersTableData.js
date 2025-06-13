@@ -91,11 +91,14 @@ export default function ordersTableData(orders, currentUser, onStatusChange) {
   const isAdminOrEditor = currentUser && ["Administrador", "Editor"].includes(currentUser.role);
   const canChangeOrderStatus = currentUser && currentUser.role === "Administrador";
 
-  // REMOVED frontend sorting. Orders array is now expected to be sorted by the backend.
-  const rows = (orders || []).map((order) => { 
+  const rows = (orders || []).map((order) => {
     const orderDate = new Date(order.createdAt).toLocaleDateString("es-CR");
     const totalAmount =
       order.totalPrice?.toLocaleString("es-CR", { style: "currency", currency: "CRC" }) || "N/A";
+
+    // Determine if the order is modifiable (i.e., not cancelled, delivered, or expired)
+    const nonModifiableStatuses = ["cancelled", "delivered", "expired"];
+    const isOrderModifiable = !nonModifiableStatuses.includes(order.status);
 
     return {
       orderId: (
@@ -109,7 +112,7 @@ export default function ordersTableData(orders, currentUser, onStatusChange) {
         <ResellerCell
           firstName={order.user?.firstName || "N/A"}
           lastName={order.user?.lastName || "N/A"}
-          email={order.user?.email || "N/A"}
+          email={order.user?.email || "N/A"} // Ensure this is correct, previously was customerDetails.email
         />
       ),
       orderDate: (
@@ -127,38 +130,51 @@ export default function ordersTableData(orders, currentUser, onStatusChange) {
         <MDBox display="flex" alignItems="center" lineHeight={1}>
           {isAdminOrEditor && (
             <>
-              <Link to={`/orders/edit/${order._id}`}>
+              {/* Edit Icon */}
+              <Link to={isOrderModifiable ? `/orders/edit/${order._id}` : "#"}>
                 <MDTypography
                   variant="caption"
-                  color="text"
+                  color={isOrderModifiable ? "info" : "secondary"} // Grey out if not modifiable
                   fontWeight="medium"
-                  sx={{ cursor: "pointer", marginRight: 1 }}
+                  sx={{
+                    cursor: isOrderModifiable ? "pointer" : "not-allowed",
+                    marginRight: 1,
+                    opacity: isOrderModifiable ? 1 : 0.5, // Reduce opacity if greyed out
+                  }}
                 >
-                  <Icon color="info" sx={{ fontSize: "24px" }}>
-                    edit
-                  </Icon>
+                  <Icon sx={{ fontSize: "24px" }}>edit</Icon>
                 </MDTypography>
               </Link>
+              {/* Status Change Icon (Cancel/Restore) */}
               {canChangeOrderStatus && onStatusChange && (
                 <MDTypography
                   component="a"
                   href="#"
                   onClick={(e) => {
-                    e.preventDefault();
-                    onStatusChange(order._id, order.status);
+                    if (isOrderModifiable) {
+                      // Only allow click if modifiable
+                      e.preventDefault();
+                      onStatusChange(order._id, order.status);
+                    } else {
+                      e.preventDefault(); // Prevent default even if disabled, for consistency
+                    }
                   }}
                   variant="caption"
-                  color="text"
+                  color={isOrderModifiable ? "text" : "secondary"} // Grey out if not modifiable
                   fontWeight="medium"
-                  sx={{ cursor: "pointer" }}
+                  sx={{
+                    cursor: isOrderModifiable ? "pointer" : "not-allowed",
+                    opacity: isOrderModifiable ? 1 : 0.5, // Reduce opacity if greyed out
+                  }}
                 >
-                  <Icon color="error" sx={{ fontSize: "24px" }}>
+                  <Icon color={isOrderModifiable ? "error" : "secondary"} sx={{ fontSize: "24px" }}>
                     {order.status === "cancelled" ? "restore_from_trash" : "cancel"}
                   </Icon>
                 </MDTypography>
               )}
             </>
           )}
+          {/* View Details Icon (Always active) */}
           <Link to={`/orders/details/${order._id}`}>
             <MDTypography
               variant="caption"
