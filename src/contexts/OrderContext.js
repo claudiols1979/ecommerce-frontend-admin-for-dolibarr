@@ -14,12 +14,16 @@ export const OrderProvider = ({ children }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [currentLimit, setCurrentLimit] = useState(10); // Default limit
 
   // --- Client-side Pagination State ---
   // Your backend's `getAllOrders` does not return pagination metadata.
   // We'll manage pagination entirely on the frontend by fetching all orders
   // and then slicing them for display.
-  const [currentPage, setCurrentPage] = useState(0); // 0-indexed for TablePagination
+  // 0-indexed for TablePagination
   const [rowsPerPage, setRowsPerPage] = useState(20); // Default items per page
   // `total` will be `orders.length`
 
@@ -36,6 +40,63 @@ export const OrderProvider = ({ children }) => {
   }, [authToken]);
 
   // --- API Functions ---
+  // New fetchOrders function that accepts pagination, sorting, and search parameters
+  const fetchOrders = useCallback(async (page = 1, limit = 10, sort = 'createdAt_desc', search = '') => {
+    if (!authToken) {
+      setOrders([]);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
+    const config = getAuthHeaders();
+    if (!config) {
+      setError({ message: "Authentication token not available. Please wait or log in." });
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      // Build query parameters
+      const params = new URLSearchParams();
+      params.append('page', page);
+      params.append('limit', limit);
+      params.append('sort', sort);
+      if (search) {
+        params.append('search', search);
+      }
+
+      // Construct URL with query parameters
+      const response = await axios.get(`${API_URL}/api/orders?${params.toString()}`, config);
+
+      if (response.data && Array.isArray(response.data.orders)) {
+        setOrders(response.data.orders);
+        setCurrentPage(response.data.page);
+        setTotalPages(response.data.pages);
+        setTotalOrders(response.data.totalOrders);
+        setCurrentLimit(limit); // Store the limit that was used for the fetch
+      } else {
+        console.warn(
+          "API response format unexpected for orders list. 'orders' array missing or not an array.",
+          response.data
+        );
+        setError({ message: "Unexpected order response format. 'orders' array missing." });
+        setOrders([]);
+      }
+    } catch (err) {
+      console.error("Error fetching orders:", err);
+      const errorMessage =
+        err.response && err.response.data && err.response.data.message
+          ? err.response.data.message
+          : err.message || "Error al cargar pedidos.";
+      setError({ message: errorMessage });
+      setOrders([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [authToken, getAuthHeaders, API_URL]);
 
   /**
    * Fetches all orders from the backend.
@@ -234,6 +295,7 @@ export const OrderProvider = ({ children }) => {
     setRowsPerPage,
     totalOrders: orders.length, // Total is simply the count of all fetched orders
 
+    fetchOrders,
     getOrders,
     getOrderById,
     createOrder, // This will throw an error with current backend

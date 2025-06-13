@@ -9,7 +9,7 @@ import MDTypography from "components/MDTypography";
 import MDBadge from "components/MDBadge";
 import Icon from "@mui/material/Icon"; // For action icons
 
-// --- NEW: Status Translation Map (duplicated for self-containment, ideally would be a shared utility) ---
+// --- Status Translation Map ---
 const statusTranslations = {
   pending: "Pendiente",
   placed: "Realizado",
@@ -19,7 +19,7 @@ const statusTranslations = {
   delivered: "Entregado",
   expired: "Expirado",
 };
-// --- END NEW ---
+// --- END Status Translation Map ---
 
 // Helper component for Reseller Info in table
 const ResellerCell = ({ firstName, lastName, email }) => (
@@ -91,7 +91,8 @@ export default function ordersTableData(orders, currentUser, onStatusChange) {
   const isAdminOrEditor = currentUser && ["Administrador", "Editor"].includes(currentUser.role);
   const canChangeOrderStatus = currentUser && currentUser.role === "Administrador";
 
-  const rows = (orders || []).map((order) => {
+  // REMOVED frontend sorting. Orders array is now expected to be sorted by the backend.
+  const rows = (orders || []).map((order) => { 
     const orderDate = new Date(order.createdAt).toLocaleDateString("es-CR");
     const totalAmount =
       order.totalPrice?.toLocaleString("es-CR", { style: "currency", currency: "CRC" }) || "N/A";
@@ -108,7 +109,7 @@ export default function ordersTableData(orders, currentUser, onStatusChange) {
         <ResellerCell
           firstName={order.user?.firstName || "N/A"}
           lastName={order.user?.lastName || "N/A"}
-          email={order.customerDetails?.email || "N/A"}
+          email={order.user?.email || "N/A"}
         />
       ),
       orderDate: (
