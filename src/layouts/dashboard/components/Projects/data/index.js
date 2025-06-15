@@ -1,19 +1,5 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/function-component-definition */
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
 
 // @mui material components
 import MDBox from "components/MDBox";
@@ -21,9 +7,12 @@ import MDTypography from "components/MDTypography";
 
 // Import dayjs for date formatting
 import dayjs from "dayjs";
-import "dayjs/locale/es"; // Import Spanish locale for dates
+import customParseFormat from "dayjs/plugin/customParseFormat"; // Importa este plugin
+import "dayjs/locale/es"; // Importa el locale en español
 
-// Set locale globally for dayjs (optional, but good for consistency)
+// Extiende dayjs con el plugin customParseFormat
+dayjs.extend(customParseFormat);
+// Establece el locale globalmente para dayjs
 dayjs.locale("es");
 
 // Helper component for displaying text in table cells
@@ -45,9 +34,9 @@ const StatusCell = ({ status }) => {
       translatedStatus = "Pendiente";
       color = "warning";
       break;
-    case "placed": // NEW: Added 'placed' status
-      translatedStatus = "Recibido"; // Or 'Realizada', 'Confirmado'
-      color = "warning"; // Or 'dark', 'secondary'
+    case "placed":
+      translatedStatus = "Recibido";
+      color = "warning";
       break;
     case "delivered":
       translatedStatus = "Entregado";
@@ -61,16 +50,16 @@ const StatusCell = ({ status }) => {
       translatedStatus = "Procesando";
       color = "warning";
       break;
-    case "shipped": // Example: Add other statuses if you have them
+    case "shipped":
       translatedStatus = "Enviado";
       color = "success";
       break;
-    case "expired": // NEW: Added 'expired' status
+    case "expired":
       translatedStatus = "Vencido";
-      color = "error"; // Using 'dark' for expired status
+      color = "error";
       break;
     default:
-      translatedStatus = status.charAt(0).toUpperCase() + status.slice(1); // Default to capitalize if unknown
+      translatedStatus = status.charAt(0).toUpperCase() + status.slice(1);
       color = "text";
   }
 
@@ -96,21 +85,31 @@ export default function data(orders) {
       { Header: "Cliente", accessor: "user", width: "30%", align: "left" },
     ],
 
-    rows: ordersToDisplay.map((order) => ({
-      // MODIFIED: Use order.orderId for the ID
-      orderId: <CustomCell text={order.orderId || order._id} />, // Fallback to _id if orderId is missing
-      // MODIFIED: Date format to MM/DD/YYYY (no time)
-      createdAt: <CustomCell text={dayjs(order.createdAt).format("MM/DD/YYYY")} />,
-      // Keep using StatusCell for Spanish translation
-      status: <StatusCell status={order.status} />,
-      totalItems: <CustomCell text={order.totalItems.toString()} />,
-      totalPrice: (
-        <MDTypography variant="caption" color="text" fontWeight="medium">
-          {/* Ensure totalPrice is a number before calling toFixed() */}₡
-          {Number(order.totalPrice || 0).toFixed(2)}
-        </MDTypography>
-      ),
-      user: <CustomCell text={order.user || "N/A"} />,
-    })),
+    rows: ordersToDisplay.map((order) => {
+      // *** CAMBIO CLAVE AQUÍ: Usamos customParseFormat con el formato exacto "D/M/YYYY" ***
+      // 'D' para día sin cero inicial, 'M' para mes sin cero inicial, 'YYYY' para año completo.
+      const parsedDate = dayjs(order.createdAt, "D/M/YYYY");
+
+      // Verificamos si la fecha es válida. Si no lo es, mostramos un mensaje de depuración.
+      const formattedDate = parsedDate.isValid()
+        ? parsedDate.format("DD/MM/YYYY")
+        : `Fecha Inválida: '${order.createdAt}'`; // Mensaje más útil para depuración
+
+      // Opcional: Para depurar en consola qué valor está llegando
+      // console.log(`Debug Date: Original: '${order.createdAt}', Parsed: ${parsedDate.toString()}, Valid: ${parsedDate.isValid()}, Formatted: ${formattedDate}`);
+
+      return {
+        orderId: <CustomCell text={order.orderId || order._id} />,
+        createdAt: <CustomCell text={formattedDate} />, // Usa la fecha formateada o el mensaje de depuración
+        status: <StatusCell status={order.status} />,
+        totalItems: <CustomCell text={order.totalItems?.toString() || "0"} />, // Añadida verificación para null/undefined
+        totalPrice: (
+          <MDTypography variant="caption" color="text" fontWeight="medium">
+            ₡{Number(order.totalPrice || 0).toFixed(2)}
+          </MDTypography>
+        ),
+        user: <CustomCell text={order.user || "N/A"} />,
+      };
+    }),
   };
 }
