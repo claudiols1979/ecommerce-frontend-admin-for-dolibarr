@@ -52,6 +52,17 @@ function Orders() {
   const [sort, setSort] = useState("createdAt_desc");
   const [searchTerm, setSearchTerm] = useState("");
 
+  useEffect(() => {
+    fetchOrders();
+    const intervalId = setInterval(() => {
+      console.log("Auto-refreshing dashboard data...");
+      fetchOrders();
+    }, 30000); // 30000 milliseconds = 30 seconds
+
+    // Cleanup function: This is crucial to stop the polling when the component unmounts
+    return () => clearInterval(intervalId);
+  }, [fetchOrders])
+
   // Main data fetching effect
   useEffect(() => {
     // --- CORRECTED CALL ---
@@ -72,11 +83,11 @@ function Orders() {
     setSort(event.target.value);
     setPage(1); // Reset to first page
   };
-  
+
   const handleSearchInputChange = (event) => {
     setSearchTerm(event.target.value);
   };
-  
+
   const handleSearch = useCallback(() => {
     if (page !== 1) {
       setPage(1); // Setting the page will trigger the useEffect to fetch data.
@@ -85,25 +96,28 @@ function Orders() {
     // If we're already on page 1, we need to trigger the fetch manually.
     fetchOrders(1, limit, sort, searchTerm);
   }, [limit, sort, searchTerm, fetchOrders, page]);
-  
+
   const handleKeyPress = (event) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       handleSearch();
     }
   };
 
-  const handleStatusChange = useCallback(async (orderId, newStatus) => {
-    try {
-      await changeOrderStatus(orderId, newStatus);
-      toast.success(`Estado del pedido cambiado.`);
-      // --- CORRECTED CALL ---
-      // Re-fetch the current view after status change.
-      fetchOrders(page, limit, sort, searchTerm);
-    } catch (err) {
-      toast.error(err.message || "Error al cambiar el estado del pedido.");
-    }
-  }, [page, limit, sort, searchTerm, changeOrderStatus, fetchOrders]);
-  
+  const handleStatusChange = useCallback(
+    async (orderId, newStatus) => {
+      try {
+        await changeOrderStatus(orderId, newStatus);
+        toast.success(`Estado del pedido cambiado.`);
+        // --- CORRECTED CALL ---
+        // Re-fetch the current view after status change.
+        fetchOrders(page, limit, sort, searchTerm);
+      } catch (err) {
+        toast.error(err.message || "Error al cambiar el estado del pedido.");
+      }
+    },
+    [page, limit, sort, searchTerm, changeOrderStatus, fetchOrders]
+  );
+
   const { columns, rows } = useMemo(
     () => ordersTableData(orders, user, handleStatusChange),
     [orders, user, handleStatusChange]
@@ -115,7 +129,9 @@ function Orders() {
         <DashboardNavbar />
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
           <CircularProgress color="info" />
-          <MDTypography variant="h5" ml={2}>Cargando pedidos...</MDTypography>
+          <MDTypography variant="h5" ml={2}>
+            Cargando pedidos...
+          </MDTypography>
         </Box>
         <Footer />
       </DashboardLayout>
@@ -127,7 +143,9 @@ function Orders() {
       <DashboardLayout>
         <DashboardNavbar />
         <MDBox p={3}>
-          <MDTypography variant="h5" color="error">{error.message}</MDTypography>
+          <MDTypography variant="h5" color="error">
+            {error.message}
+          </MDTypography>
         </MDBox>
         <Footer />
       </DashboardLayout>
@@ -154,10 +172,18 @@ function Orders() {
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <MDTypography variant="h6" color="white">Pedidos</MDTypography>
+                <MDTypography variant="h6" color="white">
+                  Pedidos
+                </MDTypography>
               </MDBox>
               <MDBox pt={3}>
-                <MDBox display="flex" justifyContent="space-between" alignItems="center" px={3} mb={3}>
+                <MDBox
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  px={3}
+                  mb={3}
+                >
                   <MDBox display="flex" alignItems="center" gap={2} flexGrow={1}>
                     <TextField
                       label="Buscar Pedido"
@@ -208,24 +234,22 @@ function Orders() {
                   showTotalEntries={false}
                   canSearch={false}
                 />
-                
+
                 <MDBox display="flex" justifyContent="center" alignItems="center" p={3}>
-                    
-                    {totalPages > 1 && (
-                        <Pagination
-                            count={totalPages}
-                            page={currentPage}
-                            onChange={handlePageChange}
-                            color="info"
-                        />
-                    )}
+                  {totalPages > 1 && (
+                    <Pagination
+                      count={totalPages}
+                      page={currentPage}
+                      onChange={handlePageChange}
+                      color="info"
+                    />
+                  )}
                 </MDBox>
                 <MDBox display="flex" justifyContent="space-between" alignItems="left" p={2}>
                   <MDTypography variant="caption" color="text">
-                        {`Mostrando ${rows.length} de ${totalOrders} pedidos`}
-                    </MDTypography>
+                    {`Mostrando ${rows.length} de ${totalOrders} pedidos`}
+                  </MDTypography>
                 </MDBox>
-
               </MDBox>
             </Card>
           </Grid>

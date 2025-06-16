@@ -52,6 +52,29 @@ function Dashboard() {
   // Use the useProducts hook to access the context values
   const { products, getProducts } = useProducts();
 
+  // --- NEW: useEffect to fetch dashboard data on component load ---
+  useEffect(() => {
+    // This will be called every time the user navigates to the dashboard
+    fetchDashboardData();
+  }, [fetchDashboardData]); // Dependency ensures it runs on mount
+
+  // Existing useEffect hooks are preserved
+  useEffect(() => {
+    console.log("Dashboard: Triggering product fetch...");
+    getProducts();
+  }, [getProducts]);
+
+  useEffect(() => {
+    if (products.length > 0) {
+      console.log("Dashboard: Products loaded successfully:");
+      console.log(products);
+    } else {
+      console.log("Dashboard: Products array is currently empty or still loading.");
+    }
+  }, [products]);
+
+
+
   const summary = dashboardData?.summary;
   const orderDetails = dashboardData?.orderDetails; // This is the data you need
   const charts = dashboardData?.charts;
@@ -121,21 +144,7 @@ function Dashboard() {
   // Assumes orderDetails is already sorted by createdAt descending from the backend
   const latest10Orders = orderDetails ? orderDetails.slice(0, 10) : [];
 
-  // useEffect 1: Trigger the data fetch on component mount
-  useEffect(() => {
-    console.log("Dashboard: Triggering product fetch...");
-    getProducts();
-  }, [getProducts]); // Dependency array: getProducts (memoized by useCallback in context)
 
-  // useEffect 2: Log products when they become available (after fetch completes)
-  useEffect(() => {
-    if (products.length > 0) {
-      console.log("Dashboard: Products loaded successfully:");
-      console.log(products); // <-- This will log your fetched products
-    } else {
-      console.log("Dashboard: Products array is currently empty or still loading.");
-    }
-  }, [products]); //
 
   return (
     <DashboardLayout>

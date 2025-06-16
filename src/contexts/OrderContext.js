@@ -112,8 +112,7 @@ export const OrderProvider = ({ children }) => {
         setOrders([]);
       }
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || err.message || "Error al cargar pedidos.";
+      const errorMessage = err.response?.data?.message || err.message || "Error al cargar pedidos.";
       setError({ message: errorMessage });
       setOrders([]);
     } finally {
@@ -173,8 +172,7 @@ export const OrderProvider = ({ children }) => {
         return response.data;
       } catch (err) {
         console.error("Error updating order:", err);
-        const errorMessage =
-          err.response?.data?.message || "Error al actualizar el pedido.";
+        const errorMessage = err.response?.data?.message || "Error al actualizar el pedido.";
         setError({ message: errorMessage });
         throw new Error(errorMessage);
       } finally {
@@ -183,9 +181,9 @@ export const OrderProvider = ({ children }) => {
     },
     [authToken, user?.role, getAuthHeaders, getOrders, API_URL]
   );
-  
+
   // This function remains as is from your original file.
-const changeOrderStatus = useCallback(
+  const changeOrderStatus = useCallback(
     async (orderId, newStatus) => {
       if (!authToken || !["Administrador", "Editor"].includes(user?.role)) {
         // Assuming Editor can also change status
@@ -220,7 +218,7 @@ const changeOrderStatus = useCallback(
     },
     [authToken, user?.role, getAuthHeaders, getOrders, API_URL]
   );
-  
+
   // This useEffect remains as is from your original file.
   useEffect(() => {
     if (authToken) {
