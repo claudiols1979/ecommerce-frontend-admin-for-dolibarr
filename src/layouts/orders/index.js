@@ -61,7 +61,7 @@ function Orders() {
 
     // Cleanup function: This is crucial to stop the polling when the component unmounts
     return () => clearInterval(intervalId);
-  }, [fetchOrders])
+  }, [fetchOrders]);
 
   // Main data fetching effect
   useEffect(() => {

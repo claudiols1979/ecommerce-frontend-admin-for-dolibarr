@@ -73,8 +73,6 @@ function Dashboard() {
     }
   }, [products]);
 
-
-
   const summary = dashboardData?.summary;
   const orderDetails = dashboardData?.orderDetails; // This is the data you need
   const charts = dashboardData?.charts;
@@ -143,8 +141,6 @@ function Dashboard() {
   // Slice the orderDetails to get only the latest 10
   // Assumes orderDetails is already sorted by createdAt descending from the backend
   const latest10Orders = orderDetails ? orderDetails.slice(0, 10) : [];
-
-
 
   return (
     <DashboardLayout>
