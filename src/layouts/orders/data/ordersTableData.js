@@ -146,7 +146,7 @@ export default function ordersTableData(orders, currentUser, onStatusChange) {
                 </MDTypography>
               </Link>
               {/* Status Change Icon (Cancel/Restore) */}
-              {canChangeOrderStatus && onStatusChange && (
+              {/* {canChangeOrderStatus && onStatusChange && (
                 <MDTypography
                   component="a"
                   href="#"
@@ -171,7 +171,7 @@ export default function ordersTableData(orders, currentUser, onStatusChange) {
                     {order.status === "cancelled" ? "" : "cancel"}
                   </Icon>
                 </MDTypography>
-              )}
+              )} */}
             </>
           )}
           {/* View Details Icon (Always active) */}

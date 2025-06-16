@@ -1,7 +1,5 @@
-// frontend/src/layouts/orders/index.js
-
-import { useState, useEffect, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
 // @mui material components
@@ -10,12 +8,14 @@ import Card from "@mui/material/Card";
 import Icon from "@mui/material/Icon";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
-import Pagination from "@mui/material/Pagination"; // For pagination control
+import Pagination from "@mui/material/Pagination";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
-import TextField from "@mui/material/TextField"; // For search input
+import TextField from "@mui/material/TextField";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -27,8 +27,6 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
-
-// OrdersTableData for table columns and rows
 import ordersTableData from "./data/ordersTableData";
 
 // Contexts
@@ -42,92 +40,82 @@ function Orders() {
     loading,
     error,
     fetchOrders,
-    currentPage,
+    currentPage, // Renamed from context
     totalPages,
     totalOrders,
-    currentLimit,
     changeOrderStatus,
   } = useOrders();
-  const navigate = useNavigate();
 
-  // Local state for pagination, sorting, and search
+  // Local state for controlling the UI and API queries
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [sort, setSort] = useState("createdAt_desc"); // Default to latest first
-  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("createdAt_desc");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const isAdmin = user?.role === "Administrador";
-  const isEditor = user?.role === "Editor";
-  const isReseller = user?.role === "Revendedor";
-
-  // Debounce search input
-  const debouncedSearch = useMemo(() => {
-    const handler = setTimeout(() => {
-      fetchOrders(page, limit, sort, search);
-    }, 500); // 500ms delay
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [search, page, limit, sort, fetchOrders]); // Add fetchOrders to dependencies
-
+  // Main data fetching effect
   useEffect(() => {
-    // Initial fetch and whenever page, limit, or sort changes
-    fetchOrders(page, limit, sort, search); // Pass search term directly
-  }, [page, limit, sort, fetchOrders]); // No need for debouncedSearch in main useEffect
+    // --- CORRECTED CALL ---
+    // Pass arguments separately to match the context function's signature.
+    fetchOrders(page, limit, sort, searchTerm);
+  }, [page, limit, sort, fetchOrders]); // fetchOrders is stable due to useCallback in context
 
-  // Handle page change from Pagination component
   const handlePageChange = (event, value) => {
     setPage(value);
   };
 
-  // Handle limit change
   const handleLimitChange = (event) => {
     setLimit(parseInt(event.target.value, 10));
-    setPage(1); // Reset to first page when limit changes
+    setPage(1); // Reset to first page
   };
 
-  // Handle sort change
   const handleSortChange = (event) => {
     setSort(event.target.value);
-    setPage(1); // Reset to first page when sort changes
+    setPage(1); // Reset to first page
   };
-
-  // Handle search input change
-  const handleSearchChange = (event) => {
-    setSearch(event.target.value);
-    setPage(1); // Reset to first page when search changes
+  
+  const handleSearchInputChange = (event) => {
+    setSearchTerm(event.target.value);
   };
-
-  // Status Change Logic (for Admin/Editor)
-  const handleStatusChange = async (orderId, currentStatus) => {
-    // Example: Toggle between 'pending' and 'cancelled' for demonstration
-    // In a real app, you'd likely open a modal with status options.
-    const newStatus = currentStatus === "cancelled" ? "placed" : "cancelled"; // Simple toggle for example
-    try {
-      await changeOrderStatus(orderId, newStatus);
-      toast.success(`Estado del pedido ${orderId} cambiado a ${newStatus}!`);
-      fetchOrders(page, limit, sort, search); // Re-fetch to update table
-    } catch (err) {
-      toast.error(err.message || "Error al cambiar el estado del pedido.");
+  
+  const handleSearch = useCallback(() => {
+    if (page !== 1) {
+      setPage(1); // Setting the page will trigger the useEffect to fetch data.
+    }
+    // --- CORRECTED CALL ---
+    // If we're already on page 1, we need to trigger the fetch manually.
+    fetchOrders(1, limit, sort, searchTerm);
+  }, [limit, sort, searchTerm, fetchOrders, page]);
+  
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      handleSearch();
     }
   };
 
-  const { columns, rows } = useMemo(() => {
-    return ordersTableData(orders, user, handleStatusChange);
-  }, [orders, user, handleStatusChange]); // Re-generate table data when orders or user changes
+  const handleStatusChange = useCallback(async (orderId, newStatus) => {
+    try {
+      await changeOrderStatus(orderId, newStatus);
+      toast.success(`Estado del pedido cambiado.`);
+      // --- CORRECTED CALL ---
+      // Re-fetch the current view after status change.
+      fetchOrders(page, limit, sort, searchTerm);
+    } catch (err) {
+      toast.error(err.message || "Error al cambiar el estado del pedido.");
+    }
+  }, [page, limit, sort, searchTerm, changeOrderStatus, fetchOrders]);
+  
+  const { columns, rows } = useMemo(
+    () => ordersTableData(orders, user, handleStatusChange),
+    [orders, user, handleStatusChange]
+  );
 
-  // Display loading, error, or data
   if (loading && orders.length === 0) {
-    // Only show full-screen loading if no data
     return (
       <DashboardLayout>
         <DashboardNavbar />
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
           <CircularProgress color="info" />
-          <MDTypography variant="h5" ml={2}>
-            Cargando pedidos...
-          </MDTypography>
+          <MDTypography variant="h5" ml={2}>Cargando pedidos...</MDTypography>
         </Box>
         <Footer />
       </DashboardLayout>
@@ -139,17 +127,7 @@ function Orders() {
       <DashboardLayout>
         <DashboardNavbar />
         <MDBox p={3}>
-          <MDTypography variant="h5" color="error" gutterBottom>
-            {error.message}
-          </MDTypography>
-          <MDButton
-            onClick={() => fetchOrders(page, limit, sort, search)}
-            variant="gradient"
-            color="info"
-            sx={{ mt: 2 }}
-          >
-            Reintentar
-          </MDButton>
+          <MDTypography variant="h5" color="error">{error.message}</MDTypography>
         </MDBox>
         <Footer />
       </DashboardLayout>
@@ -176,47 +154,29 @@ function Orders() {
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <MDTypography variant="h6" color="white">
-                  Pedidos
-                </MDTypography>
-                {/* {isAdmin || isEditor || isReseller ? (
-                  <MDButton
-                    component={Link}
-                    to="/orders/create"
-                    variant="gradient"
-                    bgColor="dark"
-                    sx={{
-                      backgroundColor: "black",
-                      color: "white",
-                      "&:hover": {
-                        backgroundColor: "#333",
-                      },
-                    }}
-                  >
-                    <Icon sx={{ fontWeight: "bold", color: "white" }}>add</Icon>
-                    &nbsp;Crear Pedido
-                  </MDButton>
-                ) : null} */}
+                <MDTypography variant="h6" color="white">Pedidos</MDTypography>
               </MDBox>
               <MDBox pt={3}>
-                <MDBox
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  px={3}
-                  mb={3}
-                >
-                  <MDBox display="flex" alignItems="center" gap={2}>
-                    {/* Search Input */}
+                <MDBox display="flex" justifyContent="space-between" alignItems="center" px={3} mb={3}>
+                  <MDBox display="flex" alignItems="center" gap={2} flexGrow={1}>
                     <TextField
                       label="Buscar Pedido"
                       variant="outlined"
-                      value={search}
-                      onChange={handleSearchChange}
-                      sx={{ minWidth: 200 }}
+                      value={searchTerm}
+                      onChange={handleSearchInputChange}
+                      onKeyPress={handleKeyPress}
+                      fullWidth
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton onClick={handleSearch} edge="end">
+                              <Icon>search</Icon>
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
                     />
-                    {/* Sort By Select */}
-                    <FormControl variant="outlined" sx={{ minWidth: 150 }}>
+                    <FormControl variant="outlined" sx={{ minWidth: 220 }}>
                       <InputLabel>Ordenar Por</InputLabel>
                       <Select value={sort} onChange={handleSortChange} label="Ordenar Por">
                         <MenuItem value="createdAt_desc">Fecha (Más Reciente)</MenuItem>
@@ -227,9 +187,8 @@ function Orders() {
                       </Select>
                     </FormControl>
                   </MDBox>
-                  <MDBox display="flex" alignItems="center" gap={2}>
-                    {/* Items Per Page Select */}
-                    <FormControl variant="outlined" sx={{ minWidth: 80 }}>
+                  <MDBox display="flex" alignItems="center" gap={2} ml={3}>
+                    <FormControl variant="outlined" sx={{ minWidth: 120 }}>
                       <InputLabel>Mostrar</InputLabel>
                       <Select value={limit} onChange={handleLimitChange} label="Mostrar">
                         <MenuItem value={5}>5</MenuItem>
@@ -238,28 +197,35 @@ function Orders() {
                         <MenuItem value={50}>50</MenuItem>
                       </Select>
                     </FormControl>
-                    <MDTypography variant="caption" color="text">
-                      {`Mostrando ${orders.length} de ${totalOrders} pedidos`}
-                    </MDTypography>
                   </MDBox>
                 </MDBox>
 
                 <DataTable
                   table={{ columns, rows }}
-                  is
+                  isSorted={false}
                   noEndBorder
-                  entriesPerPage={false} // Disable built-in entries per page
-                  showTotalEntries={false} // Disable built-in total entries
-                  canSearch={false} // Disable built-in search
+                  entriesPerPage={false}
+                  showTotalEntries={false}
+                  canSearch={false}
                 />
-                <MDBox display="flex" justifyContent="center" my={3}>
-                  <Pagination
-                    count={totalPages}
-                    page={currentPage}
-                    onChange={handlePageChange}
-                    color="info"
-                  />
+                
+                <MDBox display="flex" justifyContent="center" alignItems="center" p={3}>
+                    
+                    {totalPages > 1 && (
+                        <Pagination
+                            count={totalPages}
+                            page={currentPage}
+                            onChange={handlePageChange}
+                            color="info"
+                        />
+                    )}
                 </MDBox>
+                <MDBox display="flex" justifyContent="space-between" alignItems="left" p={2}>
+                  <MDTypography variant="caption" color="text">
+                        {`Mostrando ${rows.length} de ${totalOrders} pedidos`}
+                    </MDTypography>
+                </MDBox>
+
               </MDBox>
             </Card>
           </Grid>

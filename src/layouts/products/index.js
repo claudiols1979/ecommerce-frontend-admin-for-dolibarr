@@ -1,8 +1,7 @@
-// frontend/src/layouts/products/index.js
 /* eslint-disable */
 
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom"; // Corrected import statement
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 // @mui material components
@@ -11,12 +10,17 @@ import Card from "@mui/material/Card";
 import Icon from "@mui/material/Icon";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
-import TextField from "@mui/material/TextField"; // Import TextField for search input
-import Dialog from "@mui/material/Dialog"; // NEW: For confirmation dialog
+import TextField from "@mui/material/TextField";
+import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import Pagination from "@mui/material/Pagination";
+import MenuItem from "@mui/material/MenuItem";
+// --- IMPORTS (UNCHANGED) ---
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -31,7 +35,7 @@ import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
 
 // Custom components (from your project)
-import MDAlert from "components/MDAlert"; // Assuming you have an MDAlert component for showing error messages
+import MDAlert from "components/MDAlert";
 
 // Contexts
 import { useProducts } from "contexts/ProductContext";
@@ -39,57 +43,77 @@ import { useAuth } from "contexts/AuthContext";
 
 function Products() {
   const navigate = useNavigate();
-  // Removed restoreProduct from destructuring as it's no longer used directly in this component's UI
-  const { products, loading, error, deleteProduct, updateProductStatus } = useProducts();
-  const { user } = useAuth(); // Get user for role-based access
+  const {
+    products,
+    loading,
+    error,
+    deleteProduct,
+    searchTerm,
+    setSearchTerm,
+    page,
+    pages,
+    total,
+    limit,
+    setPage,
+    setLimit,
+    getProducts,
+  } = useProducts();
+  const { user } = useAuth();
 
-  const [searchTerm, setSearchTerm] = useState(""); // State for search input
-  const [filteredProducts, setFilteredProducts] = useState([]); // State for filtered products
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false); // NEW: State for opening delete dialog
-  const [productIdToDelete, setProductIdToDelete] = useState(null); // NEW: State to store product ID to delete
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [productIdToDelete, setProductIdToDelete] = useState(null);
 
-  // Determine if the current user can create/edit/delete products
   const canManageProducts = user?.role === "Administrador" || user?.role === "Editor";
   const canViewAllProducts =
     user?.role === "Administrador" || user?.role === "Editor" || user?.role === "Revendedor";
 
-  // Effect to filter products whenever `products` or `searchTerm` changes
+  // --- MODIFICATION: ADD USEEFFECT FOR DATA FETCHING ---
   useEffect(() => {
-    if (products.length > 0) {
-      const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    // This effect runs on initial mount and whenever page or limit changes.
+    // On mount, searchTerm is "", so it fetches all products for the first page.
+    // When paginating, it re-fetches with the correct page number,
+    // still respecting any active searchTerm.
+    getProducts(searchTerm);
+  }, [page, limit]); // It runs when page or limit changes.
 
-      const newFilteredProducts = products.filter((product) => {
-        // Filter by product name, code, brand, or labels
-        const matchesName = product.name?.toLowerCase().includes(lowerCaseSearchTerm);
-        const matchesCode = product.code?.toLowerCase().includes(lowerCaseSearchTerm);
-        const matchesBrand = product.brand?.toLowerCase().includes(lowerCaseSearchTerm); // ADDED: Filter by brand
-        const matchesLabels = product.labels?.some((label) =>
-          label.toLowerCase().includes(lowerCaseSearchTerm)
-        );
+  // --- MODIFIED AND NEW HANDLERS ---
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
 
-        return matchesName || matchesCode || matchesBrand || matchesLabels; // UPDATED: Include matchesBrand
-      });
-      setFilteredProducts(newFilteredProducts);
-    } else {
-      setFilteredProducts([]); // If no products, clear filtered list
+  const handleSearch = () => {
+    setPage(1);
+    getProducts(searchTerm);
+  };
+
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter") {
+      handleSearch();
     }
-  }, [products, searchTerm]);
+  };
 
-  // Modified handleDeleteProduct to open MUI dialog
+  // --- EXISTING HANDLERS (UNCHANGED) ---
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+
+  const handleLimitChange = (event) => {
+    setLimit(parseInt(event.target.value, 10));
+    setPage(1);
+  };
+
   const handleDeleteProduct = (id) => {
     setProductIdToDelete(id);
     setOpenDeleteDialog(true);
   };
 
-  // NEW: Handle closing the delete confirmation dialog
   const handleCloseDeleteDialog = () => {
     setOpenDeleteDialog(false);
-    setProductIdToDelete(null); // Clear the ID
+    setProductIdToDelete(null);
   };
 
-  // NEW: Handle confirming the delete action
   const handleConfirmDelete = async () => {
-    setOpenDeleteDialog(false); // Close dialog immediately
+    setOpenDeleteDialog(false);
     if (productIdToDelete) {
       try {
         if (user?.role !== "Administrador") {
@@ -101,13 +125,12 @@ function Products() {
       } catch (err) {
         toast.error(err.message || "Error al eliminar el producto.");
       } finally {
-        setProductIdToDelete(null); // Clear the ID after action
+        setProductIdToDelete(null);
       }
     }
   };
 
-  // Removed handleRestoreProduct function as it's no longer needed
-
+  // The rest of your component remains exactly the same...
   const columns = [
     {
       Header: "Producto",
@@ -130,14 +153,13 @@ function Products() {
             sx={{ objectFit: "cover" }}
           />
           <MDBox>
-            {/* Make the product name a Link to the details page */}
             <MDTypography
               component={Link}
               to={`/products/details/${row.original._id}`}
               variant="button"
               fontWeight="medium"
-              color="info" // Added color for link appearance
-              sx={{ "&:hover": { textDecoration: "underline" } }} // Underline on hover
+              color="info"
+              sx={{ "&:hover": { textDecoration: "underline" } }}
             >
               {row.original.name}
             </MDTypography>
@@ -188,7 +210,6 @@ function Products() {
         <MDBox display="flex">
           {canManageProducts && (
             <>
-              {/* Edit Icon */}
               <MDTypography
                 component={Link}
                 to={`/products/edit/${row.original._id}`}
@@ -201,11 +222,10 @@ function Products() {
                   edit
                 </Icon>
               </MDTypography>
-              {/* Delete Icon - Always visible if canManageProducts is true */}
               <MDTypography
-                component="a" // Use anchor tag for onClick
-                href="#" // Prevent default navigation
-                onClick={() => handleDeleteProduct(row.original._id)} // Calls the new handleDeleteProduct
+                component="a"
+                href="#"
+                onClick={() => handleDeleteProduct(row.original._id)}
                 variant="caption"
                 color="text"
                 fontWeight="medium"
@@ -217,7 +237,6 @@ function Products() {
               </MDTypography>
             </>
           )}
-          {/* Removed the 'ver' button as functionality moved to product name link */}
         </MDBox>
       ),
     },
@@ -315,12 +334,12 @@ function Products() {
                     to="/products/create"
                     variant="gradient"
                     sx={{
-                      backgroundColor: "#333", // Explicitly set background to black
-                      color: "#FFFFFF", // Explicitly set text color to white
+                      backgroundColor: "#333",
+                      color: "#FFFFFF",
                       "&:hover": {
-                        backgroundColor: "#333", // Slightly lighter black on hover for feedback
+                        backgroundColor: "#333",
                       },
-                    }} // Changed from "dark" to "info" for better visibility
+                    }}
                   >
                     <Icon sx={{ fontWeight: "bold" }}>add</Icon>
                     &nbsp;añadir producto
@@ -328,26 +347,66 @@ function Products() {
                 )}
               </MDBox>
               <MDBox p={3}>
-                {/* Search Input */}
                 <MDBox mb={3}>
+                  {/* --- CORRECTED TEXTFIELD --- */}
                   <TextField
                     label="Buscar por nombre, código o marca"
                     variant="outlined"
                     fullWidth
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={handleSearchChange}
+                    onKeyPress={handleKeyPress}
+                    InputProps={{
+                      placeholder: "Ej: Perfume Eros, Cód: PERF001, Marca: Versace",
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={handleSearch} edge="end">
+                            <Icon>search</Icon>
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </MDBox>
 
-                {/* Removed Bulk Actions section */}
-
                 <DataTable
-                  table={{ columns, rows: filteredProducts }}
+                  table={{ columns, rows: products }}
                   isSorted={false}
-                  entriesPerPage={true}
+                  entriesPerPage={false}
                   showTotalEntries={true}
                   noEndBorder
                 />
+
+                {pages > 1 && (
+                  <MDBox display="flex" justifyContent="space-between" alignItems="center" mt={3}>
+                    <MDTypography variant="button" color="text">
+                      Página {page} de {pages} (Total: {total} productos)
+                    </MDTypography>
+                    <Pagination
+                      count={pages}
+                      page={page}
+                      onChange={handlePageChange}
+                      color="info"
+                      size="large"
+                      siblingCount={1}
+                      boundaryCount={1}
+                    />
+                    <TextField
+                      select
+                      label="Productos por página"
+                      value={limit}
+                      onChange={handleLimitChange}
+                      variant="outlined"
+                      size="small"
+                      sx={{ width: "150px" }}
+                    >
+                      <MenuItem value={5}>5</MenuItem>
+                      <MenuItem value={10}>10</MenuItem>
+                      <MenuItem value={20}>20</MenuItem>
+                      <MenuItem value={50}>50</MenuItem>
+                    </TextField>
+                  </MDBox>
+                )}
               </MDBox>
             </Card>
           </Grid>
@@ -355,7 +414,6 @@ function Products() {
       </MDBox>
       <Footer />
 
-      {/* NEW: Delete Confirmation Dialog */}
       <Dialog
         open={openDeleteDialog}
         onClose={handleCloseDeleteDialog}
