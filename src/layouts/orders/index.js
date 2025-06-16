@@ -46,7 +46,7 @@ function Orders() {
     totalPages,
     totalOrders,
     currentLimit,
-    updateOrderStatus,
+    changeOrderStatus,
   } = useOrders();
   const navigate = useNavigate();
 
@@ -105,7 +105,7 @@ function Orders() {
     // In a real app, you'd likely open a modal with status options.
     const newStatus = currentStatus === "cancelled" ? "placed" : "cancelled"; // Simple toggle for example
     try {
-      await updateOrderStatus(orderId, newStatus);
+      await changeOrderStatus(orderId, newStatus);
       toast.success(`Estado del pedido ${orderId} cambiado a ${newStatus}!`);
       fetchOrders(page, limit, sort, search); // Re-fetch to update table
     } catch (err) {

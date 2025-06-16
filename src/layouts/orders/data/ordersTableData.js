@@ -168,7 +168,7 @@ export default function ordersTableData(orders, currentUser, onStatusChange) {
                   }}
                 >
                   <Icon color={isOrderModifiable ? "error" : "secondary"} sx={{ fontSize: "24px" }}>
-                    {order.status === "cancelled" ? "restore_from_trash" : "cancel"}
+                    {order.status === "cancelled" ? "" : "cancel"}
                   </Icon>
                 </MDTypography>
               )}
