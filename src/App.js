@@ -155,7 +155,7 @@ function MainAppContent() {
                 <>
                   <Sidenav
                     color={sidenavColor}
-                    brandName="Perfumes Store"
+                    brandName="Look & Smell"
                     routes={filteredSidenavRoutes}
                     onMouseEnter={handleOnMouseEnter}
                     onMouseLeave={handleOnMouseLeave}
