@@ -17,6 +17,8 @@ import EditReseller from "layouts/resellers/templates/EditReseller";
 import Resellers from "layouts/resellers";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
+import ForgotPassword from "layouts/authentication/reset-password/cover";
+import NewPassword from "layouts/authentication/reset-password/new-password";
 
 // --- Route Definitions ---
 // Each object represents a route in your application.
@@ -141,6 +143,20 @@ const routes = [
     route: "/authentication/sign-up",
     component: <SignUp />,
     // IMPORTANT: No 'allowedRoles' property means it's a public route
+  },
+  {
+    type: "hidden", // Does not show in sidebar
+    name: "Forgot Password",
+    key: "forgot-password",
+    route: "/authentication/reset-password",
+    component: <ForgotPassword />,
+  },
+  {
+    type: "hidden", // Does not show in sidebar
+    name: "New Password",
+    key: "new-password",
+    route: "/authentication/reset-password/:resetToken", // Note the dynamic :resetToken
+    component: <NewPassword />,
   },
 ];
 

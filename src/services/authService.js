@@ -25,10 +25,26 @@ const logout = () => {
   localStorage.removeItem("user");
 };
 
+// --- NEW FUNCTION TO REQUEST PASSWORD RESET ---
+const forgotPassword = async (emailData) => {
+  // This is a public route, no auth token needed
+  const response = await axios.post(`${API_URL}/api/auth/forgot-password`, emailData);
+  return response.data;
+};
+
+// --- NEW FUNCTION TO SUBMIT THE NEW PASSWORD ---
+const resetPassword = async (token, passwordData) => {
+  // This is a public route, no auth token needed
+  const response = await axios.put(`${API_URL}/api/auth/reset-password/${token}`, passwordData);
+  return response.data;
+};
+
 const authService = {
   register,
   login,
   logout,
+  forgotPassword,
+  resetPassword,
 };
 
 export default authService;
