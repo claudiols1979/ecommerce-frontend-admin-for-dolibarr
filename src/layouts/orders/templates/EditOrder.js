@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import axios from "axios"; // Import axios for local product search
+import axios from "axios";
 
 // @mui material components
 import Grid from "@mui/material/Grid";
@@ -18,9 +18,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-// ListItemText is no longer used for the search results, but might be used elsewhere.
 import ListItemText from "@mui/material/ListItemText";
 import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
+import { useTheme, useMediaQuery } from "@mui/material";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -56,6 +57,8 @@ function EditOrder() {
   const navigate = useNavigate();
   const { getOrderById, updateOrder, loading: orderLoading } = useOrders();
   const { user } = useAuth();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [order, setOrder] = useState(null);
   const [currentStatus, setCurrentStatus] = useState("");
@@ -78,18 +81,14 @@ function EditOrder() {
       setSearchedProducts([]);
       return;
     }
-
     const authToken = user?.token;
     if (!authToken) return;
-
     const handler = setTimeout(async () => {
       setProductsLoading(true);
       try {
         const response = await axios.get(
           `${API_URL}/api/products?keyword=${productSearchTerm}&limit=5`,
-          {
-            headers: { Authorization: `Bearer ${authToken}` },
-          }
+          { headers: { Authorization: `Bearer ${authToken}` } }
         );
         if (response.data && Array.isArray(response.data.products)) {
           setSearchedProducts(response.data.products);
@@ -100,13 +99,9 @@ function EditOrder() {
         setProductsLoading(false);
       }
     }, 500);
-
-    return () => {
-      clearTimeout(handler);
-    };
+    return () => clearTimeout(handler);
   }, [productSearchTerm, user?.token]);
 
-  // Fetch order data on component mount (original logic preserved)
   useEffect(() => {
     const fetchOrderData = async () => {
       try {
@@ -121,20 +116,16 @@ function EditOrder() {
           setCurrentStatus(fetchedOrder.status);
           setInitialStatus(fetchedOrder.status);
           const mappedItems = fetchedOrder.items.map((item) => {
-            const productIdString =
-              typeof item.product === "object" && item.product !== null
-                ? item.product._id.toString()
-                : item.product;
-            const productImageViews =
-              typeof item.product === "object" && item.product !== null
-                ? item.product.imageUrls || []
-                : [];
+            const productInfo =
+              item.product && typeof item.product === "object" ? item.product : {};
+            const totalStock = (productInfo.countInStock || 0) + item.quantity;
             return {
               product: {
-                _id: productIdString,
+                _id: productInfo._id ? productInfo._id.toString() : item.product,
                 name: item.name,
                 code: item.code,
-                imageUrls: productImageViews,
+                imageUrls: productInfo.imageUrls || [],
+                totalStock: totalStock, // Guardamos el stock total disponible
               },
               quantity: item.quantity,
               priceAtSale: item.priceAtSale,
@@ -159,26 +150,17 @@ function EditOrder() {
     }
   }, [id, getOrderById]);
 
-  // `handleAddToCart` and other handlers remain unchanged
   const handleAddToCart = (productToAdd, quantity = 1) => {
     if (!productToAdd) return;
-
     const existingItem = cartItems.find((item) => item.product._id === productToAdd._id);
     const currentQty = existingItem ? existingItem.quantity : 0;
-
     if (currentQty + quantity > productToAdd.countInStock) {
-      return toast.error(
-        `No hay suficiente stock para ${productToAdd.name}. Disponible: ${
-          productToAdd.countInStock - currentQty
-        }.`
-      );
+      return toast.error(`No hay suficiente stock.`);
     }
-
     const priceAtSale =
       productToAdd.resellerPrices?.[currentResellerCategory] ||
       productToAdd.resellerPrices?.cat1 ||
       0;
-
     if (existingItem) {
       setCartItems(
         cartItems.map((item) =>
@@ -196,6 +178,7 @@ function EditOrder() {
             name: productToAdd.name,
             code: productToAdd.code,
             imageUrls: productToAdd.imageUrls,
+            totalStock: productToAdd.countInStock, // Aseguramos que el nuevo producto también tenga el stock
           },
           quantity: quantity,
           priceAtSale,
@@ -217,15 +200,47 @@ function EditOrder() {
   };
 
   const handleUpdateCartItemQuantity = (productId, newQuantity) => {
+    const itemToUpdate = cartItems.find((item) => item.product._id === productId);
+    if (!itemToUpdate) return;
+    const maxStock = itemToUpdate.product.totalStock;
     const parsedQuantity = parseInt(newQuantity, 10);
-    if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
-      handleRemoveFromCart(productId);
+    if (isNaN(parsedQuantity) || parsedQuantity < 1) {
+      setCartItems((items) =>
+        items.map((item) => (item.product._id === productId ? { ...item, quantity: 1 } : item))
+      );
+      return;
+    }
+    if (parsedQuantity > maxStock) {
+      toast.warn(`Stock máximo disponible: ${maxStock} unidades.`);
+      setCartItems((items) =>
+        items.map((item) =>
+          item.product._id === productId ? { ...item, quantity: maxStock } : item
+        )
+      );
       return;
     }
     setCartItems(
       cartItems.map((item) =>
         item.product._id === productId ? { ...item, quantity: parsedQuantity } : item
       )
+    );
+  };
+
+  const handleQuantityButtonClick = (productId, amount) => {
+    setCartItems((prevItems) =>
+      prevItems.map((item) => {
+        if (item.product._id === productId) {
+          const maxStock = item.product.totalStock;
+          const newQuantity = item.quantity + amount;
+          if (newQuantity < 1) return item;
+          if (newQuantity > maxStock) {
+            toast.warn(`Stock máximo alcanzado: ${maxStock}`);
+            return item;
+          }
+          return { ...item, quantity: newQuantity };
+        }
+        return item;
+      })
     );
   };
 
@@ -238,11 +253,9 @@ function EditOrder() {
           .sort((a, b) => a.p.localeCompare(b.p))
       );
     const hasItemsChanged = normalizeItems(cartItems) !== normalizeItems(initialCartItems);
-
     if (!hasStatusChanged && !hasItemsChanged) return toast.info("No hay cambios para guardar.");
     if (hasItemsChanged && !canModifyOrderItemsStatuses.includes(initialStatus))
       return toast.error("No se pueden modificar los artículos en este estado.");
-
     const updatedData = {
       status: currentStatus,
       items: cartItems.map((item) => ({
@@ -253,7 +266,6 @@ function EditOrder() {
         code: item.code,
       })),
     };
-
     try {
       await updateOrder(id, updatedData);
       toast.success("Pedido actualizado exitosamente!");
@@ -267,12 +279,12 @@ function EditOrder() {
     return (
       <DashboardLayout>
         <DashboardNavbar />
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+        <MDBox display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
           <CircularProgress color="info" />
           <MDTypography variant="h5" ml={2}>
             Cargando datos del pedido...
           </MDTypography>
-        </Box>
+        </MDBox>
         <Footer />
       </DashboardLayout>
     );
@@ -282,7 +294,7 @@ function EditOrder() {
     return (
       <DashboardLayout>
         <DashboardNavbar />
-        <Box
+        <MDBox
           display="flex"
           flexDirection="column"
           justifyContent="center"
@@ -300,7 +312,7 @@ function EditOrder() {
           >
             Volver a Pedidos
           </MDButton>
-        </Box>
+        </MDBox>
         <Footer />
       </DashboardLayout>
     );
@@ -344,9 +356,8 @@ function EditOrder() {
                   Ver Detalles
                 </MDButton>
               </MDBox>
-              <MDBox p={3} component="form" role="form">
+              <MDBox p={3} component="form" role="form" onSubmit={handleSaveOrder}>
                 <Grid container spacing={3}>
-                  {/* Order Status (Original and Unchanged) */}
                   <Grid item xs={12}>
                     <MDTypography variant="h6" mb={2}>
                       Estado del Pedido:
@@ -370,8 +381,6 @@ function EditOrder() {
                       </Select>
                     </FormControl>
                   </Grid>
-
-                  {/* Product Search Section */}
                   <Grid item xs={12}>
                     <MDTypography variant="h6" mt={3} mb={1}>
                       Modificar Artículos:
@@ -394,14 +403,15 @@ function EditOrder() {
                           <List dense>
                             {searchedProducts.map((product) => (
                               <ListItem key={product._id} divider>
-                                {/* --- CORRECTED: Using MDTypography for theme-aware text --- */}
                                 <MDBox flexGrow={1} p={2}>
                                   <MDTypography variant="button" color="text" fontWeight="medium">
                                     {product.name}
                                   </MDTypography>
-                                  <MDTypography variant="caption" color="text" display="block">
-                                    {`Cód: ${product.code} | Stock: ${product.countInStock}`}
-                                  </MDTypography>
+                                  <MDTypography
+                                    variant="caption"
+                                    color="text"
+                                    display="block"
+                                  >{`Cód: ${product.code} | Stock: ${product.countInStock}`}</MDTypography>
                                 </MDBox>
                                 <ListItemSecondaryAction>
                                   <MDButton
@@ -428,7 +438,6 @@ function EditOrder() {
                     </Grid>
                   )}
 
-                  {/* Current Order Items */}
                   <Grid item xs={12}>
                     <MDTypography variant="h6" mt={3} mb={2}>
                       Artículos Actuales ({cartItems.length}):
@@ -436,62 +445,90 @@ function EditOrder() {
                   </Grid>
                   <Grid item xs={12}>
                     {cartItems.length > 0 ? (
-                      cartItems.map((item) => (
-                        <MDBox
-                          key={item.product._id}
-                          display="flex"
-                          alignItems="center"
-                          justifyContent="space-between"
-                          mb={1}
-                          p={1}
-                          borderBottom="1px solid #eee"
-                        >
-                          <MDBox display="flex" alignItems="center">
-                            <MDBox
-                              component="img"
-                              src={
-                                item.product?.imageUrls?.[0]?.secure_url ||
-                                `https://placehold.co/40x40/cccccc/000000?text=Item`
-                              }
-                              alt={item.name}
-                              sx={{
-                                width: "40px",
-                                height: "40px",
-                                objectFit: "cover",
-                                borderRadius: "md",
-                                mr: 1.5,
-                              }}
-                            />
-                            <MDTypography variant="button" fontWeight="medium" color="text">
-                              {item.name} (Cód: {item.code}) - {item.quantity} x{" "}
-                              {item.priceAtSale.toLocaleString("es-CR", {
-                                style: "currency",
-                                currency: "CRC",
-                              })}
-                            </MDTypography>
+                      cartItems.map((item) => {
+                        const maxStock = item.product.totalStock;
+                        return (
+                          <MDBox
+                            key={item.product._id}
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            mb={1}
+                            p={1}
+                            borderBottom="1px solid #eee"
+                          >
+                            <MDBox display="flex" alignItems="center" flex={1} mr={2}>
+                              <MDBox
+                                component="img"
+                                src={
+                                  item.product?.imageUrls?.[0]?.secure_url ||
+                                  "https://placehold.co/40x40/cccccc/000000?text=Item"
+                                }
+                                alt={item.name}
+                                sx={{
+                                  width: "40px",
+                                  height: "40px",
+                                  objectFit: "cover",
+                                  borderRadius: "md",
+                                  mr: 1.5,
+                                }}
+                              />
+                              <MDTypography variant="button" fontWeight="medium" color="text">
+                                {item.name} (Cód: {item.code}) - {item.quantity} x{" "}
+                                {item.priceAtSale.toLocaleString("es-CR", {
+                                  style: "currency",
+                                  currency: "CRC",
+                                })}
+                              </MDTypography>
+                            </MDBox>
+                            <MDBox display="flex" alignItems="center" gap={{ xs: 0.5, sm: 1 }}>
+                              {isMobile ? (
+                                <>
+                                  <IconButton
+                                    onClick={() => handleQuantityButtonClick(item.product._id, -1)}
+                                    disabled={!areOrderItemsEditable || item.quantity <= 1}
+                                    size="small"
+                                  >
+                                    <RemoveCircleOutlineIcon />
+                                  </IconButton>
+                                  <MDTypography
+                                    variant="body2"
+                                    sx={{ width: "2ch", textAlign: "center", fontWeight: "bold" }}
+                                  >
+                                    {item.quantity}
+                                  </MDTypography>
+                                  <IconButton
+                                    onClick={() => handleQuantityButtonClick(item.product._id, 1)}
+                                    disabled={!areOrderItemsEditable || item.quantity >= maxStock}
+                                    size="small"
+                                  >
+                                    <AddCircleOutlineIcon />
+                                  </IconButton>
+                                </>
+                              ) : (
+                                <TextField
+                                  type="number"
+                                  value={item.quantity}
+                                  onChange={(e) =>
+                                    handleUpdateCartItemQuantity(item.product._id, e.target.value)
+                                  }
+                                  inputProps={{ min: 1, max: maxStock }}
+                                  sx={{ width: "70px" }}
+                                  size="small"
+                                  disabled={!areOrderItemsEditable}
+                                />
+                              )}
+                              <IconButton
+                                onClick={() => handleRemoveFromCart(item.product._id)}
+                                color="error"
+                                disabled={!areOrderItemsEditable}
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            </MDBox>
                           </MDBox>
-                          <MDBox display="flex" alignItems="center">
-                            <TextField
-                              type="number"
-                              value={item.quantity}
-                              onChange={(e) =>
-                                handleUpdateCartItemQuantity(item.product._id, e.target.value)
-                              }
-                              inputProps={{ min: 1 }}
-                              sx={{ width: "70px", mr: 1 }}
-                              size="small"
-                              disabled={!areOrderItemsEditable}
-                            />
-                            <IconButton
-                              onClick={() => handleRemoveFromCart(item.product._id)}
-                              color="error"
-                              disabled={!areOrderItemsEditable}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          </MDBox>
-                        </MDBox>
-                      ))
+                        );
+                      })
                     ) : (
                       <MDTypography variant="body2" color="text">
                         No hay productos en este pedido.
@@ -508,7 +545,6 @@ function EditOrder() {
                     </MDBox>
                   </Grid>
 
-                  {/* Save Button (Original and Unchanged) */}
                   <Grid item xs={12} display="flex" justifyContent="flex-end" mt={3}>
                     <MDButton
                       variant="gradient"
