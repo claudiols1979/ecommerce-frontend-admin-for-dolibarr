@@ -40,7 +40,7 @@ function Orders() {
     loading,
     error,
     fetchOrders,
-    currentPage, // Renamed from context
+    currentPage,
     totalPages,
     totalOrders,
     changeOrderStatus,
@@ -59,16 +59,13 @@ function Orders() {
       fetchOrders();
     }, 30000); // 30000 milliseconds = 30 seconds
 
-    // Cleanup function: This is crucial to stop the polling when the component unmounts
     return () => clearInterval(intervalId);
   }, [fetchOrders]);
 
   // Main data fetching effect
   useEffect(() => {
-    // --- CORRECTED CALL ---
-    // Pass arguments separately to match the context function's signature.
     fetchOrders(page, limit, sort, searchTerm);
-  }, [page, limit, sort, fetchOrders]); // fetchOrders is stable due to useCallback in context
+  }, [page, limit, sort, fetchOrders]);
 
   const handlePageChange = (event, value) => {
     setPage(value);
@@ -76,12 +73,12 @@ function Orders() {
 
   const handleLimitChange = (event) => {
     setLimit(parseInt(event.target.value, 10));
-    setPage(1); // Reset to first page
+    setPage(1);
   };
 
   const handleSortChange = (event) => {
     setSort(event.target.value);
-    setPage(1); // Reset to first page
+    setPage(1);
   };
 
   const handleSearchInputChange = (event) => {
@@ -90,10 +87,8 @@ function Orders() {
 
   const handleSearch = useCallback(() => {
     if (page !== 1) {
-      setPage(1); // Setting the page will trigger the useEffect to fetch data.
+      setPage(1);
     }
-    // --- CORRECTED CALL ---
-    // If we're already on page 1, we need to trigger the fetch manually.
     fetchOrders(1, limit, sort, searchTerm);
   }, [limit, sort, searchTerm, fetchOrders, page]);
 
@@ -108,8 +103,6 @@ function Orders() {
       try {
         await changeOrderStatus(orderId, newStatus);
         toast.success(`Estado del pedido cambiado.`);
-        // --- CORRECTED CALL ---
-        // Re-fetch the current view after status change.
         fetchOrders(page, limit, sort, searchTerm);
       } catch (err) {
         toast.error(err.message || "Error al cambiar el estado del pedido.");
@@ -177,54 +170,59 @@ function Orders() {
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
-                <MDBox
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  px={3}
-                  mb={3}
-                >
-                  <MDBox display="flex" alignItems="center" gap={2} flexGrow={1}>
-                    <TextField
-                      label="Buscar Pedido"
-                      variant="outlined"
-                      value={searchTerm}
-                      onChange={handleSearchInputChange}
-                      onKeyPress={handleKeyPress}
-                      fullWidth
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton onClick={handleSearch} edge="end">
-                              <Icon>search</Icon>
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                    <FormControl variant="outlined" sx={{ minWidth: 220 }}>
-                      <InputLabel>Ordenar Por</InputLabel>
-                      <Select value={sort} onChange={handleSortChange} label="Ordenar Por">
-                        <MenuItem value="createdAt_desc">Fecha (Más Reciente)</MenuItem>
-                        <MenuItem value="createdAt_asc">Fecha (Más Antigua)</MenuItem>
-                        <MenuItem value="totalPrice_desc">Total (Mayor a Menor)</MenuItem>
-                        <MenuItem value="totalPrice_asc">Total (Menor a Mayor)</MenuItem>
-                        <MenuItem value="status_asc">Estado (A-Z)</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </MDBox>
-                  <MDBox display="flex" alignItems="center" gap={2} ml={3}>
-                    <FormControl variant="outlined" sx={{ minWidth: 120 }}>
-                      <InputLabel>Mostrar</InputLabel>
-                      <Select value={limit} onChange={handleLimitChange} label="Mostrar">
-                        <MenuItem value={5}>5</MenuItem>
-                        <MenuItem value={10}>10</MenuItem>
-                        <MenuItem value={20}>20</MenuItem>
-                        <MenuItem value={50}>50</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </MDBox>
+                {/* ==================================================================== */}
+                {/* AQUÍ COMIENZA EL BLOQUE DE FILTROS RESPONSIVO (ÚNICO CAMBIO)         */}
+                {/* Se usa Grid para que los filtros se apilen en pantallas pequeñas    */}
+                {/* ==================================================================== */}
+                <MDBox px={3} mb={3}>
+                  <Grid container spacing={2} alignItems="center">
+                    <Grid item xs={12} md={6}>
+                      <TextField
+                        label="Buscar Pedido"
+                        variant="outlined"
+                        value={searchTerm}
+                        onChange={handleSearchInputChange}
+                        onKeyPress={handleKeyPress}
+                        fullWidth
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton onClick={handleSearch} edge="end">
+                                <Icon>search</Icon>
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={3}>
+                      <FormControl variant="outlined" fullWidth>
+                        <InputLabel>Ordenar Por</InputLabel>
+                        <Select value={sort} onChange={handleSortChange} label="Ordenar Por">
+                          <MenuItem value="createdAt_desc">Fecha (Más Reciente)</MenuItem>
+                          <MenuItem value="createdAt_asc">Fecha (Más Antigua)</MenuItem>
+                          <MenuItem value="totalPrice_desc">Total (Mayor a Menor)</MenuItem>
+                          <MenuItem value="totalPrice_asc">Total (Menor a Mayor)</MenuItem>
+                          <MenuItem value="status_asc">Estado (A-Z)</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={3}>
+                      <FormControl variant="outlined" fullWidth>
+                        <InputLabel>Mostrar</InputLabel>
+                        <Select value={limit} onChange={handleLimitChange} label="Mostrar">
+                          <MenuItem value={5}>5</MenuItem>
+                          <MenuItem value={10}>10</MenuItem>
+                          <MenuItem value={20}>20</MenuItem>
+                          <MenuItem value={50}>50</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  </Grid>
                 </MDBox>
+                {/* ==================================================================== */}
+                {/* AQUÍ TERMINA EL BLOQUE DE FILTROS RESPONSIVO                         */}
+                {/* ==================================================================== */}
 
                 <DataTable
                   table={{ columns, rows }}
