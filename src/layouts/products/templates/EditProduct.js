@@ -359,7 +359,7 @@ function EditProduct() {
                       ))}
                     </MDInput>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={12} sm={6} mb={2}>
                     <MDInput
                       label="Etiquetas (separadas por coma)"
                       name="tags"
@@ -373,7 +373,7 @@ function EditProduct() {
                   </Grid>
 
                   {/* --- CAMPO DE STOCK CON LÓGICA RESPONSIVE --- */}
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={12} sm={6} mt={-5}>
                     <MDTypography variant="caption" color="text" fontWeight="bold">
                       Cantidad en Inventario
                     </MDTypography>
@@ -412,17 +412,50 @@ function EditProduct() {
                         </IconButton>
                       </MDBox>
                     ) : (
-                      <MDInput
-                        name="countInStock"
-                        type="number"
-                        value={productData.countInStock}
-                        onChange={handleChange}
-                        fullWidth
-                        required
-                        error={!!formErrors.countInStock}
-                        helperText={formErrors.countInStock}
-                        inputProps={{ min: 0, step: "1" }}
-                      />
+                      // <MDInput
+                      //   name="countInStock"
+                      //   type="number"
+                      //   value={productData.countInStock}
+                      //   onChange={handleChange}
+                      //   fullWidth
+                      //   required
+                      //   error={!!formErrors.countInStock}
+                      //   helperText={formErrors.countInStock}
+                      //   inputProps={{ min: 0, step: "1" }}
+                      // />
+                      <MDBox
+                        display="flex"
+                        alignItems="center"
+                        sx={{
+                          border: "1px solid #d2d6da",
+                          borderRadius: "0.375rem",
+                          p: "2px",
+                          mt: 1,
+                        }}
+                      >
+                        <IconButton
+                          onClick={() => handleStockChange(-1)}
+                          disabled={productData.countInStock <= 0}
+                        >
+                          <RemoveCircleOutlineIcon />
+                        </IconButton>
+                        <MDBox
+                          sx={{
+                            flexGrow: 1,
+                            textAlign: "center",
+                            bgcolor: "action.hover",
+                            borderRadius: 1,
+                            py: 1,
+                          }}
+                        >
+                          <MDTypography variant="body2" fontWeight="bold" color="text">
+                            {productData.countInStock}
+                          </MDTypography>
+                        </MDBox>
+                        <IconButton onClick={() => handleStockChange(1)}>
+                          <AddCircleOutlineIcon />
+                        </IconButton>
+                      </MDBox>
                     )}
                   </Grid>
 

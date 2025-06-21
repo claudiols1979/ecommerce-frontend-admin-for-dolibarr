@@ -506,17 +506,39 @@ function EditOrder() {
                                   </IconButton>
                                 </>
                               ) : (
-                                <TextField
-                                  type="number"
-                                  value={item.quantity}
-                                  onChange={(e) =>
-                                    handleUpdateCartItemQuantity(item.product._id, e.target.value)
-                                  }
-                                  inputProps={{ min: 1, max: maxStock }}
-                                  sx={{ width: "70px" }}
-                                  size="small"
-                                  disabled={!areOrderItemsEditable}
-                                />
+                                // <TextField
+                                //   type="number"
+                                //   value={item.quantity}
+                                //   onChange={(e) =>
+                                //     handleUpdateCartItemQuantity(item.product._id, e.target.value)
+                                //   }
+                                //   inputProps={{ min: 1, max: maxStock }}
+                                //   sx={{ width: "70px" }}
+                                //   size="small"
+                                //   disabled={!areOrderItemsEditable}
+                                // />
+                                <>
+                                  <IconButton
+                                    onClick={() => handleQuantityButtonClick(item.product._id, -1)}
+                                    disabled={!areOrderItemsEditable || item.quantity <= 1}
+                                    size="small"
+                                  >
+                                    <RemoveCircleOutlineIcon />
+                                  </IconButton>
+                                  <MDTypography
+                                    variant="body2"
+                                    sx={{ width: "2ch", textAlign: "center", fontWeight: "bold" }}
+                                  >
+                                    {item.quantity}
+                                  </MDTypography>
+                                  <IconButton
+                                    onClick={() => handleQuantityButtonClick(item.product._id, 1)}
+                                    disabled={!areOrderItemsEditable || item.quantity >= maxStock}
+                                    size="small"
+                                  >
+                                    <AddCircleOutlineIcon />
+                                  </IconButton>
+                                </>
                               )}
                               <IconButton
                                 onClick={() => handleRemoveFromCart(item.product._id)}
