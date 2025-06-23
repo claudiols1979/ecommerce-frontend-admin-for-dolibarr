@@ -174,7 +174,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   {miniSidenav ? "menu_open" : "menu"}
                 </Icon>
               </IconButton>
-              {/* <IconButton
+              <IconButton
                 size="small"
                 disableRipple
                 color="inherit"
@@ -182,7 +182,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 onClick={handleConfiguratorOpen}
               >
                 <Icon sx={iconsStyle}>settings</Icon>
-              </IconButton> */}
+              </IconButton>
               {user ? ( // If user is logged in, show logout icon
                 <IconButton sx={navbarIconButton} size="small" disableRipple onClick={logout}>
                   <Icon sx={iconsStyle}>logout</Icon>
