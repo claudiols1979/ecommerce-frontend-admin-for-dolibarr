@@ -10,11 +10,12 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Switch from "@mui/material/Switch";
 import IconButton from "@mui/material/IconButton";
 import Icon from "@mui/material/Icon";
-import { useTheme, useMediaQuery } from "@mui/material";
+import { useTheme, useMediaQuery, Chip } from "@mui/material";
 
 // @mui icons
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -30,12 +31,16 @@ import Footer from "examples/Footer";
 // Contexts
 import { useProducts } from "contexts/ProductContext";
 import { useAuth } from "contexts/AuthContext";
+import { useLabels } from "contexts/LabelContext"; // <-- 1. IMPORTAR EL CONTEXTO DE ETIQUETAS
 
 function EditProduct() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { getProductById, updateProduct, loading, error } = useProducts();
+  const { getProductById, updateProduct, loading: productLoading } = useProducts();
   const { user } = useAuth();
+
+  // --- 2. USAR EL CONTEXTO DE ETIQUETAS ---
+  const { labels, fetchLabels, assignLabelsToProduct, loading: labelsLoading } = useLabels();
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -62,6 +67,9 @@ function EditProduct() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [fetchError, setFetchError] = useState(null);
 
+  // --- 3. NUEVO ESTADO PARA LAS ETIQUETAS SELECCIONADAS ---
+  const [selectedLabelIds, setSelectedLabelIds] = useState([]);
+
   const genderOptions = [
     { value: "men", label: "Hombre" },
     { value: "women", label: "Mujer" },
@@ -71,15 +79,20 @@ function EditProduct() {
     { value: "other", label: "Otro" },
   ];
 
+  // --- 4. OBTENER DATOS DEL PRODUCTO Y ETIQUETAS AL CARGAR ---
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchProductAndLabels = async () => {
       try {
         setInitialLoading(true);
         setFetchError(null);
+
+        await fetchLabels();
+
         if (typeof getProductById !== "function") {
           throw new Error("La función para obtener el producto no está disponible.");
         }
         const fetchedProduct = await getProductById(id);
+
         if (fetchedProduct) {
           setProductData({
             name: fetchedProduct.name || "",
@@ -101,22 +114,26 @@ function EditProduct() {
             },
           });
           setExistingImageUrls(fetchedProduct.imageUrls || []);
+
+          if (fetchedProduct.promotionalLabels && Array.isArray(fetchedProduct.promotionalLabels)) {
+            setSelectedLabelIds(fetchedProduct.promotionalLabels.map((label) => label._id));
+          }
         } else {
           setFetchError("Producto no encontrado.");
           toast.error("Producto no encontrado.");
           navigate("/products");
         }
       } catch (err) {
-        setFetchError(err.message || "Error al cargar el producto.");
-        toast.error(err.message || "Error al cargar el producto.");
+        setFetchError(err.message || "Error al cargar los datos.");
+        toast.error(err.message || "Error al cargar los datos.");
       } finally {
         setInitialLoading(false);
       }
     };
     if (id) {
-      fetchProduct();
+      fetchProductAndLabels();
     }
-  }, [id, getProductById, navigate]);
+  }, [id, getProductById, navigate, fetchLabels]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -165,19 +182,18 @@ function EditProduct() {
     setSelectedNewFiles((prev) => prev.filter((_, index) => index !== indexToRemove));
   };
 
+  const handleLabelToggle = (labelId) => {
+    setSelectedLabelIds((prevSelected) =>
+      prevSelected.includes(labelId)
+        ? prevSelected.filter((id) => id !== labelId)
+        : [...prevSelected, labelId]
+    );
+  };
+
   const validateForm = () => {
-    // La lógica de validación original se mantiene sin cambios
     const errors = {};
     if (!productData.name) errors.name = "El nombre es requerido.";
     if (!productData.code) errors.code = "El código es requerido.";
-    if (!productData.description) errors.description = "La descripción es requerida.";
-    if (!productData.brand) errors.brand = "La marca es requerida.";
-    if (!productData.category) errors.category = "La categoría es requerida.";
-    if (!productData.volume) errors.volume = "El volumen es requerido.";
-    if (typeof productData.countInStock !== "number" || productData.countInStock < 0) {
-      errors.countInStock = "El stock debe ser un número positivo.";
-    }
-    // ... más validaciones ...
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -210,12 +226,14 @@ function EditProduct() {
       formData.append(`existingImageUrls[${index}][public_id]`, img.public_id);
       formData.append(`existingImageUrls[${index}][secure_url]`, img.secure_url);
     });
+
     try {
       await updateProduct(id, formData);
-      toast.success("Producto actualizado exitosamente!");
+      await assignLabelsToProduct(id, selectedLabelIds);
+      toast.success("Producto y etiquetas actualizados exitosamente!");
       navigate("/products");
     } catch (err) {
-      toast.error(error?.message || "Error al actualizar el producto.");
+      toast.error(err?.message || "Error al actualizar el producto o las etiquetas.");
     }
   };
 
@@ -265,6 +283,7 @@ function EditProduct() {
               </MDBox>
               <MDBox p={3} component="form" onSubmit={handleSubmit}>
                 <Grid container spacing={3}>
+                  {/* --- CAMPOS ORIGINALES DEL FORMULARIO --- */}
                   <Grid item xs={12} sm={6}>
                     <MDInput
                       label="Nombre del Producto"
@@ -349,8 +368,6 @@ function EditProduct() {
                       select
                       fullWidth
                       required
-                      error={!!formErrors.gender}
-                      helperText={formErrors.gender}
                     >
                       {genderOptions.map((o) => (
                         <MenuItem key={o.value} value={o.value}>
@@ -366,13 +383,8 @@ function EditProduct() {
                       value={productData.tags}
                       onChange={handleChange}
                       fullWidth
-                      error={!!formErrors.tags}
-                      helperText={formErrors.tags}
-                      placeholder="ej: floral, amaderado, especiado"
                     />
                   </Grid>
-
-                  {/* --- CAMPO DE STOCK CON LÓGICA RESPONSIVE --- */}
                   <Grid item xs={12} sm={6} mt={-5}>
                     <MDTypography variant="caption" color="text" fontWeight="bold">
                       Cantidad en Inventario
@@ -412,53 +424,19 @@ function EditProduct() {
                         </IconButton>
                       </MDBox>
                     ) : (
-                      // <MDInput
-                      //   name="countInStock"
-                      //   type="number"
-                      //   value={productData.countInStock}
-                      //   onChange={handleChange}
-                      //   fullWidth
-                      //   required
-                      //   error={!!formErrors.countInStock}
-                      //   helperText={formErrors.countInStock}
-                      //   inputProps={{ min: 0, step: "1" }}
-                      // />
-                      <MDBox
-                        display="flex"
-                        alignItems="center"
-                        sx={{
-                          border: "1px solid #d2d6da",
-                          borderRadius: "0.375rem",
-                          p: "2px",
-                          mt: 1,
-                        }}
-                      >
-                        <IconButton
-                          onClick={() => handleStockChange(-1)}
-                          disabled={productData.countInStock <= 0}
-                        >
-                          <RemoveCircleOutlineIcon />
-                        </IconButton>
-                        <MDBox
-                          sx={{
-                            flexGrow: 1,
-                            textAlign: "center",
-                            bgcolor: "action.hover",
-                            borderRadius: 1,
-                            py: 1,
-                          }}
-                        >
-                          <MDTypography variant="body2" fontWeight="bold" color="text">
-                            {productData.countInStock}
-                          </MDTypography>
-                        </MDBox>
-                        <IconButton onClick={() => handleStockChange(1)}>
-                          <AddCircleOutlineIcon />
-                        </IconButton>
-                      </MDBox>
+                      <MDInput
+                        name="countInStock"
+                        type="number"
+                        value={productData.countInStock}
+                        onChange={handleChange}
+                        fullWidth
+                        required
+                        error={!!formErrors.countInStock}
+                        helperText={formErrors.countInStock}
+                        inputProps={{ min: 0, step: "1" }}
+                      />
                     )}
                   </Grid>
-
                   <Grid item xs={12}>
                     <MDBox display="flex" alignItems="center">
                       <MDTypography variant="body2" mr={1}>
@@ -467,7 +445,6 @@ function EditProduct() {
                       <Switch checked={productData.active} onChange={handleChange} name="active" />
                     </MDBox>
                   </Grid>
-
                   <Grid item xs={12}>
                     <MDTypography variant="h6" mt={2} mb={1}>
                       Precios de Revendedor
@@ -483,13 +460,38 @@ function EditProduct() {
                             onChange={handleChange}
                             fullWidth
                             required
-                            error={!!formErrors[`resellerPrices.${cat}`]}
-                            helperText={formErrors[`resellerPrices.${cat}`]}
-                            inputProps={{ min: 0, step: "1" }}
                           />
                         </Grid>
                       ))}
                     </Grid>
+                  </Grid>
+
+                  {/* --- NUEVA SECCIÓN PARA ETIQUETAS PROMOCIONALES --- */}
+                  <Grid item xs={12}>
+                    <MDTypography variant="h6" mt={2} mb={1}>
+                      Etiquetas Promocionales
+                    </MDTypography>
+                    <MDBox display="flex" flexWrap="wrap" gap={1}>
+                      {labelsLoading ? (
+                        <CircularProgress size={24} />
+                      ) : (
+                        labels.map((label) => {
+                          const isSelected = selectedLabelIds.includes(label._id);
+                          return (
+                            <Chip
+                              key={label._id}
+                              icon={isSelected ? <CheckCircleIcon /> : undefined}
+                              label={label.name}
+                              clickable
+                              onClick={() => handleLabelToggle(label._id)}
+                              color={isSelected ? "info" : "secondary"}
+                              variant={isSelected ? "filled" : "outlined"}
+                              sx={{ fontWeight: "bold" }}
+                            />
+                          );
+                        })
+                      )}
+                    </MDBox>
                   </Grid>
 
                   {/* --- SECCIÓN DE MANEJO DE IMÁGENES (INTACTA) --- */}
@@ -614,13 +616,20 @@ function EditProduct() {
                         variant="gradient"
                         color="secondary"
                         onClick={() => navigate("/products")}
-                        disabled={loading}
-                        sx={{ marginRight: 2 }}
+                        disabled={productLoading || labelsLoading}
                       >
                         Cancelar
                       </MDButton>
-                      <MDButton variant="gradient" color="info" type="submit" disabled={loading}>
-                        {loading ? "Actualizando..." : "Actualizar Producto"}
+                      <MDButton
+                        variant="gradient"
+                        color="info"
+                        type="submit"
+                        disabled={productLoading || labelsLoading}
+                        sx={{ ml: 2 }}
+                      >
+                        {productLoading || labelsLoading
+                          ? "Actualizando..."
+                          : "Actualizar Producto"}
                       </MDButton>
                     </MDBox>
                   </Grid>

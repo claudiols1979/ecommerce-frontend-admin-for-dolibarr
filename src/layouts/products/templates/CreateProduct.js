@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -8,11 +8,12 @@ import Card from "@mui/material/Card";
 import MenuItem from "@mui/material/MenuItem";
 import Switch from "@mui/material/Switch";
 import IconButton from "@mui/material/IconButton";
-import { useTheme, useMediaQuery } from "@mui/material";
+import { useTheme, useMediaQuery, Chip, CircularProgress } from "@mui/material";
 
 // @mui icons
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -25,14 +26,18 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 
-// Context
+// Contexts
 import { useProducts } from "contexts/ProductContext";
 import { useAuth } from "contexts/AuthContext";
+import { useLabels } from "contexts/LabelContext"; // <-- 1. IMPORTAR EL CONTEXTO DE ETIQUETAS
 
 function CreateProduct() {
   const navigate = useNavigate();
-  const { createProduct, loading, error } = useProducts();
+  const { createProduct, loading: productLoading } = useProducts();
   const { user } = useAuth();
+
+  // --- 2. USAR EL CONTEXTO DE ETIQUETAS ---
+  const { labels, fetchLabels, assignLabelsToProduct, loading: labelsLoading } = useLabels();
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -48,18 +53,15 @@ function CreateProduct() {
     tags: "",
     countInStock: 0,
     active: true,
-    resellerPrices: {
-      cat1: 0,
-      cat2: 0,
-      cat3: 0,
-      cat4: 0,
-      cat5: 0,
-    },
+    resellerPrices: { cat1: 0, cat2: 0, cat3: 0, cat4: 0, cat5: 0 },
   });
 
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [filePreviews, setFilePreviews] = useState([]);
   const [formErrors, setFormErrors] = useState({});
+
+  // --- 3. NUEVO ESTADO PARA LAS ETIQUETAS SELECCIONADAS ---
+  const [selectedLabelIds, setSelectedLabelIds] = useState([]);
 
   const genderOptions = [
     { value: "men", label: "Hombre" },
@@ -69,6 +71,11 @@ function CreateProduct() {
     { value: "elderly", label: "Adulto Mayor" },
     { value: "other", label: "Otro" },
   ];
+
+  // --- 4. OBTENER LAS ETIQUETAS AL CARGAR EL COMPONENTE ---
+  useEffect(() => {
+    fetchLabels();
+  }, [fetchLabels]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -104,6 +111,15 @@ function CreateProduct() {
     setSelectedFiles(files);
     const previews = files.map((file) => URL.createObjectURL(file));
     setFilePreviews(previews);
+  };
+
+  // --- 5. NUEVO HANDLER PARA EL TOGGLE DE ETIQUETAS ---
+  const handleLabelToggle = (labelId) => {
+    setSelectedLabelIds((prevSelected) =>
+      prevSelected.includes(labelId)
+        ? prevSelected.filter((id) => id !== labelId)
+        : [...prevSelected, labelId]
+    );
   };
 
   const validateForm = () => {
@@ -145,6 +161,7 @@ function CreateProduct() {
       toast.error("No tienes permiso para crear productos.");
       return;
     }
+
     const formData = new FormData();
     Object.keys(productData).forEach((key) => {
       if (key === "resellerPrices") {
@@ -166,12 +183,23 @@ function CreateProduct() {
     selectedFiles.forEach((file) => {
       formData.append("images", file);
     });
+
     try {
-      await createProduct(formData);
-      toast.success("Producto creado exitosamente!");
+      const createdProductResponse = await createProduct(formData);
+      const newProductId = createdProductResponse?.product?._id;
+
+      if (!newProductId) {
+        throw new Error("No se pudo obtener el ID del producto recién creado.");
+      }
+
+      if (selectedLabelIds.length > 0) {
+        await assignLabelsToProduct(newProductId, selectedLabelIds);
+      }
+
+      toast.success("Producto creado y etiquetas asignadas exitosamente!");
       navigate("/products");
     } catch (err) {
-      toast.error(err?.message || "Error al crear el producto.");
+      toast.error(err?.message || "Error al crear el producto o asignar etiquetas.");
     }
   };
 
@@ -306,7 +334,6 @@ function CreateProduct() {
                     />
                   </Grid>
 
-                  {/* --- CAMPO DE STOCK CON LÓGICA RESPONSIVE Y ESTILO CORREGIDO --- */}
                   <Grid item xs={12} sm={6} mt={-4}>
                     <MDTypography variant="caption" color="text" fontWeight="bold">
                       Cantidad en Inventario
@@ -346,50 +373,17 @@ function CreateProduct() {
                         </IconButton>
                       </MDBox>
                     ) : (
-                      // <MDInput
-                      //   name="countInStock"
-                      //   type="number"
-                      //   value={productData.countInStock}
-                      //   onChange={handleChange}
-                      //   fullWidth
-                      //   required
-                      //   error={!!formErrors.countInStock}
-                      //   helperText={formErrors.countInStock}
-                      //   inputProps={{ min: 0, step: "1" }}
-                      // />
-                      <MDBox
-                        display="flex"
-                        alignItems="center"
-                        sx={{
-                          border: "1px solid #d2d6da",
-                          borderRadius: "0.375rem",
-                          p: "2px",
-                          mt: 1,
-                        }}
-                      >
-                        <IconButton
-                          onClick={() => handleStockChange(-1)}
-                          disabled={productData.countInStock <= 0}
-                        >
-                          <RemoveCircleOutlineIcon />
-                        </IconButton>
-                        <MDBox
-                          sx={{
-                            flexGrow: 1,
-                            textAlign: "center",
-                            bgcolor: "action.hover",
-                            borderRadius: 1,
-                            py: 1,
-                          }}
-                        >
-                          <MDTypography variant="body2" fontWeight="bold" color="text">
-                            {productData.countInStock}
-                          </MDTypography>
-                        </MDBox>
-                        <IconButton onClick={() => handleStockChange(1)}>
-                          <AddCircleOutlineIcon />
-                        </IconButton>
-                      </MDBox>
+                      <MDInput
+                        name="countInStock"
+                        type="number"
+                        value={productData.countInStock}
+                        onChange={handleChange}
+                        fullWidth
+                        required
+                        error={!!formErrors.countInStock}
+                        helperText={formErrors.countInStock}
+                        inputProps={{ min: 0, step: "1" }}
+                      />
                     )}
                   </Grid>
 
@@ -402,7 +396,6 @@ function CreateProduct() {
                     </MDBox>
                   </Grid>
 
-                  {/* --- SECCIÓN DE PRECIOS Y OTROS (SIN CAMBIOS) --- */}
                   <Grid item xs={12}>
                     <MDTypography variant="h6" mt={2} mb={1}>
                       Precios de Revendedor
@@ -426,6 +419,35 @@ function CreateProduct() {
                       ))}
                     </Grid>
                   </Grid>
+
+                  {/* --- 7. NUEVA SECCIÓN PARA ETIQUETAS PROMOCIONALES --- */}
+                  <Grid item xs={12}>
+                    <MDTypography variant="h6" mt={2} mb={1}>
+                      Etiquetas Promocionales
+                    </MDTypography>
+                    <MDBox display="flex" flexWrap="wrap" gap={1}>
+                      {labelsLoading ? (
+                        <CircularProgress size={24} />
+                      ) : (
+                        labels.map((label) => {
+                          const isSelected = selectedLabelIds.includes(label._id);
+                          return (
+                            <Chip
+                              key={label._id}
+                              icon={isSelected ? <CheckCircleIcon /> : undefined}
+                              label={label.name}
+                              clickable
+                              onClick={() => handleLabelToggle(label._id)}
+                              color={isSelected ? "info" : "secondary"}
+                              variant={isSelected ? "filled" : "outlined"}
+                              sx={{ fontWeight: "bold" }}
+                            />
+                          );
+                        })
+                      )}
+                    </MDBox>
+                  </Grid>
+
                   <Grid item xs={12}>
                     <MDBox mt={2}>
                       <MDTypography variant="h6" mb={1}>
@@ -463,19 +485,25 @@ function CreateProduct() {
                       </MDBox>
                     </MDBox>
                   </Grid>
+
                   <Grid item xs={12}>
                     <MDBox mt={4} mb={1} display="flex" justifyContent="flex-end">
                       <MDButton
                         variant="gradient"
                         color="secondary"
                         onClick={() => navigate("/products")}
-                        disabled={loading}
-                        sx={{ marginRight: 2 }}
+                        disabled={productLoading || labelsLoading}
                       >
                         Cancelar
                       </MDButton>
-                      <MDButton variant="gradient" color="info" type="submit" disabled={loading}>
-                        {loading ? "Creando..." : "Crear Producto"}
+                      <MDButton
+                        variant="gradient"
+                        color="info"
+                        type="submit"
+                        disabled={productLoading || labelsLoading}
+                        sx={{ ml: 2 }}
+                      >
+                        {productLoading || labelsLoading ? "Creando..." : "Crear Producto"}
                       </MDButton>
                     </MDBox>
                   </Grid>
