@@ -61,7 +61,7 @@ function Cover() {
     event.preventDefault();
 
     // Basic client-side validation
-    if (!firstName || !lastName || !email || !password || !role || !agreement) {
+    if (!firstName || !lastName || !email || !password || !role) {
       alert("Por favor, complete todos los campos requeridos y acepte los términos."); // Spanish message
       return;
     }
