@@ -170,8 +170,10 @@ function Products() {
         </MDBox>
       ),
     },
-    { Header: "Categoría", accessor: "category" },
+    { Header: "Departmento", accessor: "department" },
     { Header: "Marca", accessor: "brand" },
+    { Header: "Categoría", accessor: "category" },
+    { Header: "Subcategoría", accessor: "subcategory" },
     {
       Header: "Precio (Cat1)",
       accessor: "resellerPrices.cat1",
@@ -222,7 +224,7 @@ function Products() {
                   edit
                 </Icon>
               </MDTypography>
-              <MDTypography
+              {/* <MDTypography
                 component="a"
                 href="#"
                 onClick={() => handleDeleteProduct(row.original._id)}
@@ -234,7 +236,7 @@ function Products() {
                 <Icon color="error" sx={{ fontSize: "24px" }}>
                   delete
                 </Icon>
-              </MDTypography>
+              </MDTypography> */}
             </>
           )}
         </MDBox>
@@ -328,7 +330,7 @@ function Products() {
                 <MDTypography variant="h6" color="white">
                   Gestión de Productos
                 </MDTypography>
-                {canManageProducts && (
+                {/* {canManageProducts && (
                   <MDButton
                     component={Link}
                     to="/products/create"
@@ -344,7 +346,7 @@ function Products() {
                     <Icon sx={{ fontWeight: "bold" }}>add</Icon>
                     &nbsp;añadir producto
                   </MDButton>
-                )}
+                )} */}
               </MDBox>
               <MDBox p={3}>
                 <MDBox mb={3}>

@@ -272,7 +272,7 @@ function MainAppContent() {
                   }
                 />
                 <Route
-                  path="/revendedores"
+                  path="/clientes"
                   element={
                     <ProtectedRoute allowedRoles={["Administrador", "Editor"]}>
                       <Resellers />

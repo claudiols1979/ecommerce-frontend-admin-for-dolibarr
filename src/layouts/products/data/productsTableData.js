@@ -118,8 +118,7 @@ const ActionButtons = ({ productId }) => {
         <Edit color="info" sx={{ fontSize: "24px" }} />
       </MDTypography>
 
-      {/* Delete Icon (only visible to Admin) */}
-      {isAdmin && (
+      {/* {isAdmin && (
         <MDTypography
           component="a"
           href="#"
@@ -131,7 +130,7 @@ const ActionButtons = ({ productId }) => {
         >
           <Delete color="error" sx={{ fontSize: "24px" }} />
         </MDTypography>
-      )}
+      )} */}
 
       {/* Delete Confirmation Dialog */}
       <Dialog
@@ -200,7 +199,9 @@ export default function productsTableData(products, userResellerCategory = "cat1
   return {
     columns: [
       { Header: "producto", accessor: "product", width: "30%", align: "left" },
+      { Header: "department", accessor: "department", align: "left" },
       { Header: "categoría", accessor: "category", align: "left" },
+      { Header: "subcategoría", accessor: "subcategory", align: "left" },
       { Header: "volumen", accessor: "volume", align: "center" },
       { Header: "precio", accessor: "price", align: "right" },
       { Header: "en inventario", accessor: "inStock", align: "center" },
@@ -230,9 +231,19 @@ export default function productsTableData(products, userResellerCategory = "cat1
             productId={product._id}
           />
         ),
+        department: (
+          <MDTypography variant="caption" color="text" fontWeight="medium">
+            {product.department}
+          </MDTypography>
+        ),
         category: (
           <MDTypography variant="caption" color="text" fontWeight="medium">
             {product.category}
+          </MDTypography>
+        ),
+        subcategory: (
+          <MDTypography variant="caption" color="text" fontWeight="medium">
+            {product.subcategory}
           </MDTypography>
         ),
         volume: (

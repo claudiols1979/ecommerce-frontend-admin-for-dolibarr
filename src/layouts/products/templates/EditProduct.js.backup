@@ -10,7 +10,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Switch from "@mui/material/Switch";
 import IconButton from "@mui/material/IconButton";
 import Icon from "@mui/material/Icon";
-import { useTheme, useMediaQuery, Chip, FormControlLabel, Checkbox, Divider } from "@mui/material";
+import { useTheme, useMediaQuery, Chip } from "@mui/material";
 
 // @mui icons
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -31,13 +31,15 @@ import Footer from "examples/Footer";
 // Contexts
 import { useProducts } from "contexts/ProductContext";
 import { useAuth } from "contexts/AuthContext";
-import { useLabels } from "contexts/LabelContext";
+import { useLabels } from "contexts/LabelContext"; // <-- 1. IMPORTAR EL CONTEXTO DE ETIQUETAS
 
 function EditProduct() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { getProductById, updateProduct, loading: productLoading } = useProducts();
   const { user } = useAuth();
+
+  // --- 2. USAR EL CONTEXTO DE ETIQUETAS ---
   const { labels, fetchLabels, assignLabelsToProduct, loading: labelsLoading } = useLabels();
 
   const theme = useTheme();
@@ -47,8 +49,8 @@ function EditProduct() {
     name: "",
     code: "",
     description: "",
-    department: "",
-    subcategory: "",
+    department: "", // <-- NUEVO CAMPO AÑADIDO
+    subcategory: "", // <-- NUEVO CAMPO AÑADIDO
     brand: "",
     category: "",
     volume: "",
@@ -57,19 +59,6 @@ function EditProduct() {
     countInStock: 0,
     active: true,
     resellerPrices: { cat1: 0, cat2: 0, cat3: 0, cat4: 0, cat5: 0 },
-    // Nuevos campos flexibles
-    colors: [],
-    sizes: [],
-    materials: [],
-    ageRange: "",
-    features: [],
-    voltage: "",
-    warranty: "",
-    includesBatteries: false,
-    batteryType: "",
-    dimensions: { width: 0, height: 0, depth: 0 },
-    weight: 0,
-    recommendedLocation: "",
   });
 
   const [existingImageUrls, setExistingImageUrls] = useState([]);
@@ -79,52 +68,20 @@ function EditProduct() {
   const [formErrors, setFormErrors] = useState({});
   const [initialLoading, setInitialLoading] = useState(true);
   const [fetchError, setFetchError] = useState(null);
+
+  // --- 3. NUEVO ESTADO PARA LAS ETIQUETAS SELECCIONADAS ---
   const [selectedLabelIds, setSelectedLabelIds] = useState([]);
-  const [currentColorInput, setCurrentColorInput] = useState("");
-  const [currentSizeInput, setCurrentSizeInput] = useState("");
-  const [currentMaterialInput, setCurrentMaterialInput] = useState("");
-  const [currentFeatureInput, setCurrentFeatureInput] = useState("");
 
   const genderOptions = [
-    { value: "Hombre", label: "Hombre" },
-    { value: "Mujer", label: "Mujer" },
-    { value: "Unisex", label: "Unisex" },
-    { value: "Niño", label: "Niño" },
-    { value: "Niña", label: "Niña" },
+    { value: "men", label: "Hombre" },
+    { value: "women", label: "Mujer" },
+    { value: "unisex", label: "Unisex" },
+    { value: "children", label: "Niño/a" },
+    { value: "elderly", label: "Adulto Mayor" },
+    { value: "other", label: "Otro" },
   ];
 
-  const ageRangeOptions = [
-    { value: "Bebé", label: "Bebé" },
-    { value: "Infantil", label: "Infantil" },
-    { value: "Adolescente", label: "Adolescente" },
-    { value: "Adulto", label: "Adulto" },
-  ];
-
-  const voltageOptions = [
-    { value: "110V", label: "110V" },
-    { value: "220V", label: "220V" },
-    { value: "Bivoltaje", label: "Bivoltaje" },
-  ];
-
-  const warrantyOptions = [
-    { value: "3 meses", label: "3 meses" },
-    { value: "6 meses", label: "6 meses" },
-    { value: "1 año", label: "1 año" },
-    { value: "2 años", label: "2 años" },
-  ];
-
-  const batteryTypeOptions = [
-    { value: "AA", label: "AA" },
-    { value: "AAA", label: "AAA" },
-    { value: "Recargable", label: "Recargable" },
-    { value: "Litio", label: "Litio" },
-  ];
-
-  const locationOptions = [
-    { value: "Interior", label: "Interior" },
-    { value: "Exterior", label: "Exterior" },
-  ];
-
+  // --- 4. OBTENER DATOS DEL PRODUCTO Y ETIQUETAS AL CARGAR ---
   useEffect(() => {
     const fetchProductAndLabels = async () => {
       try {
@@ -143,12 +100,10 @@ function EditProduct() {
             name: fetchedProduct.name || "",
             code: fetchedProduct.code || "",
             description: fetchedProduct.description || "",
-            department: fetchedProduct.department || "",
-            subcategory: fetchedProduct.subcategory || "",
             brand: fetchedProduct.brand || "",
             category: fetchedProduct.category || "",
             volume: fetchedProduct.volume || "",
-            gender: fetchedProduct.gender || "Unisex",
+            gender: fetchedProduct.gender || "unisex",
             tags: fetchedProduct.tags ? fetchedProduct.tags.join(", ") : "",
             countInStock: fetchedProduct.countInStock || 0,
             active: fetchedProduct.active !== undefined ? fetchedProduct.active : true,
@@ -159,19 +114,6 @@ function EditProduct() {
               cat4: 0,
               cat5: 0,
             },
-            // Nuevos campos
-            colors: fetchedProduct.colors || [],
-            sizes: fetchedProduct.sizes || [],
-            materials: fetchedProduct.materials || [],
-            ageRange: fetchedProduct.ageRange || "",
-            features: fetchedProduct.features || [],
-            voltage: fetchedProduct.voltage || "",
-            warranty: fetchedProduct.warranty || "",
-            includesBatteries: fetchedProduct.includesBatteries || false,
-            batteryType: fetchedProduct.batteryType || "",
-            dimensions: fetchedProduct.dimensions || { width: 0, height: 0, depth: 0 },
-            weight: fetchedProduct.weight || 0,
-            recommendedLocation: fetchedProduct.recommendedLocation || "",
           });
           setExistingImageUrls(fetchedProduct.imageUrls || []);
 
@@ -197,20 +139,13 @@ function EditProduct() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-
-    if (name.startsWith("dimensions.")) {
-      const dimension = name.split(".")[1];
-      setProductData((prev) => ({
-        ...prev,
-        dimensions: { ...prev.dimensions, [dimension]: parseFloat(value) || 0 },
-      }));
-    } else if (name.startsWith("resellerPrices.")) {
+    if (name.startsWith("resellerPrices.")) {
       const cat = name.split(".")[1];
       setProductData((prev) => ({
         ...prev,
         resellerPrices: { ...prev.resellerPrices, [cat]: parseFloat(value) || 0 },
       }));
-    } else if (name === "countInStock" || name === "weight") {
+    } else if (name === "countInStock") {
       setProductData((prev) => ({ ...prev, [name]: parseInt(value, 10) || 0 }));
     } else if (type === "checkbox") {
       setProductData((prev) => ({ ...prev, [name]: checked }));
@@ -224,23 +159,6 @@ function EditProduct() {
     setProductData((prev) => ({
       ...prev,
       countInStock: Math.max(0, prev.countInStock + amount),
-    }));
-  };
-
-  const handleAddItem = (field, inputValue, setInputValue) => {
-    if (inputValue.trim() && !productData[field].includes(inputValue.trim())) {
-      setProductData((prev) => ({
-        ...prev,
-        [field]: [...prev[field], inputValue.trim()],
-      }));
-      setInputValue("");
-    }
-  };
-
-  const handleRemoveItem = (field, item) => {
-    setProductData((prev) => ({
-      ...prev,
-      [field]: prev[field].filter((i) => i !== item),
     }));
   };
 
@@ -289,19 +207,11 @@ function EditProduct() {
       return;
     }
     const formData = new FormData();
-
-    // Agregar todos los campos al formData
     Object.keys(productData).forEach((key) => {
       if (key === "resellerPrices") {
         Object.keys(productData.resellerPrices).forEach((cat) =>
           formData.append(`resellerPrices[${cat}]`, productData.resellerPrices[cat])
         );
-      } else if (key === "dimensions") {
-        Object.keys(productData.dimensions).forEach((dim) =>
-          formData.append(`dimensions[${dim}]`, productData.dimensions[dim])
-        );
-      } else if (Array.isArray(productData[key])) {
-        productData[key].forEach((item) => formData.append(`${key}[]`, item));
       } else if (key === "tags") {
         productData.tags
           .split(",")
@@ -312,7 +222,6 @@ function EditProduct() {
         formData.append(key, productData[key]);
       }
     });
-
     selectedNewFiles.forEach((file) => formData.append("images", file));
     imagesToDelete.forEach((publicId) => formData.append("imagesToDelete", publicId));
     existingImageUrls.forEach((img, index) => {
@@ -358,7 +267,7 @@ function EditProduct() {
       <DashboardNavbar />
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6} justifyContent="center">
-          <Grid item xs={12} lg={10}>
+          <Grid item xs={12} lg={8}>
             <Card>
               <MDBox
                 mx={2}
@@ -376,7 +285,7 @@ function EditProduct() {
               </MDBox>
               <MDBox p={3} component="form" onSubmit={handleSubmit}>
                 <Grid container spacing={3}>
-                  {/* Campos básicos del producto */}
+                  {/* --- CAMPOS ORIGINALES DEL FORMULARIO --- */}
                   <Grid item xs={12} sm={6}>
                     <MDInput
                       label="Nombre del Producto"
@@ -461,7 +370,7 @@ function EditProduct() {
                       helperText={formErrors.subcategory}
                     />
                   </Grid>
-                  {/* <Grid item xs={12} sm={6}>
+                  <Grid item xs={12} sm={6}>
                     <MDInput
                       label="Volumen"
                       name="volume"
@@ -490,10 +399,10 @@ function EditProduct() {
                         </MenuItem>
                       ))}
                     </MDInput>
-                  </Grid> */}
+                  </Grid>
                   <Grid item xs={12} sm={6} mb={2}>
                     <MDInput
-                      label="Notas aromáticas (separadas por coma)"
+                      label="Etiquetas (separadas por coma)"
                       name="tags"
                       value={productData.tags}
                       onChange={handleChange}
@@ -560,362 +469,6 @@ function EditProduct() {
                       <Switch checked={productData.active} onChange={handleChange} name="active" />
                     </MDBox>
                   </Grid>
-
-                  {/* --- NUEVOS ATRIBUTOS FLEXIBLES --- */}
-                  <Grid item xs={12}>
-                    <Divider>
-                      <MDTypography variant="h5" color="primary">
-                        Atributos Flexibles
-                      </MDTypography>
-                    </Divider>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <MDTypography variant="h6" mb={1}>
-                      Volúmen
-                    </MDTypography>
-                    <MDInput
-                      name="volume"
-                      value={productData.volume}
-                      onChange={handleChange}
-                      fullWidth
-                      required
-                      error={!!formErrors.volume}
-                      helperText={formErrors.volume}
-                      placeholder="ej: 100ml, 50ml, 1oz"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <MDTypography variant="h6" mb={1}>
-                      Género
-                    </MDTypography>
-                    <MDInput
-                      name="gender"
-                      value={productData.gender}
-                      onChange={handleChange}
-                      select
-                      fullWidth
-                      required
-                    >
-                      {genderOptions.map((o) => (
-                        <MenuItem key={o.value} value={o.value}>
-                          {o.label}
-                        </MenuItem>
-                      ))}
-                    </MDInput>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <MDTypography variant="h6" mb={1}>
-                      Colores
-                    </MDTypography>
-                    <MDBox display="flex" alignItems="center" mb={1}>
-                      <MDInput
-                        value={currentColorInput}
-                        onChange={(e) => setCurrentColorInput(e.target.value)}
-                        placeholder="Agregar color"
-                        fullWidth
-                      />
-                      <MDButton
-                        variant="gradient"
-                        color="info"
-                        size="small"
-                        onClick={() =>
-                          handleAddItem("colors", currentColorInput, setCurrentColorInput)
-                        }
-                        sx={{ ml: 1 }}
-                      >
-                        Agregar
-                      </MDButton>
-                    </MDBox>
-                    <MDBox display="flex" flexWrap="wrap" gap={0.5}>
-                      {productData.colors.map((color, index) => (
-                        <Chip
-                          key={index}
-                          label={color}
-                          onDelete={() => handleRemoveItem("colors", color)}
-                          color="primary"
-                          variant="outlined"
-                        />
-                      ))}
-                    </MDBox>
-                  </Grid>
-
-                  {/* Tamaños */}
-                  <Grid item xs={12} sm={6}>
-                    <MDTypography variant="h6" mb={1}>
-                      Tamaños
-                    </MDTypography>
-                    <MDBox display="flex" alignItems="center" mb={1}>
-                      <MDInput
-                        value={currentSizeInput}
-                        onChange={(e) => setCurrentSizeInput(e.target.value)}
-                        placeholder="Agregar tamaño"
-                        fullWidth
-                      />
-                      <MDButton
-                        variant="gradient"
-                        color="info"
-                        size="small"
-                        onClick={() =>
-                          handleAddItem("sizes", currentSizeInput, setCurrentSizeInput)
-                        }
-                        sx={{ ml: 1 }}
-                      >
-                        Agregar
-                      </MDButton>
-                    </MDBox>
-                    <MDBox display="flex" flexWrap="wrap" gap={0.5}>
-                      {productData.sizes.map((size, index) => (
-                        <Chip
-                          key={index}
-                          label={size}
-                          onDelete={() => handleRemoveItem("sizes", size)}
-                          color="secondary"
-                          variant="outlined"
-                        />
-                      ))}
-                    </MDBox>
-                  </Grid>
-
-                  {/* Materiales */}
-                  <Grid item xs={12} sm={6}>
-                    <MDTypography variant="h6" mb={1}>
-                      Materiales
-                    </MDTypography>
-                    <MDBox display="flex" alignItems="center" mb={1}>
-                      <MDInput
-                        value={currentMaterialInput}
-                        onChange={(e) => setCurrentMaterialInput(e.target.value)}
-                        placeholder="Agregar material"
-                        fullWidth
-                      />
-                      <MDButton
-                        variant="gradient"
-                        color="info"
-                        size="small"
-                        onClick={() =>
-                          handleAddItem("materials", currentMaterialInput, setCurrentMaterialInput)
-                        }
-                        sx={{ ml: 1 }}
-                      >
-                        Agregar
-                      </MDButton>
-                    </MDBox>
-                    <MDBox display="flex" flexWrap="wrap" gap={0.5}>
-                      {productData.materials.map((material, index) => (
-                        <Chip
-                          key={index}
-                          label={material}
-                          onDelete={() => handleRemoveItem("materials", material)}
-                          color="success"
-                          variant="outlined"
-                        />
-                      ))}
-                    </MDBox>
-                  </Grid>
-
-                  {/* Características especiales */}
-                  <Grid item xs={12} sm={6}>
-                    <MDTypography variant="h6" mb={1}>
-                      Características Especiales
-                    </MDTypography>
-                    <MDBox display="flex" alignItems="center" mb={1}>
-                      <MDInput
-                        value={currentFeatureInput}
-                        onChange={(e) => setCurrentFeatureInput(e.target.value)}
-                        placeholder="Agregar característica"
-                        fullWidth
-                      />
-                      <MDButton
-                        variant="gradient"
-                        color="info"
-                        size="small"
-                        onClick={() =>
-                          handleAddItem("features", currentFeatureInput, setCurrentFeatureInput)
-                        }
-                        sx={{ ml: 1 }}
-                      >
-                        Agregar
-                      </MDButton>
-                    </MDBox>
-                    <MDBox display="flex" flexWrap="wrap" gap={0.5}>
-                      {productData.features.map((feature, index) => (
-                        <Chip
-                          key={index}
-                          label={feature}
-                          onDelete={() => handleRemoveItem("features", feature)}
-                          color="warning"
-                          variant="outlined"
-                        />
-                      ))}
-                    </MDBox>
-                  </Grid>
-
-                  {/* Rango etario */}
-                  <Grid item xs={12} sm={6}>
-                    <MDInput
-                      label="Rango Etario"
-                      name="ageRange"
-                      value={productData.ageRange}
-                      onChange={handleChange}
-                      select
-                      fullWidth
-                    >
-                      <MenuItem value="">Seleccionar rango etario</MenuItem>
-                      {ageRangeOptions.map((o) => (
-                        <MenuItem key={o.value} value={o.value}>
-                          {o.label}
-                        </MenuItem>
-                      ))}
-                    </MDInput>
-                  </Grid>
-
-                  {/* Voltaje */}
-                  <Grid item xs={12} sm={6}>
-                    <MDInput
-                      label="Voltaje"
-                      name="voltage"
-                      value={productData.voltage}
-                      onChange={handleChange}
-                      select
-                      fullWidth
-                    >
-                      <MenuItem value="">Seleccionar voltaje</MenuItem>
-                      {voltageOptions.map((o) => (
-                        <MenuItem key={o.value} value={o.value}>
-                          {o.label}
-                        </MenuItem>
-                      ))}
-                    </MDInput>
-                  </Grid>
-
-                  {/* Garantía */}
-                  <Grid item xs={12} sm={6}>
-                    <MDInput
-                      label="Garantía"
-                      name="warranty"
-                      value={productData.warranty}
-                      onChange={handleChange}
-                      select
-                      fullWidth
-                    >
-                      <MenuItem value="">Seleccionar garantía</MenuItem>
-                      {warrantyOptions.map((o) => (
-                        <MenuItem key={o.value} value={o.value}>
-                          {o.label}
-                        </MenuItem>
-                      ))}
-                    </MDInput>
-                  </Grid>
-
-                  {/* Tipo de batería */}
-                  <Grid item xs={12} sm={6}>
-                    <MDInput
-                      label="Tipo de Batería"
-                      name="batteryType"
-                      value={productData.batteryType}
-                      onChange={handleChange}
-                      select
-                      fullWidth
-                    >
-                      <MenuItem value="">Seleccionar tipo de batería</MenuItem>
-                      {batteryTypeOptions.map((o) => (
-                        <MenuItem key={o.value} value={o.value}>
-                          {o.label}
-                        </MenuItem>
-                      ))}
-                    </MDInput>
-                  </Grid>
-
-                  {/* Incluye baterías */}
-                  <Grid item xs={12} sm={6}>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={productData.includesBatteries}
-                          onChange={handleChange}
-                          name="includesBatteries"
-                        />
-                      }
-                      label="Incluye baterías"
-                    />
-                  </Grid>
-
-                  {/* Ubicación recomendada */}
-                  <Grid item xs={12} sm={6}>
-                    <MDInput
-                      label="Ubicación Recomendada"
-                      name="recommendedLocation"
-                      value={productData.recommendedLocation}
-                      onChange={handleChange}
-                      select
-                      fullWidth
-                    >
-                      <MenuItem value="">Seleccionar ubicación</MenuItem>
-                      {locationOptions.map((o) => (
-                        <MenuItem key={o.value} value={o.value}>
-                          {o.label}
-                        </MenuItem>
-                      ))}
-                    </MDInput>
-                  </Grid>
-
-                  {/* Dimensiones */}
-                  <Grid item xs={12}>
-                    <MDTypography variant="h6" mb={1}>
-                      Dimensiones (cm)
-                    </MDTypography>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} sm={4}>
-                        <MDInput
-                          label="Ancho"
-                          name="dimensions.width"
-                          type="number"
-                          value={productData.dimensions.width}
-                          onChange={handleChange}
-                          fullWidth
-                          inputProps={{ min: 0, step: "0.1" }}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={4}>
-                        <MDInput
-                          label="Alto"
-                          name="dimensions.height"
-                          type="number"
-                          value={productData.dimensions.height}
-                          onChange={handleChange}
-                          fullWidth
-                          inputProps={{ min: 0, step: "0.1" }}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={4}>
-                        <MDInput
-                          label="Profundidad"
-                          name="dimensions.depth"
-                          type="number"
-                          value={productData.dimensions.depth}
-                          onChange={handleChange}
-                          fullWidth
-                          inputProps={{ min: 0, step: "0.1" }}
-                        />
-                      </Grid>
-                    </Grid>
-                  </Grid>
-
-                  {/* Peso */}
-                  <Grid item xs={12} sm={6}>
-                    <MDInput
-                      label="Peso (kg)"
-                      name="weight"
-                      type="number"
-                      value={productData.weight}
-                      onChange={handleChange}
-                      fullWidth
-                      inputProps={{ min: 0, step: "0.1" }}
-                    />
-                  </Grid>
-
-                  {/* Precios de revendedor */}
                   <Grid item xs={12}>
                     <MDTypography variant="h6" mt={2} mb={1}>
                       Precios de Revendedor
@@ -937,7 +490,7 @@ function EditProduct() {
                     </Grid>
                   </Grid>
 
-                  {/* Etiquetas promocionales */}
+                  {/* --- NUEVA SECCIÓN PARA ETIQUETAS PROMOCIONALES --- */}
                   <Grid item xs={12}>
                     <MDTypography variant="h6" mt={2} mb={1}>
                       Etiquetas Promocionales
@@ -965,7 +518,7 @@ function EditProduct() {
                     </MDBox>
                   </Grid>
 
-                  {/* Manejo de imágenes */}
+                  {/* --- SECCIÓN DE MANEJO DE IMÁGENES (INTACTA) --- */}
                   <Grid item xs={12}>
                     <MDBox mt={2}>
                       <MDTypography variant="h6" mb={1}>

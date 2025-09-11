@@ -8,7 +8,8 @@ import Card from "@mui/material/Card";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import Icon from "@mui/material/Icon";
-import Chip from "@mui/material/Chip"; // <-- 1. IMPORTAR CHIP
+import Chip from "@mui/material/Chip";
+import Divider from "@mui/material/Divider";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -34,6 +35,8 @@ function ProductDetail() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [fetchError, setFetchError] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  console.log("Product: ", product);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -76,6 +79,14 @@ function ProductDetail() {
         (prevIndex) => (prevIndex - 1 + product.imageUrls.length) % product.imageUrls.length
       );
     }
+  };
+
+  // Helper function para mostrar valor o N/A
+  const displayValue = (value, isArray = false) => {
+    if (isArray) {
+      return value && value.length > 0 ? value : "N/A";
+    }
+    return value || "N/A";
   };
 
   if (initialLoading) {
@@ -281,43 +292,55 @@ function ProductDetail() {
                       <MDTypography component="span" variant="button" fontWeight="bold">
                         Nombre:
                       </MDTypography>{" "}
-                      {product.name}
+                      {displayValue(product.name)}
                     </MDTypography>
                     <MDTypography variant="body2" color="text" mb={0.5}>
                       <MDTypography component="span" variant="button" fontWeight="bold">
                         Código:
                       </MDTypography>{" "}
-                      {product.code}
+                      {displayValue(product.code)}
+                    </MDTypography>
+                    <MDTypography variant="body2" color="text" mb={0.5}>
+                      <MDTypography component="span" variant="button" fontWeight="bold">
+                        Departamento:
+                      </MDTypography>{" "}
+                      {displayValue(product.department)}
                     </MDTypography>
                     <MDTypography variant="body2" color="text" mb={0.5}>
                       <MDTypography component="span" variant="button" fontWeight="bold">
                         Marca:
                       </MDTypography>{" "}
-                      {product.brand}
+                      {displayValue(product.brand)}
                     </MDTypography>
                     <MDTypography variant="body2" color="text" mb={0.5}>
                       <MDTypography component="span" variant="button" fontWeight="bold">
                         Categoría:
                       </MDTypography>{" "}
-                      {product.category}
+                      {displayValue(product.category)}
                     </MDTypography>
                     <MDTypography variant="body2" color="text" mb={0.5}>
                       <MDTypography component="span" variant="button" fontWeight="bold">
+                        Subcategoría:
+                      </MDTypography>{" "}
+                      {displayValue(product.subcategory)}
+                    </MDTypography>
+                    {/* <MDTypography variant="body2" color="text" mb={0.5}>
+                      <MDTypography component="span" variant="button" fontWeight="bold">
                         Volumen:
                       </MDTypography>{" "}
-                      {product.volume}
+                      {displayValue(product.volume)}
                     </MDTypography>
                     <MDTypography variant="body2" color="text" mb={0.5}>
                       <MDTypography component="span" variant="button" fontWeight="bold">
                         Género:
                       </MDTypography>{" "}
-                      {product.gender}
-                    </MDTypography>
+                      {displayValue(product.gender)}
+                    </MDTypography> */}
                     <MDTypography variant="body2" color="text" mb={0.5}>
                       <MDTypography component="span" variant="button" fontWeight="bold">
                         En Inventario:
                       </MDTypography>{" "}
-                      {product.countInStock}
+                      {product.countInStock || 0}
                     </MDTypography>
                     <MDTypography variant="body2" color="text" mb={0.5}>
                       <MDTypography component="span" variant="button" fontWeight="bold">
@@ -338,7 +361,7 @@ function ProductDetail() {
                       {product.tags && product.tags.length > 0 ? product.tags.join(", ") : "N/A"}
                     </MDTypography>
 
-                    {/* --- 2. SECCIÓN AÑADIDA PARA ETIQUETAS PROMOCIONALES --- */}
+                    {/* Etiquetas Promocionales */}
                     {product.promotionalLabels && product.promotionalLabels.length > 0 && (
                       <MDBox mt={2}>
                         <MDTypography variant="h6" mb={1}>
@@ -357,12 +380,195 @@ function ProductDetail() {
                       </MDBox>
                     )}
 
-                    <MDTypography variant="h6" mt={2} mb={1}>
+                    <MDTypography variant="h6" mt={3} mb={1}>
                       Descripción:
                     </MDTypography>
-                    <MDTypography variant="body2" color="text">
-                      {product.description}
+                    <MDTypography variant="body2" color="text" mb={2}>
+                      {displayValue(product.description)}
                     </MDTypography>
+
+                    <Divider sx={{ my: 2 }} />
+
+                    {/* NUEVOS ATRIBUTOS FLEXIBLES */}
+                    <MDTypography variant="h6" mb={2} color="primary">
+                      Atributos Flexibles
+                    </MDTypography>
+
+                    {/* Colores */}
+                    <MDTypography variant="body2" color="text" mb={0.5}>
+                      <MDTypography component="span" variant="button" fontWeight="bold">
+                        Volumen:
+                      </MDTypography>{" "}
+                      {displayValue(product.volume)}
+                    </MDTypography>
+                    <MDTypography variant="body2" color="text" mb={0.5}>
+                      <MDTypography component="span" variant="button" fontWeight="bold">
+                        Género:
+                      </MDTypography>{" "}
+                      {displayValue(product.gender)}
+                    </MDTypography>
+                    <MDBox mb={2}>
+                      <MDTypography variant="button" fontWeight="bold" mb={1}>
+                        Colores:
+                      </MDTypography>
+                      {product.colors && product.colors.length > 0 ? (
+                        <MDBox display="flex" flexWrap="wrap" gap={0.5} mt={0.5}>
+                          {product.colors.map((color, index) => (
+                            <Chip
+                              key={index}
+                              label={color}
+                              color="primary"
+                              variant="outlined"
+                              size="small"
+                            />
+                          ))}
+                        </MDBox>
+                      ) : (
+                        <MDTypography variant="body2" color="text">
+                          N/A
+                        </MDTypography>
+                      )}
+                    </MDBox>
+
+                    {/* Tamaños */}
+                    <MDBox mb={2}>
+                      <MDTypography variant="button" fontWeight="bold" mb={1}>
+                        Tamaños:
+                      </MDTypography>
+                      {product.sizes && product.sizes.length > 0 ? (
+                        <MDBox display="flex" flexWrap="wrap" gap={0.5} mt={0.5}>
+                          {product.sizes.map((size, index) => (
+                            <Chip
+                              key={index}
+                              label={size}
+                              color="secondary"
+                              variant="outlined"
+                              size="small"
+                            />
+                          ))}
+                        </MDBox>
+                      ) : (
+                        <MDTypography variant="body2" color="text">
+                          N/A
+                        </MDTypography>
+                      )}
+                    </MDBox>
+
+                    {/* Materiales */}
+                    <MDBox mb={2}>
+                      <MDTypography variant="button" fontWeight="bold" mb={1}>
+                        Materiales:
+                      </MDTypography>
+                      {product.materials && product.materials.length > 0 ? (
+                        <MDBox display="flex" flexWrap="wrap" gap={0.5} mt={0.5}>
+                          {product.materials.map((material, index) => (
+                            <Chip
+                              key={index}
+                              label={material}
+                              color="success"
+                              variant="outlined"
+                              size="small"
+                            />
+                          ))}
+                        </MDBox>
+                      ) : (
+                        <MDTypography variant="body2" color="text">
+                          N/A
+                        </MDTypography>
+                      )}
+                    </MDBox>
+
+                    {/* Características */}
+                    <MDBox mb={2}>
+                      <MDTypography variant="button" fontWeight="bold" mb={1}>
+                        Características Especiales:
+                      </MDTypography>
+                      {product.features && product.features.length > 0 ? (
+                        <MDBox display="flex" flexWrap="wrap" gap={0.5} mt={0.5}>
+                          {product.features.map((feature, index) => (
+                            <Chip
+                              key={index}
+                              label={feature}
+                              color="warning"
+                              variant="outlined"
+                              size="small"
+                            />
+                          ))}
+                        </MDBox>
+                      ) : (
+                        <MDTypography variant="body2" color="text">
+                          N/A
+                        </MDTypography>
+                      )}
+                    </MDBox>
+
+                    {/* Información adicional */}
+                    <MDTypography variant="body2" color="text" mb={0.5}>
+                      <MDTypography component="span" variant="button" fontWeight="bold">
+                        Rango Etario:
+                      </MDTypography>{" "}
+                      {displayValue(product.ageRange)}
+                    </MDTypography>
+
+                    <MDTypography variant="body2" color="text" mb={0.5}>
+                      <MDTypography component="span" variant="button" fontWeight="bold">
+                        Voltaje:
+                      </MDTypography>{" "}
+                      {displayValue(product.voltage)}
+                    </MDTypography>
+
+                    <MDTypography variant="body2" color="text" mb={0.5}>
+                      <MDTypography component="span" variant="button" fontWeight="bold">
+                        Garantía:
+                      </MDTypography>{" "}
+                      {displayValue(product.warranty)}
+                    </MDTypography>
+
+                    <MDTypography variant="body2" color="text" mb={0.5}>
+                      <MDTypography component="span" variant="button" fontWeight="bold">
+                        Tipo de Batería:
+                      </MDTypography>{" "}
+                      {displayValue(product.batteryType)}
+                    </MDTypography>
+
+                    <MDTypography variant="body2" color="text" mb={0.5}>
+                      <MDTypography component="span" variant="button" fontWeight="bold">
+                        Incluye Baterías:
+                      </MDTypography>{" "}
+                      {product.includesBatteries ? "Sí" : "No"}
+                    </MDTypography>
+
+                    <MDTypography variant="body2" color="text" mb={0.5}>
+                      <MDTypography component="span" variant="button" fontWeight="bold">
+                        Ubicación Recomendada:
+                      </MDTypography>{" "}
+                      {displayValue(product.recommendedLocation)}
+                    </MDTypography>
+
+                    <MDTypography variant="body2" color="text" mb={0.5}>
+                      <MDTypography component="span" variant="button" fontWeight="bold">
+                        Peso:
+                      </MDTypography>{" "}
+                      {product.weight ? `${product.weight} kg` : "N/A"}
+                    </MDTypography>
+
+                    {/* Dimensiones */}
+                    <MDTypography variant="body2" color="text" mb={2}>
+                      <MDTypography component="span" variant="button" fontWeight="bold">
+                        Dimensiones:
+                      </MDTypography>{" "}
+                      {product.dimensions &&
+                      (product.dimensions.width ||
+                        product.dimensions.height ||
+                        product.dimensions.depth)
+                        ? `${product.dimensions.width || 0} x ${product.dimensions.height || 0} x ${
+                            product.dimensions.depth || 0
+                          } cm`
+                        : "N/A"}
+                    </MDTypography>
+
+                    <Divider sx={{ my: 2 }} />
+
                     <MDTypography variant="h6" mt={2} mb={1}>
                       Precios de Revendedor:
                     </MDTypography>

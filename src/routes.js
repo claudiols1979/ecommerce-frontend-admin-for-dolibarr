@@ -57,15 +57,15 @@ const routes = [
     // Roles with double quotes for Prettier compliance
     allowedRoles: ["Administrador", "Editor"], // All authenticated users
   },
-  {
-    type: "collapse",
-    name: "Pedidos",
-    key: "pedidos",
-    icon: <Icon fontSize="small">shopping_cart</Icon>, // Using shopping_cart icon for orders
-    route: "/orders",
-    component: <Orders />,
-    allowedRoles: ["Administrador", "Editor", "ReVendedor"], // Assuming all authenticated users can view orders initially
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Pedidos",
+  //   key: "pedidos",
+  //   icon: <Icon fontSize="small">shopping_cart</Icon>, // Using shopping_cart icon for orders
+  //   route: "/orders",
+  //   component: <Orders />,
+  //   allowedRoles: ["Administrador", "Editor", "ReVendedor"], // Assuming all authenticated users can view orders initially
+  // },
   {
     type: "hidden", // Hidden from Sidenav
     name: "Crear Orden",
@@ -86,10 +86,10 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Revendedores",
-    key: "revendedores",
+    name: "Clientes",
+    key: "clientes",
     icon: <Icon fontSize="small">person_add</Icon>,
-    route: "/revendedores",
+    route: "/clientes",
     component: <Resellers />,
     // Roles with double quotes
     allowedRoles: ["Administrador", "Editor"], // All authenticated users
