@@ -179,7 +179,7 @@ function MainAppContent() {
                 <>
                   <Sidenav
                     color={sidenavColor}
-                    brandName="Look & Smell"
+                    brandName="Software Factory ERP"
                     routes={filteredSidenavRoutes}
                     onMouseEnter={handleOnMouseEnter}
                     onMouseLeave={handleOnMouseLeave}

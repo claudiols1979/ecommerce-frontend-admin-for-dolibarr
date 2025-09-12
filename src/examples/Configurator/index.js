@@ -138,7 +138,7 @@ function Configurator() {
         px={3}
       >
         <MDBox>
-          <MDTypography variant="h5">Material UI Configuración</MDTypography>
+          <MDTypography variant="h5">Configuración</MDTypography>
           <MDTypography variant="body2" color="text">
             Ver nuestras opciones.
           </MDTypography>
