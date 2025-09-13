@@ -22,6 +22,7 @@ export const AuthProvider = ({ children }) => {
         } else {
           localStorage.removeItem("user");
           setUser(null);
+          navigate("/authentication/sign-in");
         }
       } catch (error) {
         localStorage.removeItem("user");
