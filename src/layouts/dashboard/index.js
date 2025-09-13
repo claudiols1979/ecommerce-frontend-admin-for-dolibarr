@@ -152,11 +152,11 @@ function Dashboard() {
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
                 color="dark"
-                icon={<GroupIcon />}
-                title="Total de usuarios"
-                count={summary?.numberOfUsers}
+                icon="credit_card"
+                title="Total ventas hoy"
+                count={`₡${summary?.dailySales.toFixed(2)}`}
                 percentage={{
-                  label: "Total de usuarios registrados",
+                  label: "Total de ventas hoy",
                 }}
               />
             </MDBox>
@@ -191,12 +191,12 @@ function Dashboard() {
               <ComplexStatisticsCard
                 color="primary"
                 icon="person"
-                title="Revendedores"
+                title="Cientes"
                 count={summary?.numberOfResellers}
                 percentage={{
                   color: "success",
                   amount: "",
-                  label: "Total revendedores registrados",
+                  label: "Total clientes registrados",
                 }}
               />
             </MDBox>

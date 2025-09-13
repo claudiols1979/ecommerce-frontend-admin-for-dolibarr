@@ -188,11 +188,11 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
 
             {user && ( // Only render if the 'user' object exists
               <MDTypography
-                component="h5"
-                variant="h5"
+                component="h6"
+                variant="h6"
                 fontWeight="regular"
                 color={textColor}
-                mt={0.5}
+                mt={0.2}
               >
                 Bienvenido {user.firstName || "Guest"}
               </MDTypography>
