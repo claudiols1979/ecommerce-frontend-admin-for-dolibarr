@@ -330,6 +330,17 @@ function EditProduct() {
     }
   };
 
+  const stripHtml = (html) => html?.replace(/<[^>]*>/g, "") || "";
+
+  const stripHtmlWithBreaks = (html) => {
+    if (!html) return "";
+    return html
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/p>/gi, "\n\n")
+      .replace(/<[^>]*>/g, "")
+      .trim();
+  };
+
   if (initialLoading) {
     return (
       <DashboardLayout>
@@ -381,6 +392,7 @@ function EditProduct() {
                     <MDInput
                       label="Nombre del Producto"
                       name="name"
+                      disabled
                       value={productData.name}
                       onChange={handleChange}
                       fullWidth
@@ -393,6 +405,7 @@ function EditProduct() {
                     <MDInput
                       label="Código"
                       name="code"
+                      disabled
                       value={productData.code}
                       onChange={handleChange}
                       fullWidth
@@ -402,18 +415,26 @@ function EditProduct() {
                     />
                   </Grid>
                   <Grid item xs={12}>
-                    <MDInput
-                      label="Descripción"
-                      name="description"
-                      value={productData.description}
-                      onChange={handleChange}
-                      multiline
-                      rows={3}
-                      fullWidth
-                      required
-                      error={!!formErrors.description}
-                      helperText={formErrors.description}
-                    />
+                    <MDTypography variant="caption" color="text" fontWeight="bold" sx={{ mb: 1 }}>
+                      Descripción
+                    </MDTypography>
+                    <MDTypography
+                      variant="body2"
+                      color="text"
+                      disabled
+                      sx={{
+                        whiteSpace: "pre-line",
+                        p: 1,
+                        border: "1px solid",
+                        borderColor: "grey.300",
+                        borderRadius: 1,
+                        bgcolor: "grey.50",
+                        minHeight: "80px",
+                      }}
+                    >
+                      {stripHtmlWithBreaks(productData.description) ||
+                        "No hay descripción disponible."}
+                    </MDTypography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <MDInput
@@ -517,7 +538,8 @@ function EditProduct() {
                       >
                         <IconButton
                           onClick={() => handleStockChange(-1)}
-                          disabled={productData.countInStock <= 0}
+                          //disabled={productData.countInStock <= 0}
+                          disabled
                         >
                           <RemoveCircleOutlineIcon />
                         </IconButton>
@@ -534,7 +556,7 @@ function EditProduct() {
                             {productData.countInStock}
                           </MDTypography>
                         </MDBox>
-                        <IconButton onClick={() => handleStockChange(1)}>
+                        <IconButton onClick={() => handleStockChange(1)} disabled>
                           <AddCircleOutlineIcon />
                         </IconButton>
                       </MDBox>
@@ -543,6 +565,7 @@ function EditProduct() {
                         name="countInStock"
                         type="number"
                         value={productData.countInStock}
+                        disabled
                         onChange={handleChange}
                         fullWidth
                         required
@@ -926,6 +949,7 @@ function EditProduct() {
                           <MDInput
                             label={`Precio ${cat.toUpperCase()}`}
                             name={`resellerPrices.${cat}`}
+                            disabled
                             type="number"
                             value={productData.resellerPrices[cat]}
                             onChange={handleChange}

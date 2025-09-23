@@ -147,6 +147,15 @@ function ProductDetail() {
   const formattedPrice =
     displayPrice?.toLocaleString("es-CR", { style: "currency", currency: "CRC" }) || "N/A";
 
+  const stripHtmlWithBreaks = (html) => {
+    if (!html) return "";
+    return html
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/p>/gi, "\n\n")
+      .replace(/<[^>]*>/g, "")
+      .trim();
+  };
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -384,7 +393,7 @@ function ProductDetail() {
                       Descripción:
                     </MDTypography>
                     <MDTypography variant="body2" color="text" mb={2}>
-                      {displayValue(product.description)}
+                      {stripHtmlWithBreaks(product.description) || "No description available."}
                     </MDTypography>
 
                     <Divider sx={{ my: 2 }} />
