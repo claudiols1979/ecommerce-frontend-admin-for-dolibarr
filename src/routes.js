@@ -15,6 +15,7 @@ import EditOrder from "layouts/orders/templates/EditOrder";
 import CreateReseller from "layouts/resellers/templates/CreateReseller";
 import EditReseller from "layouts/resellers/templates/EditReseller";
 import HeroCarousel from "layouts/herocarousel";
+import AdGridSystem from "layouts/adgridsystem";
 import Resellers from "layouts/resellers";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
@@ -74,6 +75,15 @@ const routes = [
     icon: <Icon fontSize="small">edit</Icon>, // Using shopping_cart icon for orders
     route: "/hero-carousel",
     component: <HeroCarousel />,
+    allowedRoles: ["Administrador", "Editor", "ReVendedor"], // Assuming all authenticated users can view orders initially
+  },
+  {
+    type: "collapse",
+    name: "AdGridSystem",
+    key: "AdGridSystem",
+    icon: <Icon fontSize="small">edit</Icon>, // Using shopping_cart icon for orders
+    route: "/adgridsystem",
+    component: <AdGridSystem />,
     allowedRoles: ["Administrador", "Editor", "ReVendedor"], // Assuming all authenticated users can view orders initially
   },
   {
