@@ -40,6 +40,7 @@ import { DashboardProvider } from "contexts/DashboardContext";
 import { ResellerProvider } from "contexts/ResellerContext"; // NEW: ResellerProvider import
 import { HeroCarouselProvider } from "contexts/HeroCarouselContext";
 import { AdGridProvider } from "contexts/AdGridContext";
+import { VideoProvider } from "contexts/VideoContext";
 
 // Protected Route utility
 import ProtectedRoute from "utils/ProtectedRoute";
@@ -60,6 +61,7 @@ import ProductDetail from "layouts/products/templates/ProductDetail";
 import Orders from "layouts/orders";
 import HeroCarousel from "layouts/herocarousel";
 import AdGridSystem from "layouts/adgridsystem";
+import HeroVideoCarousel from "layouts/herovideocarousel";
 import CreateOrder from "layouts/orders/templates/CreateOrder";
 import EditOrder from "layouts/orders/templates/EditOrder";
 import OrderDetail from "layouts/orders/templates/OrderDetail";
@@ -323,6 +325,14 @@ function MainAppContent() {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path="/herovideocarousel"
+                  element={
+                    <ProtectedRoute allowedRoles={["Administrador", "Editor", "Revendedor"]}>
+                      <HeroVideoCarousel />
+                    </ProtectedRoute>
+                  }
+                />
                 {/* Fallback for authenticated users */}
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
@@ -365,7 +375,9 @@ export default function App() {
             <ResellerProvider>
               <HeroCarouselProvider>
                 <AdGridProvider>
-                  <MainAppContent />
+                  <VideoProvider>
+                    <MainAppContent />
+                  </VideoProvider>
                 </AdGridProvider>
               </HeroCarouselProvider>
             </ResellerProvider>

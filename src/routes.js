@@ -16,6 +16,7 @@ import CreateReseller from "layouts/resellers/templates/CreateReseller";
 import EditReseller from "layouts/resellers/templates/EditReseller";
 import HeroCarousel from "layouts/herocarousel";
 import AdGridSystem from "layouts/adgridsystem";
+import HeroVideoCarousel from "layouts/herovideocarousel";
 import Resellers from "layouts/resellers";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
@@ -84,6 +85,15 @@ const routes = [
     icon: <Icon fontSize="small">imagemode</Icon>, // Using shopping_cart icon for orders
     route: "/adgridsystem",
     component: <AdGridSystem />,
+    allowedRoles: ["Administrador", "Editor", "ReVendedor"], // Assuming all authenticated users can view orders initially
+  },
+  {
+    type: "collapse",
+    name: "HeroVideoCarousel",
+    key: "HeroVideoCarousel",
+    icon: <Icon fontSize="small">video_camera_back_add</Icon>, // Using shopping_cart icon for orders
+    route: "/herovideocarousel",
+    component: <HeroVideoCarousel />,
     allowedRoles: ["Administrador", "Editor", "ReVendedor"], // Assuming all authenticated users can view orders initially
   },
   {

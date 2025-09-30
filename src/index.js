@@ -28,6 +28,7 @@ import { DashboardProvider } from "./contexts/DashboardContext";
 import { ProductProvider } from "./contexts/ProductContext";
 import { ResellerProvider } from "./contexts/ResellerContext";
 import { LabelProvider } from "contexts/LabelContext";
+import { VideoProvider } from "contexts/VideoContext";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -43,7 +44,9 @@ root.render(
           <ProductProvider>
             <ResellerProvider>
               <LabelProvider>
-                <App />
+                <VideoProvider>
+                  <App />
+                </VideoProvider>
               </LabelProvider>
             </ResellerProvider>
           </ProductProvider>
