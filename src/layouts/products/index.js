@@ -175,7 +175,7 @@ function Products() {
     { Header: "Categoría", accessor: "category" },
     { Header: "Subcategoría", accessor: "subcategory" },
     {
-      Header: "Precio (Cat1)",
+      Header: "Precio (Sin iva)",
       accessor: "resellerPrices.cat1",
       Cell: ({ cell: { value } }) =>
         value ? value.toLocaleString("es-CR", { style: "currency", currency: "CRC" }) : "N/A",

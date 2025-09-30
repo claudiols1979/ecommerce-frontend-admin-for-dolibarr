@@ -360,10 +360,11 @@ function EditOrder() {
                 <Grid container spacing={3}>
                   <Grid item xs={12}>
                     <MDTypography variant="h6" mb={2}>
-                      Estado del Pedido:
+                      Estado del Pedido: {statusTranslations[currentStatus]}
                     </MDTypography>
                   </Grid>
-                  <Grid item xs={12} md={6}>
+
+                  {/* <Grid item xs={12} md={6}>
                     <FormControl fullWidth variant="outlined">
                       <InputLabel id="status-label">Estado</InputLabel>
                       <Select
@@ -380,8 +381,8 @@ function EditOrder() {
                         ))}
                       </Select>
                     </FormControl>
-                  </Grid>
-                  <Grid item xs={12}>
+                  </Grid> */}
+                  {/* <Grid item xs={12}>
                     <MDTypography variant="h6" mt={3} mb={1}>
                       Modificar Artículos:
                     </MDTypography>
@@ -436,7 +437,7 @@ function EditOrder() {
                         No se pueden modificar los artículos en el estado actual del pedido.
                       </MDTypography>
                     </Grid>
-                  )}
+                  )} */}
 
                   <Grid item xs={12}>
                     <MDTypography variant="h6" mt={3} mb={2}>
@@ -558,7 +559,7 @@ function EditOrder() {
                     )}
                     <MDBox mt={2} display="flex" justifyContent="flex-end">
                       <MDTypography variant="h6" color="text">
-                        Nuevo Total Estimado:{" "}
+                        Nuevo Total Estimado sin iva:{" "}
                         {calculateTotalPrice().toLocaleString("es-CR", {
                           style: "currency",
                           currency: "CRC",

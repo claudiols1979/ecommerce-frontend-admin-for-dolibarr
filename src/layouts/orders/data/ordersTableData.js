@@ -131,7 +131,7 @@ export default function ordersTableData(orders, currentUser, onStatusChange) {
           {isAdminOrEditor && (
             <>
               {/* Edit Icon */}
-              <Link to={isOrderModifiable ? `/orders/edit/${order._id}` : "#"}>
+              {/* <Link to={isOrderModifiable ? `/orders/edit/${order._id}` : "#"}>
                 <MDTypography
                   variant="caption"
                   color={isOrderModifiable ? "info" : "secondary"} // Grey out if not modifiable
@@ -144,7 +144,7 @@ export default function ordersTableData(orders, currentUser, onStatusChange) {
                 >
                   <Icon sx={{ fontSize: "24px" }}>edit</Icon>
                 </MDTypography>
-              </Link>
+              </Link> */}
               {/* Status Change Icon (Cancel/Restore) */}
               {/* {canChangeOrderStatus && onStatusChange && (
                 <MDTypography

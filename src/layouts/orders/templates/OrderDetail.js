@@ -193,11 +193,11 @@ function OrderDetail() {
                       color="warning"
                       sx={{ mr: 1 }}
                     >
-                      Editar Pedido
+                      Ver Pedido
                     </MDButton>
                   )}
                   <MDButton onClick={() => navigate("/orders")} variant="gradient" color="dark">
-                    Volver a Pedidos
+                    Volver a todos los Pedidos
                   </MDButton>
                 </MDBox>
               </MDBox>
@@ -324,7 +324,7 @@ function OrderDetail() {
                               </MDTypography>
                             </MDBox>
                             <MDTypography variant="button" fontWeight="medium">
-                              Subtotal:{" "}
+                              Subtotal sin iva:{" "}
                               {(item.quantity * item.priceAtSale).toLocaleString("es-CR", {
                                 style: "currency",
                                 currency: "CRC",

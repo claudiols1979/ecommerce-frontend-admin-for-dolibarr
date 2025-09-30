@@ -53,7 +53,7 @@ const routes = [
     type: "collapse",
     name: "Productos",
     key: "productos",
-    icon: <Icon fontSize="small">inventory</Icon>,
+    icon: <Icon fontSize="small">sell</Icon>,
     route: "/products",
     component: <Products />,
     // Roles with double quotes for Prettier compliance
@@ -72,7 +72,7 @@ const routes = [
     type: "collapse",
     name: "HeroCarousel",
     key: "HeroCarousel",
-    icon: <Icon fontSize="small">edit</Icon>, // Using shopping_cart icon for orders
+    icon: <Icon fontSize="small">view_carousel</Icon>, // Using shopping_cart icon for orders
     route: "/hero-carousel",
     component: <HeroCarousel />,
     allowedRoles: ["Administrador", "Editor", "ReVendedor"], // Assuming all authenticated users can view orders initially
@@ -81,7 +81,7 @@ const routes = [
     type: "collapse",
     name: "AdGridSystem",
     key: "AdGridSystem",
-    icon: <Icon fontSize="small">edit</Icon>, // Using shopping_cart icon for orders
+    icon: <Icon fontSize="small">imagemode</Icon>, // Using shopping_cart icon for orders
     route: "/adgridsystem",
     component: <AdGridSystem />,
     allowedRoles: ["Administrador", "Editor", "ReVendedor"], // Assuming all authenticated users can view orders initially
