@@ -482,7 +482,7 @@ function EditOrder() {
                                 })}
                               </MDTypography>
                             </MDBox>
-                            <MDBox display="flex" alignItems="center" gap={{ xs: 0.5, sm: 1 }}>
+                            {/* <MDBox display="flex" alignItems="center" gap={{ xs: 0.5, sm: 1 }}>
                               {isMobile ? (
                                 <>
                                   <IconButton
@@ -548,7 +548,7 @@ function EditOrder() {
                               >
                                 <DeleteIcon />
                               </IconButton>
-                            </MDBox>
+                            </MDBox> */}
                           </MDBox>
                         );
                       })
@@ -569,7 +569,7 @@ function EditOrder() {
                   </Grid>
 
                   <Grid item xs={12} display="flex" justifyContent="flex-end" mt={3}>
-                    <MDButton
+                    {/* <MDButton
                       variant="gradient"
                       color="success"
                       onClick={handleSaveOrder}
@@ -580,7 +580,7 @@ function EditOrder() {
                       ) : (
                         "Guardar Cambios"
                       )}
-                    </MDButton>
+                    </MDButton> */}
                   </Grid>
                 </Grid>
               </MDBox>

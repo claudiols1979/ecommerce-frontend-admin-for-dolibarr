@@ -228,7 +228,7 @@ function OrderDetail() {
                     </MDBox>
                     <MDTypography variant="body2" color="text" mb={0.5}>
                       <MDTypography component="span" variant="button" fontWeight="bold">
-                        Total:
+                        Total (con iva + envío):
                       </MDTypography>{" "}
                       {order.totalPrice.toLocaleString("es-CR", {
                         style: "currency",
