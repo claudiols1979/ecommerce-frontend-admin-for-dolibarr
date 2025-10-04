@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -380,34 +380,17 @@ function Products() {
                 />
 
                 {pages > 1 && (
-                  <MDBox display="flex" justifyContent="space-between" alignItems="center" mt={3}>
-                    <MDTypography variant="button" color="text">
-                      Página {page} de {pages} (Total: {total} productos)
-                    </MDTypography>
-                    <Pagination
-                      count={pages}
-                      page={page}
-                      onChange={handlePageChange}
-                      color="info"
-                      size="large"
-                      siblingCount={1}
-                      boundaryCount={1}
-                    />
-                    <TextField
-                      select
-                      label="Productos por página"
-                      value={limit}
-                      onChange={handleLimitChange}
-                      variant="outlined"
-                      size="small"
-                      sx={{ width: "150px" }}
-                    >
-                      <MenuItem value={5}>5</MenuItem>
-                      <MenuItem value={10}>10</MenuItem>
-                      <MenuItem value={20}>20</MenuItem>
-                      <MenuItem value={50}>50</MenuItem>
-                    </TextField>
-                  </MDBox>
+                  <MDBox display="flex" justifyContent="center" alignItems="center" mt={3} gap={2}>                 
+                  <Pagination
+                    count={pages}
+                    page={page}
+                    onChange={handlePageChange}
+                    color="info"
+                    size="large"
+                    siblingCount={1}
+                    boundaryCount={1}
+                  />
+                </MDBox>
                 )}
               </MDBox>
             </Card>
