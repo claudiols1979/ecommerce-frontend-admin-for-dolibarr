@@ -73,10 +73,10 @@ function HeroCarousel() {
       <MDBox py={3}>
         <MDBox display="flex" justifyContent="space-between" alignItems="center" mb={3}>
           <MDTypography variant="h4" fontWeight="medium">
-            Hero Carousel Management
+            Administrador Hero Carousel
           </MDTypography>
           <MDButton variant="gradient" color="info" onClick={handleCreateSlide} disabled={loading}>
-            Add New Slide
+            Agregar nuevo
           </MDButton>
         </MDBox>
 

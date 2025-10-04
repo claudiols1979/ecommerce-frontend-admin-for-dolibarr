@@ -34,16 +34,16 @@ function SlidesTable({ slides, loading, onEditSlide }) {
   };
 
   const columns = [
-    { Header: "Image", accessor: "image", width: "10%", align: "left" },
-    { Header: "Title", accessor: "title", width: "25%", align: "left" },
-    { Header: "Description", accessor: "description", width: "30%", align: "left" },
-    { Header: "Order", accessor: "order", width: "10%", align: "center" },
-    { Header: "Status", accessor: "status", width: "10%", align: "center" },
-    { Header: "Actions", accessor: "actions", width: "15%", align: "center" },
+    { Header: "Imagen", accessor: "imagen", width: "10%", align: "left" },
+    { Header: "Título", accessor: "título", width: "25%", align: "left" },
+    { Header: "Descripción", accessor: "descripción", width: "30%", align: "left" },
+    { Header: "Órden", accessor: "órden", width: "10%", align: "center" },
+    { Header: "Estado", accessor: "estado", width: "10%", align: "center" },
+    { Header: "Acciones", accessor: "acciones", width: "15%", align: "center" },
   ];
 
   const rows = slides.map((slide) => ({
-    image: (
+    imagen: (
       <MDAvatar
         src={slide.image}
         alt={slide.alt}
@@ -52,37 +52,37 @@ function SlidesTable({ slides, loading, onEditSlide }) {
         bgColor="transparent"
       />
     ),
-    title: (
+    título: (
       <MDTypography variant="caption" fontWeight="medium">
         {slide.title}
       </MDTypography>
     ),
-    description: (
+    descripción: (
       <MDTypography variant="caption" color="text">
         {slide.description.length > 50
           ? `${slide.description.substring(0, 50)}...`
           : slide.description}
       </MDTypography>
     ),
-    order: (
+    órden: (
       <MDTypography variant="caption" fontWeight="medium">
         {slide.order}
       </MDTypography>
     ),
-    status: (
+    estado: (
       <MDButton
         variant="gradient"
         color={slide.isActive ? "success" : "error"}
         size="small"
         onClick={() => handleToggleActive(slide._id, slide.isActive)}
       >
-        {slide.isActive ? "Active" : "Inactive"}
+        {slide.isActive ? "Activo" : "Inactivo"}
       </MDButton>
     ),
-    actions: (
+    acciones: (
       <MDBox display="flex" gap={1}>
         <MDButton variant="gradient" color="info" size="small" onClick={() => onEditSlide(slide)}>
-          Edit
+          Editar
         </MDButton>
         <MDButton
           variant="gradient"
@@ -90,7 +90,7 @@ function SlidesTable({ slides, loading, onEditSlide }) {
           size="small"
           onClick={() => handleDelete(slide._id)}
         >
-          Delete
+          Eliminar
         </MDButton>
       </MDBox>
     ),

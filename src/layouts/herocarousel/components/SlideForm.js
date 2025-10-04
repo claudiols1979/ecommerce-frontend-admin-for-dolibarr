@@ -101,7 +101,7 @@ function SlideForm({ slide, onClose, onSuccess }) {
       sx={{ border: "1px solid #e0e0e0", borderRadius: 2 }}
     >
       <MDTypography variant="h5" fontWeight="medium" mb={3}>
-        {slide ? "Edit Slide" : "Create New Slide"}
+        {slide ? "Editar Slide" : "Crear Nuevo Slide"}
       </MDTypography>
 
       {error && (
@@ -118,7 +118,7 @@ function SlideForm({ slide, onClose, onSuccess }) {
 
       <MDBox mb={2}>
         <MDTypography variant="button" fontWeight="medium">
-          Image Upload {!slide && "*"}
+          Subir Imágen {!slide && "*"}
         </MDTypography>
         <input
           type="file"
@@ -146,7 +146,7 @@ function SlideForm({ slide, onClose, onSuccess }) {
       <MDBox mb={2}>
         <MDInput
           fullWidth
-          label="Title *"
+          label="Título *"
           name="title"
           value={formData.title}
           onChange={handleInputChange}
@@ -158,7 +158,7 @@ function SlideForm({ slide, onClose, onSuccess }) {
       <MDBox mb={2}>
         <MDInput
           fullWidth
-          label="Description *"
+          label="Descripción *"
           name="description"
           value={formData.description}
           onChange={handleInputChange}
@@ -172,7 +172,7 @@ function SlideForm({ slide, onClose, onSuccess }) {
       <MDBox mb={2}>
         <MDInput
           fullWidth
-          label="Alt Text *"
+          label="Texto Alt *"
           name="alt"
           value={formData.alt}
           onChange={handleInputChange}
@@ -184,7 +184,7 @@ function SlideForm({ slide, onClose, onSuccess }) {
       <MDBox mb={2}>
         <MDInput
           fullWidth
-          label="Button Text"
+          label="Texto de Butón"
           name="buttonText"
           value={formData.buttonText}
           onChange={handleInputChange}
@@ -195,7 +195,7 @@ function SlideForm({ slide, onClose, onSuccess }) {
       <MDBox mb={2}>
         <MDInput
           fullWidth
-          label="Button Link"
+          label="Botón Hipervínculo"
           name="buttonLink"
           value={formData.buttonLink}
           onChange={handleInputChange}
@@ -207,7 +207,7 @@ function SlideForm({ slide, onClose, onSuccess }) {
         <MDInput
           fullWidth
           type="number"
-          label="Order"
+          label="Órden"
           name="order"
           value={formData.order}
           onChange={handleInputChange}
@@ -225,16 +225,16 @@ function SlideForm({ slide, onClose, onSuccess }) {
           disabled={formLoading}
         />
         <MDTypography variant="button" fontWeight="medium">
-          Active Slide
+          Slide Activo
         </MDTypography>
       </MDBox>
 
       <MDBox display="flex" gap={1}>
         <MDButton variant="gradient" color="info" type="submit" disabled={formLoading}>
-          {formLoading ? "Saving..." : slide ? "Update Slide" : "Create Slide"}
+          {formLoading ? "Saving..." : slide ? "Actualizar Slide" : "Crear Slide"}
         </MDButton>
         <MDButton variant="outlined" color="secondary" onClick={onClose} disabled={formLoading}>
-          Cancel
+          Cancelar
         </MDButton>
       </MDBox>
     </MDBox>
