@@ -381,6 +381,7 @@ function VideoForm({ video, onClose, onSuccess }) {
           value={formData.order}
           onChange={handleInputChange}
           disabled={isUploading}
+          inputProps={{ min: 0, max: 1 }}
         />
       </MDBox>
 

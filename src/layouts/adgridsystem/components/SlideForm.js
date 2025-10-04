@@ -208,7 +208,7 @@ function SlideForm({ itemToEdit, onCancel, onSuccess }) {
           value={formData.order}
           onChange={handleInputChange}
           disabled={formLoading}
-          inputProps={{ min: 0 }}
+          inputProps={{ min: 0, max: 6 }}
         />
       </MDBox>
 
