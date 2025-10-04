@@ -104,10 +104,10 @@ function HeroVideoCarousel() {
       <MDBox py={3}>
         <MDBox display="flex" justifyContent="space-between" alignItems="center" mb={3}>
           <MDTypography variant="h4" fontWeight="medium">
-            Video Carousel Management
+            Administrador Video Carousel
           </MDTypography>
           <MDButton variant="gradient" color="info" onClick={handleCreateVideo} disabled={loading}>
-            Upload Video
+            Subir Video
           </MDButton>
         </MDBox>
 

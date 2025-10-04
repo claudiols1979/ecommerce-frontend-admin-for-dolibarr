@@ -53,7 +53,7 @@ function VideosTable({ videos, loading, onEditVideo, onDeleteVideo, onActivateVi
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              backgroundColor: video.isActive ? "#f0f8ff" : "transparent",
+              backgroundColor: video.isActive ? "transparent" : "transparent",
             }}
           >
             <MDBox display="flex" alignItems="center" flex={1}>
@@ -77,18 +77,18 @@ function VideosTable({ videos, loading, onEditVideo, onDeleteVideo, onActivateVi
                   {video.isActive && (
                     <MDTypography
                       variant="caption"
-                      color="success"
+                      color="white"
                       fontWeight="medium"
                       sx={{
                         ml: 1,
                         px: 1,
                         py: 0.5,
                         backgroundColor: "success.main",
-                        color: "white",
+                        color: "primary",
                         borderRadius: 1,
                       }}
                     >
-                      ACTIVE
+                      ACTIVO
                     </MDTypography>
                   )}
                 </MDBox>
@@ -110,7 +110,7 @@ function VideosTable({ videos, loading, onEditVideo, onDeleteVideo, onActivateVi
                   size="small"
                   onClick={() => onActivateVideo(video._id)}
                 >
-                  Activate
+                  Activar
                 </MDButton>
               )}
               <MDBox display="flex" gap={1}>
@@ -120,7 +120,7 @@ function VideosTable({ videos, loading, onEditVideo, onDeleteVideo, onActivateVi
                   size="small"
                   onClick={() => onEditVideo(video)}
                 >
-                  Edit
+                  Editar
                 </MDButton>
                 <MDButton
                   variant="outlined"
@@ -128,7 +128,7 @@ function VideosTable({ videos, loading, onEditVideo, onDeleteVideo, onActivateVi
                   size="small"
                   onClick={() => onDeleteVideo(video._id, video.title)}
                 >
-                  Delete
+                  Eliminar
                 </MDButton>
               </MDBox>
             </MDBox>
