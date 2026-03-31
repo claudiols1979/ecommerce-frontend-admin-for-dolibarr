@@ -9,6 +9,90 @@ import MDButton from "components/MDButton";
 
 // Material Dashboard 2 React components
 import Card from "@mui/material/Card";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import Icon from "@mui/material/Icon";
+
+function MDActionMenu({ video, onEdit, onDelete, onActivate }) {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleOpen = (event) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = (e) => {
+    if (e) e.stopPropagation();
+    setAnchorEl(null);
+  };
+
+  return (
+    <>
+      <IconButton size="small" onClick={handleOpen} color="inherit">
+        <MoreVertIcon />
+      </IconButton>
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+      >
+        <MenuItem
+          onClick={(e) => {
+            handleClose(e);
+            onEdit(video);
+          }}
+        >
+          <MDBox display="flex" alignItems="center">
+            <Icon sx={{ mr: 1, color: "info.main" }}>edit</Icon>
+            <MDTypography variant="button">Editar</MDTypography>
+          </MDBox>
+        </MenuItem>
+        {!video.isActive && (
+          <MenuItem
+            onClick={(e) => {
+              handleClose(e);
+              onActivate(video._id);
+            }}
+          >
+            <MDBox display="flex" alignItems="center">
+              <Icon sx={{ mr: 1, color: "success.main" }}>check_circle</Icon>
+              <MDTypography variant="button">Activar</MDTypography>
+            </MDBox>
+          </MenuItem>
+        )}
+        <MenuItem
+          onClick={(e) => {
+            handleClose(e);
+            onDelete(video._id, video.title);
+          }}
+        >
+          <MDBox display="flex" alignItems="center">
+            <Icon sx={{ mr: 1, color: "error.main" }}>delete</Icon>
+            <MDTypography variant="button">Eliminar</MDTypography>
+          </MDBox>
+        </MenuItem>
+      </Menu>
+    </>
+  );
+}
+
+MDActionMenu.propTypes = {
+  video: PropTypes.object.isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onActivate: PropTypes.func.isRequired,
+};
 
 function VideosTable({ videos, loading, onEditVideo, onDeleteVideo, onActivateVideo }) {
   if (loading) {
@@ -103,35 +187,13 @@ function VideosTable({ videos, loading, onEditVideo, onDeleteVideo, onActivateVi
                 </MDBox>
               </MDBox>
             </MDBox>
-            <MDBox display="flex" gap={1} flexDirection="column">
-              {!video.isActive && (
-                <MDButton
-                  variant="gradient"
-                  color="success"
-                  size="small"
-                  onClick={() => onActivateVideo(video._id)}
-                >
-                  Activar
-                </MDButton>
-              )}
-              <MDBox display="flex" gap={1}>
-                <MDButton
-                  variant="outlined"
-                  color="info"
-                  size="small"
-                  onClick={() => onEditVideo(video)}
-                >
-                  Editar
-                </MDButton>
-                <MDButton
-                  variant="outlined"
-                  color="error"
-                  size="small"
-                  onClick={() => onDeleteVideo(video._id, video.title)}
-                >
-                  Eliminar
-                </MDButton>
-              </MDBox>
+            <MDBox display="flex" alignItems="center">
+              <MDActionMenu
+                video={video}
+                onEdit={onEditVideo}
+                onDelete={onDeleteVideo}
+                onActivate={onActivateVideo}
+              />
             </MDBox>
           </MDBox>
         ))}

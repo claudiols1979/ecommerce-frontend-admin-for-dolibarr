@@ -62,10 +62,14 @@ export const VideoProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.post(`${API_URL}/api/hero-carousel-video`, videoData, {
-        ...config,
-        timeout: 15000,
-      });
+      const response = await axios.post(
+        `${API_URL}/api/hero-carousel-video`,
+        videoData,
+        {
+          ...config,
+          timeout: 15000,
+        }
+      );
       setVideos((prev) => [...prev, response.data]);
       return response.data;
     } catch (err) {
@@ -87,10 +91,14 @@ export const VideoProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.put(`${API_URL}/api/hero-carousel-video/${id}`, videoData, {
-        ...config,
-        timeout: 15000,
-      });
+      const response = await axios.put(
+        `${API_URL}/api/hero-carousel-video/${id}`,
+        videoData,
+        {
+          ...config,
+          timeout: 15000,
+        }
+      );
       setVideos((prev) => prev.map((video) => (video._id === id ? response.data : video)));
       return response.data;
     } catch (err) {
@@ -138,7 +146,10 @@ export const VideoProvider = ({ children }) => {
       const response = await axios.put(
         `${API_URL}/api/hero-carousel-video/${id}/activate`,
         {},
-        { ...config, timeout: 15000 }
+        {
+          ...config,
+          timeout: 15000,
+        }
       );
 
       // Actualizar el estado: el video activado se marca como activo, los demás como inactivos

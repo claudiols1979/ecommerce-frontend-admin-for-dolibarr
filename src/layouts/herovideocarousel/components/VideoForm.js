@@ -299,6 +299,8 @@ function VideoForm({ video, onClose, onSuccess }) {
             <video
               src={videoPreview}
               controls
+              muted
+              preload="auto"
               style={{
                 width: "100%",
                 maxWidth: "100%",
