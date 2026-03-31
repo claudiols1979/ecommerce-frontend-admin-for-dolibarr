@@ -33,6 +33,15 @@ function VideoForm({ video, onClose, onSuccess }) {
   const [videoFile, setVideoFile] = useState(null);
   const [videoPreview, setVideoPreview] = useState("");
   const [videoError, setVideoError] = useState(false);
+
+  // Efecto para checkear si el video preview es de la cuenta restringida
+  useEffect(() => {
+    if (videoPreview?.includes("dl4k0gqfv")) {
+      setVideoError(true);
+    } else {
+      setVideoError(false);
+    }
+  }, [videoPreview]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
