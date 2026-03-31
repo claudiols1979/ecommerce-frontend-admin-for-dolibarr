@@ -13,7 +13,7 @@ import { useVideo } from "contexts/VideoContext";
 
 // Configuración de Cloudinary
 const CLOUDINARY_CONFIG = {
-  cloudName: "dl4k0gqfv",
+  cloudName: "dryzziijr",
   uploadPreset: "video_hero_upload",
 };
 
