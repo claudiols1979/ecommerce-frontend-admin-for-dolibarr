@@ -58,37 +58,23 @@ function VideosTable({ videos, loading, onEditVideo, onDeleteVideo, onActivateVi
             }}
           >
             <MDBox display="flex" alignItems="center" flex={1}>
-              {video.video?.includes("dl4k0gqfv") ? (
-                <MDBox
-                  sx={{
-                    width: "120px",
-                    height: "80px",
-                    borderRadius: "4px",
-                    bgcolor: "grey.200",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundImage: `url(https://placehold.co/120x80/263C5C/FFFFFF?text=Video+Restringido)`,
-                    backgroundSize: "cover",
-                    marginRight: "16px",
-                  }}
-                />
-              ) : (
-                <video
-                  style={{
-                    width: "120px",
-                    height: "80px",
-                    borderRadius: "4px",
-                    objectFit: "cover",
-                    marginRight: "16px",
-                    backgroundColor: "#000",
-                  }}
-                  controls
-                  poster={`https://placehold.co/120x80/263C5C/FFFFFF?text=${encodeURIComponent(video.title.substring(0, 10))}`}
-                >
-                  <source src={video.video} type="video/mp4" />
-                </video>
-              )}
+              <video
+                key={video.video}
+                src={video.video}
+                controls
+                preload="metadata"
+                crossOrigin="anonymous"
+                width="120"
+                height="80"
+                style={{
+                  width: "120px",
+                  height: "80px",
+                  borderRadius: "4px",
+                  objectFit: "cover",
+                  marginRight: "16px",
+                  backgroundColor: "#000",
+                }}
+              />
               <MDBox flex={1}>
                 <MDBox display="flex" alignItems="center" mb={1}>
                   <MDTypography variant="h6" fontWeight="medium">
