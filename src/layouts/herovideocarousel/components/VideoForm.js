@@ -12,10 +12,7 @@ import MDButton from "components/MDButton";
 import { useVideo } from "contexts/VideoContext";
 
 // Configuración de Cloudinary
-const CLOUDINARY_CONFIG = {
-  cloudName: "dryzziijr",
-  uploadPreset: "video_hero_upload",
-};
+import { CLOUDINARY_CONFIG } from "config/cloudinary";
 
 function VideoForm({ video, onClose, onSuccess }) {
   const { createVideo, updateVideo, loading, error } = useVideo();
@@ -34,6 +31,10 @@ function VideoForm({ video, onClose, onSuccess }) {
   const [videoPreview, setVideoPreview] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [localError, setLocalError] = useState(null);
+ 
+  const setError = (msg) => setLocalError(msg);
+  const displayError = localError || error;
 
   useEffect(() => {
     if (video) {
@@ -62,12 +63,12 @@ function VideoForm({ video, onClose, onSuccess }) {
       console.log("📁 Archivo seleccionado:", file.name, file.size, file.type);
 
       if (!file.type.startsWith("video/")) {
-        alert("Por favor selecciona un archivo de video válido");
+        setError("Por favor selecciona un archivo de video válido");
         return;
       }
 
       if (file.size > 100 * 1024 * 1024) {
-        alert("El video no puede ser mayor a 100MB");
+        setError("El video no puede ser mayor a 100MB");
         return;
       }
 
@@ -151,17 +152,17 @@ function VideoForm({ video, onClose, onSuccess }) {
 
     // Validaciones específicas para el backend
     if (!formData.title) {
-      alert("El título es requerido");
+      setError("El título es requerido");
       return;
     }
 
     if (!formData.description) {
-      alert("El subtítulo es requerido (se usará como subtitle)");
+      setError("El subtítulo es requerido (se usará como subtitle)");
       return;
     }
 
     if (!video && !videoFile) {
-      alert("Por favor selecciona un video");
+      setError("Por favor selecciona un video");
       return;
     }
 
@@ -202,9 +203,13 @@ function VideoForm({ video, onClose, onSuccess }) {
 
       console.log("🎉 Proceso completado exitosamente");
       onSuccess();
-    } catch (error) {
-      console.error("💥 Error en el proceso:", error);
-      alert(`Error: ${error.message}`);
+    } catch (err) {
+      console.error("💥 Error en el proceso:", err);
+      let msg = err.message;
+      if (msg.includes("Upload preset not found")) {
+        msg = "Error: El 'Upload Preset' (" + CLOUDINARY_CONFIG.uploadPreset + ") no existe en la cuenta " + CLOUDINARY_CONFIG.cloudName + ". Debes crearlo en el panel de Cloudinary como 'Unsigned'.";
+      }
+      setError(msg);
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
@@ -234,14 +239,14 @@ function VideoForm({ video, onClose, onSuccess }) {
         </MDTypography>
       </MDBox> */}
 
-      {error && (
+      {displayError && (
         <MDBox
           mb={2}
           p={1}
           sx={{ border: "1px solid #f44336", borderRadius: 1, bgcolor: "#ffebee" }}
         >
-          <MDTypography color="error" variant="body2">
-            Error: {error}
+          <MDTypography color="error" variant="body2" fontWeight="medium">
+            {displayError}
           </MDTypography>
         </MDBox>
       )}
