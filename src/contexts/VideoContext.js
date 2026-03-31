@@ -39,7 +39,7 @@ export const VideoProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${API_URL}/api/hero-carousel-video`, config);
+      const response = await axios.get(`${API_URL}/api/hero-carousel-video`, { ...config, timeout: 15000 });
       setVideos(response.data);
     } catch (err) {
       // Si no hay videos o el backend no responde, simplemente dejamos el array vacío
@@ -59,7 +59,7 @@ export const VideoProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.post(`${API_URL}/api/hero-carousel-video`, videoData, config);
+      const response = await axios.post(`${API_URL}/api/hero-carousel-video`, videoData, { ...config, timeout: 15000 });
       setVideos((prev) => [...prev, response.data]);
       return response.data;
     } catch (err) {
@@ -84,7 +84,7 @@ export const VideoProvider = ({ children }) => {
       const response = await axios.put(
         `${API_URL}/api/hero-carousel-video/${id}`,
         videoData,
-        config
+        { ...config, timeout: 15000 }
       );
       setVideos((prev) => prev.map((video) => (video._id === id ? response.data : video)));
       return response.data;
@@ -106,7 +106,7 @@ export const VideoProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      await axios.delete(`${API_URL}/api/hero-carousel-video/${id}`, config);
+      await axios.delete(`${API_URL}/api/hero-carousel-video/${id}`, { ...config, timeout: 15000 });
       setVideos((prev) => prev.filter((video) => video._id !== id));
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Error deleting video";
@@ -130,7 +130,7 @@ export const VideoProvider = ({ children }) => {
       const response = await axios.put(
         `${API_URL}/api/hero-carousel-video/${id}/activate`,
         {},
-        config
+        { ...config, timeout: 15000 }
       );
 
       // Actualizar el estado: el video activado se marca como activo, los demás como inactivos

@@ -65,8 +65,10 @@ function VideosTable({ videos, loading, onEditVideo, onDeleteVideo, onActivateVi
                   borderRadius: "4px",
                   objectFit: "cover",
                   marginRight: "16px",
+                  backgroundColor: "#000",
                 }}
                 controls
+                poster={`https://placehold.co/120x80/263C5C/FFFFFF?text=${encodeURIComponent(video.title.substring(0, 10))}`}
               >
                 <source src={video.video} type="video/mp4" />
               </video>

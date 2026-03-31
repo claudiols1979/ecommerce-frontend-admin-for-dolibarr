@@ -32,6 +32,7 @@ function VideoForm({ video, onClose, onSuccess }) {
 
   const [videoFile, setVideoFile] = useState(null);
   const [videoPreview, setVideoPreview] = useState("");
+  const [videoError, setVideoError] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -296,19 +297,41 @@ function VideoForm({ video, onClose, onSuccess }) {
 
         {videoPreview && (
           <MDBox mt={2}>
-            <video
-              controls
-              style={{
-                maxWidth: "100%",
-                maxHeight: "300px",
-                borderRadius: "8px",
-                border: "1px solid",
-                borderColor: "divider",
-              }}
-            >
-              <source src={videoPreview} type="video/mp4" />
-              Tu navegador no soporta videos.
-            </video>
+            {!videoError ? (
+              <video
+                controls
+                style={{
+                  maxWidth: "100%",
+                  maxHeight: "300px",
+                  borderRadius: "8px",
+                  border: "1px solid",
+                  borderColor: "divider",
+                }}
+                poster={`https://placehold.co/600x300/F5F5F5/333333?text=Vista+Previa+Video`}
+                onError={() => setVideoError(true)}
+              >
+                <source src={videoPreview} type="video/mp4" />
+                Tu navegador no soporta videos.
+              </video>
+            ) : (
+              <MDBox
+                sx={{
+                  width: "100%",
+                  height: "200px",
+                  borderRadius: "8px",
+                  bgcolor: "grey.200",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundImage: `url(https://placehold.co/600x300/F5F5F5/333333?text=Video+no+disponible)`,
+                  backgroundSize: "cover",
+                }}
+              >
+                <MDTypography variant="caption" color="text">
+                  Video no disponible (Cloudinary restringido)
+                </MDTypography>
+              </MDBox>
+            )}
           </MDBox>
         )}
       </MDBox>
