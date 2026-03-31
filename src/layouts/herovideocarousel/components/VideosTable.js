@@ -59,13 +59,8 @@ function VideosTable({ videos, loading, onEditVideo, onDeleteVideo, onActivateVi
           >
             <MDBox display="flex" alignItems="center" flex={1}>
               <video
-                key={video.video}
                 src={video.video}
                 controls
-                preload="metadata"
-                crossOrigin="anonymous"
-                width="120"
-                height="80"
                 style={{
                   width: "120px",
                   height: "80px",

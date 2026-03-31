@@ -297,23 +297,16 @@ function VideoForm({ video, onClose, onSuccess }) {
         {videoPreview && (
           <MDBox mt={2}>
             <video
-              key={videoPreview}
               src={videoPreview}
               controls
-              preload="metadata"
-              crossOrigin="anonymous"
-              width="100%"
-              height="auto"
               style={{
+                width: "100%",
                 maxWidth: "100%",
                 maxHeight: "300px",
                 borderRadius: "8px",
-                border: "1px solid",
-                borderColor: "divider",
+                objectFit: "cover",
               }}
-            >
-              Tu navegador no soporta videos.
-            </video>
+            />
           </MDBox>
         )}
       </MDBox>
