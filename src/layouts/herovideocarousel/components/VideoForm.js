@@ -297,10 +297,11 @@ function VideoForm({ video, onClose, onSuccess }) {
         {videoPreview && (
           <MDBox mt={2}>
             <video
-              src={videoPreview}
+              src={videoPreview ? videoPreview.replace(/^http:\/\//i, "https://") : ""}
               controls
               muted
-              preload="auto"
+              preload="metadata"
+              poster={`https://placehold.co/600x300/1A237E/FFFFFF?text=Vista+Previa`}
               style={{
                 width: "100%",
                 maxWidth: "100%",

@@ -20,19 +20,20 @@ function MDActionMenu({ video, onEdit, onDelete, onActivate }) {
   const open = Boolean(anchorEl);
 
   const handleOpen = (event) => {
+    event.preventDefault();
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
   };
 
   const handleClose = (e) => {
-    if (e) e.stopPropagation();
+    if (e && e.stopPropagation) e.stopPropagation();
     setAnchorEl(null);
   };
 
   return (
     <>
-      <IconButton size="small" onClick={handleOpen} color="inherit">
-        <MoreVertIcon />
+      <IconButton size="medium" onClick={handleOpen} color="info" sx={{ color: "info.main" }}>
+        <MoreVertIcon fontSize="medium" />
       </IconButton>
       <Menu
         anchorEl={anchorEl}
@@ -143,8 +144,10 @@ function VideosTable({ videos, loading, onEditVideo, onDeleteVideo, onActivateVi
           >
             <MDBox display="flex" alignItems="center" flex={1}>
               <video
-                src={video.video}
                 controls
+                muted
+                preload="metadata"
+                poster={`https://placehold.co/120x80/263C5C/FFFFFF?text=Check+Cloudinary`}
                 style={{
                   width: "120px",
                   height: "80px",
@@ -153,7 +156,12 @@ function VideosTable({ videos, loading, onEditVideo, onDeleteVideo, onActivateVi
                   marginRight: "16px",
                   backgroundColor: "#000",
                 }}
-              />
+              >
+                <source
+                  src={video.video ? video.video.replace(/^http:\/\//i, "https://") : ""}
+                  type="video/mp4"
+                />
+              </video>
               <MDBox flex={1}>
                 <MDBox display="flex" alignItems="center" mb={1}>
                   <MDTypography variant="h6" fontWeight="medium">
