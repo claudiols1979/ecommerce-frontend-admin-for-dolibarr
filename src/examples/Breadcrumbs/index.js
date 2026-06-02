@@ -34,6 +34,9 @@ function Breadcrumbs({ icon, title, route, light }) {
     <MDBox mr={{ xs: 0, xl: 8 }}>
       <MuiBreadcrumbs
         sx={{
+          "& li": {
+            lineHeight: 1,
+          },
           "& .MuiBreadcrumbs-separator": {
             color: ({ palette: { white, grey } }) => (light ? white.main : grey[600]),
           },

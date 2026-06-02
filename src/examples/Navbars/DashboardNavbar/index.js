@@ -145,7 +145,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
       <Toolbar sx={(theme) => navbarContainer(theme)}>
         <MDBox color="inherit" mb={{ xs: 1, md: 0 }} sx={(theme) => navbarRow(theme, { isMini })}>
           {/* Use the dynamically determined breadcrumbTitle here */}
-          <Breadcrumbs icon="car" title={breadcrumbTitle} route={pathSegments} light={light} />
+          <Breadcrumbs icon="home" title={breadcrumbTitle} route={pathSegments} light={light} />
         </MDBox>
         {isMini ? null : (
           <MDBox sx={(theme) => navbarRow(theme, { isMini })}>
