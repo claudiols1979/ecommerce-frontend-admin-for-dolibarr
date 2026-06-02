@@ -47,7 +47,23 @@ function Breadcrumbs({ icon, title, route, light }) {
             opacity={light ? 0.8 : 0.5}
             sx={{ lineHeight: 0 }}
           >
-            <Icon>{icon}</Icon>
+            <Icon
+              sx={{
+                fontSize: {
+                  xs: "1.4rem",
+                  sm: "1.7rem",
+                  md: "2rem",
+                  lg: "2.3rem",
+                },
+                verticalAlign: "middle",
+                transition: "transform 0.2s ease",
+                "&:hover": {
+                  transform: "scale(1.15)",
+                },
+              }}
+            >
+              {icon}
+            </Icon>
           </MDTypography>
         </Link>
         {routes.map((el) => (
