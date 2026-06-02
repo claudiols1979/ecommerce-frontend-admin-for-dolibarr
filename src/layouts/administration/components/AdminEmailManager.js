@@ -150,13 +150,19 @@ function AdminEmailManager() {
         Configura los correos que recibirán notificaciones cuando se realice un nuevo pedido.
       </MDTypography>
 
-      <MDBox display="flex" justifyContent="flex-end" mb={2}>
+      <MDBox
+        display="flex"
+        justifyContent={{ xs: "stretch", sm: "flex-end" }}
+        mb={2}
+      >
         <MDButton
           variant="outlined"
           color="info"
           size="small"
+          fullWidth={false}
           onClick={handleTestNotification}
           disabled={isTesting || loading}
+          sx={{ width: { xs: "100%", sm: "auto" } }}
         >
           {isTesting ? <CircularProgress size={15} color="inherit" /> : "Probar Notificación"}
         </MDButton>
@@ -210,8 +216,14 @@ function AdminEmailManager() {
         <MDBox>
           {emails.map((email) => (
             <Card key={email._id} sx={{ mb: 1, p: 2 }}>
-              <MDBox display="flex" justifyContent="space-between" alignItems="center">
-                <MDBox>
+              <MDBox
+                display="flex"
+                justifyContent="space-between"
+                alignItems={{ xs: "flex-start", sm: "center" }}
+                flexDirection={{ xs: "column", sm: "row" }}
+                gap={1}
+              >
+                <MDBox sx={{ wordBreak: "break-all", maxWidth: { xs: "100%", sm: "60%" } }}>
                   <MDTypography variant="button" fontWeight="bold">
                     {email.email}
                   </MDTypography>
@@ -221,7 +233,7 @@ function AdminEmailManager() {
                     </MDTypography>
                   )}
                 </MDBox>
-                <MDBox display="flex" alignItems="center">
+                <MDBox display="flex" alignItems="center" sx={{ flexShrink: 0 }}>
                   <Switch
                     checked={email.isActive}
                     onChange={() => handleToggleStatus(email._id, email.isActive)}

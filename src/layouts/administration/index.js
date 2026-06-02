@@ -111,10 +111,12 @@ function Administration() {
                       <MDBox
                         display="flex"
                         justifyContent="space-between"
-                        alignItems="center"
+                        alignItems={{ xs: "flex-start", md: "center" }}
+                        flexDirection={{ xs: "column", md: "row" }}
                         mb={2}
+                        gap={2}
                       >
-                        <MDBox>
+                        <MDBox sx={{ flex: "1 1 auto", maxWidth: { xs: "100%", md: "70%" } }}>
                           <MDTypography variant="button" fontWeight="bold">
                             Régimen Fiscal Activo
                           </MDTypography>
@@ -138,6 +140,7 @@ function Administration() {
                               {configs.TAX_REGIME === "simplified" ? "Simplificado" : "Tradicional"}
                             </MDTypography>
                           }
+                          sx={{ flexShrink: 0 }}
                         />
                       </MDBox>
                       <Divider />
@@ -327,11 +330,27 @@ function Administration() {
 }
 
 const SystemVar = ({ label, value }) => (
-  <MDBox display="flex" justifyContent="space-between" mb={0.5}>
-    <MDTypography variant="caption" fontWeight="bold" color="text">
+  <MDBox
+    display="flex"
+    justifyContent="space-between"
+    mb={0.5}
+    sx={{
+      flexWrap: "wrap",
+      gap: 0.5,
+      wordBreak: "break-word",
+    }}
+  >
+    <MDTypography variant="caption" fontWeight="bold" color="text" sx={{ minWidth: "120px" }}>
       {label}:
     </MDTypography>
-    <MDTypography variant="caption" fontWeight="medium">
+    <MDTypography
+      variant="caption"
+      fontWeight="medium"
+      sx={{
+        wordBreak: "break-all",
+        maxWidth: { xs: "180px", sm: "100%" },
+      }}
+    >
       {value || "No configurado"}
     </MDTypography>
   </MDBox>

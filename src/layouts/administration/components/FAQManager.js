@@ -141,15 +141,22 @@ function FAQManager() {
 
   return (
     <MDBox>
-      <MDBox display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+      <MDBox
+        display="flex"
+        justifyContent="space-between"
+        alignItems={{ xs: "flex-start", sm: "center" }}
+        flexDirection={{ xs: "column", sm: "row" }}
+        mb={2}
+        gap={1}
+      >
         <MDTypography variant="h6">Gestión de FAQ</MDTypography>
         <MDButton variant="gradient" color="info" onClick={() => handleOpen()}>
           <Icon>add</Icon>&nbsp;Nueva Pregunta
         </MDButton>
       </MDBox>
 
-      <TableContainer component={Paper} sx={{ boxShadow: "none" }}>
-        <Table>
+      <TableContainer component={Paper} sx={{ boxShadow: "none", overflowX: "auto" }}>
+        <Table sx={{ minWidth: { xs: 500, sm: "auto" } }}>
           <TableHead sx={{ display: "table-header-group" }}>
             <TableRow>
               <TableCell sx={{ color: "inherit" }}>
@@ -245,12 +252,18 @@ function FAQManager() {
               onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
               sx={{ mb: 2 }}
             />
-            <MDBox display="flex" alignItems="center" mt={1}>
+            <MDBox
+              display="flex"
+              alignItems="center"
+              mt={1}
+              flexWrap="wrap"
+              gap={0.5}
+            >
               <MDTypography
                 variant="button"
                 color={!formData.active ? "text" : "secondary"}
                 fontWeight={!formData.active ? "bold" : "regular"}
-                sx={{ mr: 1, opacity: !formData.active ? 1 : 0.5 }}
+                sx={{ opacity: !formData.active ? 1 : 0.5 }}
               >
                 Pregunta inactiva
               </MDTypography>
@@ -263,7 +276,7 @@ function FAQManager() {
                 variant="button"
                 color={formData.active ? "success" : "secondary"}
                 fontWeight={formData.active ? "bold" : "regular"}
-                sx={{ ml: 1, opacity: formData.active ? 1 : 0.5 }}
+                sx={{ opacity: formData.active ? 1 : 0.5 }}
               >
                 Pregunta activa
               </MDTypography>

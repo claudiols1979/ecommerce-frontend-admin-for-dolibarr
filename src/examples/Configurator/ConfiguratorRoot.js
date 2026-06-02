@@ -18,7 +18,7 @@ import Drawer from "@mui/material/Drawer";
 import { styled } from "@mui/material/styles";
 
 export default styled(Drawer)(({ theme, ownerState }) => {
-  const { boxShadows, functions, transitions } = theme;
+  const { boxShadows, functions, transitions, breakpoints } = theme;
   const { openConfigurator } = ownerState;
 
   const configuratorWidth = 360;
@@ -29,11 +29,16 @@ export default styled(Drawer)(({ theme, ownerState }) => {
     "& .MuiDrawer-paper": {
       height: "100vh",
       width: configuratorWidth,
+      maxWidth: "100vw",
       margin: 0,
       padding: `0 ${pxToRem(10)}`,
       borderRadius: 0,
       boxShadow: lg,
       overflowY: "auto",
+      [breakpoints.down("sm")]: {
+        width: "100vw",
+        padding: `0 ${pxToRem(10)}`,
+      },
     },
   };
 });

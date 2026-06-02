@@ -221,11 +221,22 @@ function Configurator() {
           </MDTypography>
 
           <MDBox
-            sx={{
+            sx={({
+              breakpoints,
+            }) => ({
               display: "flex",
+              flexDirection: "row",
               mt: 2,
               mr: 1,
-            }}
+              gap: 1,
+              [breakpoints.down("sm")]: {
+                flexDirection: "column",
+                "& .sidenav-type-btn": {
+                  flex: "1 1 auto",
+                  minWidth: "100%",
+                },
+              },
+            })}
           >
             <MDButton
               color="dark"
@@ -233,6 +244,7 @@ function Configurator() {
               onClick={handleDarkSidenav}
               disabled={disabled}
               fullWidth
+              className="sidenav-type-btn"
               sx={
                 !transparentSidenav && !whiteSidenav
                   ? sidenavTypeActiveButtonStyles
@@ -241,7 +253,7 @@ function Configurator() {
             >
               Oscura
             </MDButton>
-            <MDBox sx={{ mx: 1, width: "8rem", minWidth: "8rem" }}>
+            <MDBox className="sidenav-type-btn" sx={{ width: "8rem", minWidth: "8rem" }}>
               <MDButton
                 color="dark"
                 variant="gradient"
@@ -263,6 +275,7 @@ function Configurator() {
               onClick={handleWhiteSidenav}
               disabled={disabled}
               fullWidth
+              className="sidenav-type-btn"
               sx={
                 whiteSidenav && !transparentSidenav
                   ? sidenavTypeActiveButtonStyles
