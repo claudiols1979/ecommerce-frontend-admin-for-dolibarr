@@ -913,7 +913,11 @@ function OrderDetail() {
                             borderBottom="1px solid #eee"
                             gap={1}
                           >
-                            <MDBox display="flex" alignItems="center" sx={{ flex: "1 1 auto", minWidth: 0 }}>
+                            <MDBox
+                              display="flex"
+                              alignItems="center"
+                              sx={{ flex: "1 1 auto", minWidth: 0 }}
+                            >
                               <MDBox
                                 component="img"
                                 src={"/placeholder.png"}
@@ -930,7 +934,11 @@ function OrderDetail() {
                                   e.target.src = "/placeholder.png";
                                 }}
                               />
-                              <MDTypography variant="button" fontWeight="medium" sx={{ wordBreak: "break-word" }}>
+                              <MDTypography
+                                variant="button"
+                                fontWeight="medium"
+                                sx={{ wordBreak: "break-word" }}
+                              >
                                 {item.name} (Cód: {item.code}) - {item.quantity} x{" "}
                                 {Math.round(item.priceAtSale).toLocaleString("es-CR", {
                                   style: "currency",
@@ -959,7 +967,11 @@ function OrderDetail() {
                                 )}
                               </MDTypography>
                             </MDBox>
-                            <MDTypography variant="button" fontWeight="medium" sx={{ flexShrink: 0 }}>
+                            <MDTypography
+                              variant="button"
+                              fontWeight="medium"
+                              sx={{ flexShrink: 0 }}
+                            >
                               {order?.taxRegime === "simplified"
                                 ? "Subtotal:"
                                 : "Subtotal sin iva:"}{" "}

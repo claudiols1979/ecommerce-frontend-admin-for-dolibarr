@@ -51,7 +51,9 @@ function ComplexStatisticsCard({ color, title, count, percentage, icon }) {
           <MDTypography variant="button" fontWeight="light" color="text">
             {title}
           </MDTypography>
-          <MDTypography variant="h4" sx={{ wordBreak: "break-word" }}>{count}</MDTypography>
+          <MDTypography variant="h4" sx={{ wordBreak: "break-word" }}>
+            {count}
+          </MDTypography>
         </MDBox>
       </MDBox>
       <Divider />

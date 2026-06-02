@@ -924,7 +924,11 @@ function EditOrder() {
                           borderBottom="1px solid #eee"
                           gap={1}
                         >
-                          <MDBox display="flex" alignItems="center" sx={{ flex: "1 1 auto", minWidth: 0 }}>
+                          <MDBox
+                            display="flex"
+                            alignItems="center"
+                            sx={{ flex: "1 1 auto", minWidth: 0 }}
+                          >
                             <MDBox
                               component="img"
                               src={item.product?.imageUrls?.[0]?.secure_url || "/placeholder.png"}
@@ -938,7 +942,12 @@ function EditOrder() {
                                 flexShrink: 0,
                               }}
                             />
-                            <MDTypography variant="button" fontWeight="medium" color="text" sx={{ wordBreak: "break-word" }}>
+                            <MDTypography
+                              variant="button"
+                              fontWeight="medium"
+                              color="text"
+                              sx={{ wordBreak: "break-word" }}
+                            >
                               {item.name} (Cód: {item.code}) - {item.quantity} x{" "}
                               {item.priceAtSale.toLocaleString("es-CR", {
                                 style: "currency",

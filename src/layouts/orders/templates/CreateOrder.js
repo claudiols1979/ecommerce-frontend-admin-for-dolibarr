@@ -504,7 +504,11 @@ function CreateOrder() {
                             borderBottom="1px solid #eee"
                             gap={1}
                           >
-                            <MDBox display="flex" alignItems="center" sx={{ flex: "1 1 auto", minWidth: 0 }}>
+                            <MDBox
+                              display="flex"
+                              alignItems="center"
+                              sx={{ flex: "1 1 auto", minWidth: 0 }}
+                            >
                               <MDBox
                                 component="img"
                                 src={"/placeholder.png"}
@@ -521,7 +525,11 @@ function CreateOrder() {
                                   e.target.src = "/placeholder.png";
                                 }}
                               />
-                              <MDTypography variant="button" fontWeight="medium" sx={{ wordBreak: "break-word" }}>
+                              <MDTypography
+                                variant="button"
+                                fontWeight="medium"
+                                sx={{ wordBreak: "break-word" }}
+                              >
                                 {item.name} (Cód: {item.code}) - {item.quantity} x{" "}
                                 {Math.round(item.priceAtSale).toLocaleString("es-CR", {
                                   style: "currency",

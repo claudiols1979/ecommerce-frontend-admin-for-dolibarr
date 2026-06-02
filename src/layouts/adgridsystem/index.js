@@ -130,7 +130,12 @@ function AdGridSystem() {
           <MDTypography variant="h4" fontWeight="medium">
             Grid de Departamentos
           </MDTypography>
-          <MDBox display="flex" flexDirection={{ xs: "column", sm: "row" }} gap={1} width={{ xs: "100%", sm: "auto" }}>
+          <MDBox
+            display="flex"
+            flexDirection={{ xs: "column", sm: "row" }}
+            gap={1}
+            width={{ xs: "100%", sm: "auto" }}
+          >
             <MDButton
               variant="outlined"
               color="info"

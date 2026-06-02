@@ -375,7 +375,12 @@ function Products() {
                   Gestión de Productos
                 </MDTypography>
                 {canManageProducts && (
-                  <MDBox display="flex" flexDirection={{ xs: "column", sm: "row" }} gap={1} width={{ xs: "100%", sm: "auto" }}>
+                  <MDBox
+                    display="flex"
+                    flexDirection={{ xs: "column", sm: "row" }}
+                    gap={1}
+                    width={{ xs: "100%", sm: "auto" }}
+                  >
                     <MDButton
                       component={Link}
                       to="/products/create-batch"

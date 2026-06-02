@@ -261,7 +261,12 @@ function ResellerDetail() {
                 <MDTypography variant="h6" color="white">
                   Detalles del Revendedor
                 </MDTypography>
-                <MDBox display="flex" flexDirection={{ xs: "column", sm: "row" }} gap={1} width={{ xs: "100%", sm: "auto" }}>
+                <MDBox
+                  display="flex"
+                  flexDirection={{ xs: "column", sm: "row" }}
+                  gap={1}
+                  width={{ xs: "100%", sm: "auto" }}
+                >
                   {" "}
                   {/* Use MDBox with gap for multiple buttons */}
                   {/* Edit button */}
