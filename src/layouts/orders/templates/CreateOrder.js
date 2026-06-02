@@ -505,12 +505,7 @@ function CreateOrder() {
                             <MDBox display="flex" alignItems="center">
                               <MDBox
                                 component="img"
-                                src={
-                                  item.product?.imageUrls?.[0]?.secure_url ||
-                                  `https://placehold.co/40x40/cccccc/000000?text=${
-                                    item.code || "Item"
-                                  }`
-                                }
+                                src={"/placeholder.png"}
                                 alt={item.name || "Item"}
                                 sx={{
                                   width: "40px",
@@ -518,6 +513,9 @@ function CreateOrder() {
                                   objectFit: "cover",
                                   borderRadius: "md",
                                   mr: 1.5,
+                                }}
+                                onError={(e) => {
+                                  e.target.src = "/placeholder.png";
                                 }}
                               />
                               <MDTypography variant="button" fontWeight="medium">

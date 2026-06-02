@@ -922,10 +922,7 @@ function EditOrder() {
                           <MDBox display="flex" alignItems="center" flex={1} mr={2}>
                             <MDBox
                               component="img"
-                              src={
-                                item.product?.imageUrls?.[0]?.secure_url ||
-                                "https://placehold.co/40x40/cccccc/000000?text=Item"
-                              }
+                              src={item.product?.imageUrls?.[0]?.secure_url || "/placeholder.png"}
                               alt={item.name}
                               sx={{
                                 width: "40px",

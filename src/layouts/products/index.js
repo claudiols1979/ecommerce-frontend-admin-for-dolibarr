@@ -157,7 +157,7 @@ function Products() {
             src={
               row.original.imageUrls && row.original.imageUrls.length > 0
                 ? row.original.imageUrls[0].secure_url
-                : "https://placehold.co/40x40/cccccc/000000?text=No+Image"
+                : "/placeholder.png"
             }
             alt={row.original.name}
             width="40px"
@@ -165,6 +165,9 @@ function Products() {
             borderRadius="md"
             mr={2}
             sx={{ objectFit: "cover" }}
+            onError={(e) => {
+              e.target.src = "/placeholder.png";
+            }}
           />
           <MDBox>
             <Tooltip title={row.original.name} placement="top" arrow>

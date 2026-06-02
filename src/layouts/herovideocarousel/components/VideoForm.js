@@ -32,7 +32,7 @@ function VideoForm({ video, onClose, onSuccess }) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [localError, setLocalError] = useState(null);
- 
+
   const setError = (msg) => setLocalError(msg);
   const displayError = localError || error;
 
@@ -207,7 +207,12 @@ function VideoForm({ video, onClose, onSuccess }) {
       console.error("💥 Error en el proceso:", err);
       let msg = err.message;
       if (msg.includes("Upload preset not found")) {
-        msg = "Error: El 'Upload Preset' (" + CLOUDINARY_CONFIG.uploadPreset + ") no existe en la cuenta " + CLOUDINARY_CONFIG.cloudName + ". Debes crearlo en el panel de Cloudinary como 'Unsigned'.";
+        msg =
+          "Error: El 'Upload Preset' (" +
+          CLOUDINARY_CONFIG.uploadPreset +
+          ") no existe en la cuenta " +
+          CLOUDINARY_CONFIG.cloudName +
+          ". Debes crearlo en el panel de Cloudinary como 'Unsigned'.";
       }
       setError(msg);
     } finally {
@@ -306,7 +311,7 @@ function VideoForm({ video, onClose, onSuccess }) {
               controls
               muted
               preload="metadata"
-              poster={`https://placehold.co/600x300/1A237E/FFFFFF?text=Vista+Previa`}
+              poster="/placeholder.png"
               style={{
                 width: "100%",
                 maxWidth: "100%",

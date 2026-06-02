@@ -147,7 +147,7 @@ function VideosTable({ videos, loading, onEditVideo, onDeleteVideo, onActivateVi
                 controls
                 muted
                 preload="metadata"
-                poster={`https://placehold.co/120x80/263C5C/FFFFFF?text=Check+Cloudinary`}
+                poster="/placeholder.png"
                 style={{
                   width: "120px",
                   height: "80px",
