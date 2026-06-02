@@ -48,14 +48,11 @@ function Breadcrumbs({ icon, title, route, light }) {
             sx={{ lineHeight: 1 }}
           >
             <Icon
-              sx={{
-                fontSize: {
-                  xs: "8rem",
-                  sm: "10rem",
-                  md: "12rem",
-                  lg: "14rem",
-                },
+              style={{
+                fontSize: "14rem",
                 verticalAlign: "middle",
+              }}
+              sx={{
                 transition: "transform 0.2s ease",
                 "&:hover": {
                   transform: "scale(1.15)",
