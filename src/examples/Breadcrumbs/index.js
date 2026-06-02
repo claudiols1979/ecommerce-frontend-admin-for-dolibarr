@@ -50,10 +50,10 @@ function Breadcrumbs({ icon, title, route, light }) {
             <Icon
               sx={{
                 fontSize: {
-                  xs: "1.4rem",
-                  sm: "1.7rem",
-                  md: "2rem",
-                  lg: "2.3rem",
+                  xs: "2.2rem",
+                  sm: "2.8rem",
+                  md: "3.2rem",
+                  lg: "3.8rem",
                 },
                 verticalAlign: "middle",
                 transition: "transform 0.2s ease",

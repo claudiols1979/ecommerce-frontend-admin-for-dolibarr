@@ -72,8 +72,8 @@ function collapseIconBox(theme, ownerState) {
   const { pxToRem } = functions;
 
   return {
-    minWidth: pxToRem(36),
-    minHeight: pxToRem(36),
+    minWidth: pxToRem(48),
+    minHeight: pxToRem(48),
     color:
       (transparentSidenav && !darkMode && !active) || (whiteSidenav && !active)
         ? dark.main
