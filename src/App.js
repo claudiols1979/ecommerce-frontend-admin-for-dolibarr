@@ -15,6 +15,9 @@ import MDBox from "components/MDBox";
 import Sidenav from "examples/Sidenav";
 import Configurator from "examples/Configurator";
 
+// Brand logo
+import brandLogo from "assets/images/favicon.png";
+
 // Material Dashboard 2 React themes
 import theme from "assets/theme";
 import themeRTL from "assets/theme/theme-rtl";
@@ -218,6 +221,7 @@ function MainAppContent() {
                 <>
                   <Sidenav
                     color={sidenavColor}
+                    brand={brandLogo}
                     brandName="ORIYINA⅃"
                     routes={filteredSidenavRoutes}
                     onMouseEnter={handleOnMouseEnter}
