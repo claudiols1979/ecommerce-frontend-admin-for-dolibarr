@@ -138,12 +138,13 @@ function ForgotPasswordCover() {
                     "&:hover:not(.Mui-disabled)::before": {
                       borderBottomColor: "rgba(255, 255, 255, 0.6) !important",
                     },
-                    "& input:-webkit-autofill, & input:-webkit-autofill:hover, & input:-webkit-autofill:focus, & input:-webkit-autofill:active": {
-                      WebkitBoxShadow: "0 0 0 30px rgba(255, 255, 255, 0.1) inset !important",
-                      WebkitTextFillColor: "#fff !important",
-                      caretColor: "#fff",
-                      transition: "background-color 5000s ease-in-out 0s",
-                    },
+                    "& input:-webkit-autofill, & input:-webkit-autofill:hover, & input:-webkit-autofill:focus, & input:-webkit-autofill:active":
+                      {
+                        WebkitBoxShadow: "0 0 0 30px rgba(255, 255, 255, 0.1) inset !important",
+                        WebkitTextFillColor: "#fff !important",
+                        caretColor: "#fff",
+                        transition: "background-color 5000s ease-in-out 0s",
+                      },
                   },
                   "& .MuiInputLabel-root": { color: "rgba(255, 255, 255, 0.7) !important" },
                   "& .MuiInputLabel-root.Mui-focused": { color: "#ffffff !important" },
