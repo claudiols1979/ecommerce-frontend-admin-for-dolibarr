@@ -58,7 +58,7 @@ function Breadcrumbs({ icon, title, route, light }) {
               sx={{
                 transition: "transform 0.2s ease",
                 "&:hover": {
-                  transform: "scale(1.15)",
+                  transform: "scale(1.50)",
                 },
               }}
             >
