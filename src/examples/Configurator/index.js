@@ -221,9 +221,7 @@ function Configurator() {
           </MDTypography>
 
           <MDBox
-            sx={({
-              breakpoints,
-            }) => ({
+            sx={({ breakpoints }) => ({
               display: "flex",
               flexDirection: "row",
               mt: 2,

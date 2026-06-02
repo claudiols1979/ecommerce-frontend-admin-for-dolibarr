@@ -252,13 +252,7 @@ function FAQManager() {
               onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
               sx={{ mb: 2 }}
             />
-            <MDBox
-              display="flex"
-              alignItems="center"
-              mt={1}
-              flexWrap="wrap"
-              gap={0.5}
-            >
+            <MDBox display="flex" alignItems="center" mt={1} flexWrap="wrap" gap={0.5}>
               <MDTypography
                 variant="button"
                 color={!formData.active ? "text" : "secondary"}

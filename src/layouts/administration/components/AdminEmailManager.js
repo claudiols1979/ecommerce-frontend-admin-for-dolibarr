@@ -150,11 +150,7 @@ function AdminEmailManager() {
         Configura los correos que recibirán notificaciones cuando se realice un nuevo pedido.
       </MDTypography>
 
-      <MDBox
-        display="flex"
-        justifyContent={{ xs: "stretch", sm: "flex-end" }}
-        mb={2}
-      >
+      <MDBox display="flex" justifyContent={{ xs: "stretch", sm: "flex-end" }} mb={2}>
         <MDButton
           variant="outlined"
           color="info"
