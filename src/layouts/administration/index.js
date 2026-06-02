@@ -70,7 +70,7 @@ function Administration() {
       <DashboardNavbar />
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6} justifyContent="center">
-          <Grid item xs={12} md={8} lg={6}>
+          <Grid item xs={12} md={10} lg={8}>
             <Card>
               <MDBox
                 mx={2}
