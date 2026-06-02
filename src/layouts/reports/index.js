@@ -153,8 +153,8 @@ function Reports() {
           <MDTypography variant="h6">Detalle de Órdenes en el Periodo</MDTypography>
         </MDBox>
         <MDBox pb={3}>
-          <TableContainer>
-            <Table>
+          <TableContainer sx={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+            <Table sx={{ minWidth: { xs: "650px", sm: "auto" } }}>
               <TableHead sx={{ display: "table-header-group" }}>
                 <TableRow>
                   <TableCell>

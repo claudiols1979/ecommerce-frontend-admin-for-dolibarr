@@ -158,14 +158,19 @@ function Claims() {
         fullWidth
       >
         <DialogTitle>
-          <MDBox display="flex" justifyContent="space-between" alignItems="center">
+          <MDBox
+            display="flex"
+            flexDirection={{ xs: "column", sm: "row" }}
+            justifyContent="space-between"
+            alignItems={{ xs: "flex-start", sm: "center" }}
+            gap={1}
+          >
             <MDTypography variant="h6">Reclamo: {selectedClaim?.subject}</MDTypography>
-            <MDBox>
+            <MDBox display="flex" flexWrap="wrap" gap={0.5}>
               <MDButton
                 variant="outlined"
                 color="info"
                 size="small"
-                sx={{ mr: 1 }}
                 onClick={() => handleChangeStatus("in-progress")}
               >
                 En Proceso
@@ -174,7 +179,6 @@ function Claims() {
                 variant="outlined"
                 color="success"
                 size="small"
-                sx={{ mr: 1 }}
                 onClick={() => handleChangeStatus("resolved")}
               >
                 Resuelto
@@ -276,7 +280,7 @@ function Claims() {
             })}
           </MDBox>
           {selectedClaim?.status !== "resolved" && selectedClaim?.status !== "closed" ? (
-            <MDBox display="flex" gap={1}>
+            <MDBox display="flex" flexDirection={{ xs: "column", sm: "row" }} gap={1}>
               <MDInput
                 fullWidth
                 label="Escribe un mensaje..."
@@ -290,6 +294,7 @@ function Claims() {
                 color="info"
                 onClick={handleSendMessage}
                 disabled={sending}
+                sx={{ minWidth: { xs: "100%", sm: "auto" } }}
               >
                 <Icon>send</Icon>
               </MDButton>

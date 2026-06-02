@@ -99,11 +99,24 @@ function HeroVideoCarousel() {
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox py={3}>
-        <MDBox display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <MDBox
+          display="flex"
+          flexDirection={{ xs: "column", sm: "row" }}
+          justifyContent="space-between"
+          alignItems={{ xs: "flex-start", sm: "center" }}
+          mb={3}
+          gap={2}
+        >
           <MDTypography variant="h4" fontWeight="medium">
             Administrador Video Carousel
           </MDTypography>
-          <MDButton variant="gradient" color="info" onClick={handleCreateVideo} disabled={loading}>
+          <MDButton
+            variant="gradient"
+            color="info"
+            onClick={handleCreateVideo}
+            disabled={loading}
+            sx={{ width: { xs: "100%", sm: "auto" } }}
+          >
             Subir Video
           </MDButton>
         </MDBox>

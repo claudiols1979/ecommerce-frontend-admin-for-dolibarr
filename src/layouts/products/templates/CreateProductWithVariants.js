@@ -632,7 +632,7 @@ function CreateProductWithVariants() {
                 </MDTypography>
                 <Grid container spacing={2}>
                   {["cat1", "cat2", "cat3", "cat4", "cat5"].map((cat) => (
-                    <Grid item xs={6} md={2.4} key={cat}>
+                    <Grid item xs={6} sm={4} md={2.4} key={cat}>
                       <MDInput
                         label={cat.toUpperCase()}
                         type="number"
@@ -863,7 +863,7 @@ function CreateProductWithVariants() {
                           </MDTypography>
                         </Grid>
                         {["cat1", "cat2", "cat3", "cat4", "cat5"].map((cat) => (
-                          <Grid item xs={6} md={2.4} key={cat}>
+                          <Grid item xs={6} sm={4} md={2.4} key={cat}>
                             <MDInput
                               label={cat.toUpperCase()}
                               type="number"
@@ -974,12 +974,20 @@ function CreateProductWithVariants() {
                 <Divider sx={{ my: 3 }} />
 
                 {/* ===== ACCIONES ===== */}
-                <MDBox display="flex" justifyContent="space-between" alignItems="center">
+                <MDBox
+                  display="flex"
+                  flexDirection={{ xs: "column", sm: "row" }}
+                  justifyContent="space-between"
+                  alignItems={{ xs: "stretch", sm: "center" }}
+                  gap={2}
+                >
                   <MDButton
                     variant="outlined"
                     color="dark"
                     onClick={() => navigate("/products")}
                     disabled={loading}
+                    fullWidth
+                    sx={{ width: { sm: "auto" } }}
                   >
                     Cancelar
                   </MDButton>
@@ -989,6 +997,8 @@ function CreateProductWithVariants() {
                     type="submit"
                     disabled={loading}
                     startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
+                    fullWidth
+                    sx={{ width: { sm: "auto" } }}
                   >
                     {loading
                       ? "Creando..."

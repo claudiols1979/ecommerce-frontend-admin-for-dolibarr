@@ -29,14 +29,17 @@ function MDConfirmationModal({
       onClose={onClose}
       aria-labelledby="confirmation-dialog-title"
       aria-describedby="confirmation-dialog-description"
+      maxWidth="xs"
+      fullWidth
       PaperProps={{
         sx: {
           background:
             "linear-gradient(135deg, rgba(49, 0, 138, 0.95) 0%, rgba(49, 0, 138, 0.95) 35%, rgba(168, 85, 247, 0.95) 65%, rgba(247, 37, 133, 0.95) 100%) !important",
           color: "#ffffff",
-          borderRadius: "15px",
-          padding: "10px",
+          borderRadius: { xs: "10px", sm: "15px" },
+          padding: { xs: "6px", sm: "10px" },
           boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+          margin: { xs: 2, sm: "auto" },
         },
       }}
     >

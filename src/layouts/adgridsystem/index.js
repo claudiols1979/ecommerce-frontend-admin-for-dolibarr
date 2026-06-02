@@ -119,20 +119,36 @@ function AdGridSystem() {
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox py={3}>
-        <MDBox display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <MDBox
+          display="flex"
+          flexDirection={{ xs: "column", sm: "row" }}
+          justifyContent="space-between"
+          alignItems={{ xs: "flex-start", sm: "center" }}
+          mb={3}
+          gap={2}
+        >
           <MDTypography variant="h4" fontWeight="medium">
             Grid de Departamentos
           </MDTypography>
-          <MDBox display="flex" gap={1}>
+          <MDBox display="flex" flexDirection={{ xs: "column", sm: "row" }} gap={1} width={{ xs: "100%", sm: "auto" }}>
             <MDButton
               variant="outlined"
               color="info"
               onClick={handleReorder}
               disabled={loading || gridItems.length === 0}
+              fullWidth
+              sx={{ width: { sm: "auto" } }}
             >
               Reordenar
             </MDButton>
-            <MDButton variant="gradient" color="info" onClick={handleCreateItem} disabled={loading}>
+            <MDButton
+              variant="gradient"
+              color="info"
+              onClick={handleCreateItem}
+              disabled={loading}
+              fullWidth
+              sx={{ width: { sm: "auto" } }}
+            >
               Nuevo Item
             </MDButton>
           </MDBox>

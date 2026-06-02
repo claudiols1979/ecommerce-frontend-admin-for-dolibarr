@@ -366,21 +366,25 @@ function Products() {
                 borderRadius="lg"
                 coloredShadow="info"
                 display="flex"
+                flexDirection={{ xs: "column", sm: "row" }}
                 justifyContent="space-between"
-                alignItems="center"
+                alignItems={{ xs: "flex-start", sm: "center" }}
+                gap={2}
               >
                 <MDTypography variant="h6" color="white">
                   Gestión de Productos
                 </MDTypography>
                 {canManageProducts && (
-                  <MDBox display="flex" gap={1}>
+                  <MDBox display="flex" flexDirection={{ xs: "column", sm: "row" }} gap={1} width={{ xs: "100%", sm: "auto" }}>
                     <MDButton
                       component={Link}
                       to="/products/create-batch"
                       variant="outlined"
+                      fullWidth
                       sx={{
                         color: "#fff !important",
                         borderColor: "rgba(255,255,255,0.7) !important",
+                        width: { sm: "auto" },
                         "&:hover": {
                           borderColor: "#fff !important",
                           backgroundColor: "rgba(255, 255, 255, 0.15)",
@@ -394,9 +398,11 @@ function Products() {
                       component={Link}
                       to="/products/create"
                       variant="gradient"
+                      fullWidth
                       sx={{
                         backgroundColor: "#333",
                         color: "#FFFFFF",
+                        width: { sm: "auto" },
                         "&:hover": {
                           backgroundColor: "#333",
                         },

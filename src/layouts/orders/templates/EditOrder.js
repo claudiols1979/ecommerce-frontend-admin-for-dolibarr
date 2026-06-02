@@ -559,8 +559,10 @@ function EditOrder() {
                 borderRadius="lg"
                 coloredShadow="info"
                 display="flex"
+                flexDirection={{ xs: "column", sm: "row" }}
                 justifyContent="space-between"
-                alignItems="center"
+                alignItems={{ xs: "flex-start", sm: "center" }}
+                gap={2}
               >
                 <MDTypography variant="h6" color="white">
                   Editar Pedido: {order.orderNumber || order._id}
@@ -569,6 +571,7 @@ function EditOrder() {
                   onClick={() => navigate(`/orders/details/${id}`)}
                   variant="gradient"
                   color="dark"
+                  sx={{ width: { xs: "100%", sm: "auto" } }}
                 >
                   Ver Detalles
                 </MDButton>
@@ -913,13 +916,15 @@ function EditOrder() {
                         <MDBox
                           key={item.product._id}
                           display="flex"
-                          alignItems="center"
+                          flexDirection={{ xs: "column", sm: "row" }}
+                          alignItems={{ xs: "flex-start", sm: "center" }}
                           justifyContent="space-between"
                           mb={1}
                           p={1}
                           borderBottom="1px solid #eee"
+                          gap={1}
                         >
-                          <MDBox display="flex" alignItems="center" flex={1} mr={2}>
+                          <MDBox display="flex" alignItems="center" sx={{ flex: "1 1 auto", minWidth: 0 }}>
                             <MDBox
                               component="img"
                               src={item.product?.imageUrls?.[0]?.secure_url || "/placeholder.png"}
@@ -930,9 +935,10 @@ function EditOrder() {
                                 objectFit: "cover",
                                 borderRadius: "md",
                                 mr: 1.5,
+                                flexShrink: 0,
                               }}
                             />
-                            <MDTypography variant="button" fontWeight="medium" color="text">
+                            <MDTypography variant="button" fontWeight="medium" color="text" sx={{ wordBreak: "break-word" }}>
                               {item.name} (Cód: {item.code}) - {item.quantity} x{" "}
                               {item.priceAtSale.toLocaleString("es-CR", {
                                 style: "currency",

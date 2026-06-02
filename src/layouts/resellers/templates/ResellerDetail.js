@@ -253,13 +253,15 @@ function ResellerDetail() {
                 borderRadius="lg"
                 coloredShadow="info"
                 display="flex"
+                flexDirection={{ xs: "column", sm: "row" }}
                 justifyContent="space-between"
-                alignItems="center"
+                alignItems={{ xs: "flex-start", sm: "center" }}
+                gap={2}
               >
                 <MDTypography variant="h6" color="white">
                   Detalles del Revendedor
                 </MDTypography>
-                <MDBox display="flex" gap={1}>
+                <MDBox display="flex" flexDirection={{ xs: "column", sm: "row" }} gap={1} width={{ xs: "100%", sm: "auto" }}>
                   {" "}
                   {/* Use MDBox with gap for multiple buttons */}
                   {/* Edit button */}
@@ -269,6 +271,7 @@ function ResellerDetail() {
                       to={`/resellers/edit/${reseller._id}`}
                       variant="gradient"
                       color="dark"
+                      sx={{ width: { xs: "100%", sm: "auto" } }}
                     >
                       <Icon sx={{ fontWeight: "bold" }}>edit</Icon>
                       &nbsp;Editar
@@ -282,6 +285,7 @@ function ResellerDetail() {
                       sx={{
                         backgroundColor: "#ffc107", // Gold-ish color for warning
                         color: "black",
+                        width: { xs: "100%", sm: "auto" },
                         "&:hover": {
                           backgroundColor: "#e0a800", // Darker gold on hover
                         },

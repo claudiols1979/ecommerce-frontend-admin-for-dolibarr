@@ -90,7 +90,9 @@ function Administration() {
                 <Tabs
                   value={activeTab}
                   onChange={handleTabChange}
-                  centered
+                  variant="scrollable"
+                  scrollButtons="auto"
+                  allowScrollButtonsMobile
                   sx={{ mb: 3, borderBottom: "1px solid #ddd" }}
                 >
                   <Tab label="Fiscal" />

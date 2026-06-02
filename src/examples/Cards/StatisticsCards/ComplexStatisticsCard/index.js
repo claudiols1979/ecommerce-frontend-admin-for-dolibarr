@@ -41,16 +41,17 @@ function ComplexStatisticsCard({ color, title, count, percentage, icon }) {
           width="4rem"
           height="4rem"
           mt={-3}
+          flexShrink={0}
         >
           <Icon fontSize="medium" color="inherit">
             {icon}
           </Icon>
         </MDBox>
-        <MDBox textAlign="right" lineHeight={1.25}>
+        <MDBox textAlign="right" lineHeight={1.25} ml={1} sx={{ minWidth: 0, overflow: "hidden" }}>
           <MDTypography variant="button" fontWeight="light" color="text">
             {title}
           </MDTypography>
-          <MDTypography variant="h4">{count}</MDTypography>
+          <MDTypography variant="h4" sx={{ wordBreak: "break-word" }}>{count}</MDTypography>
         </MDBox>
       </MDBox>
       <Divider />

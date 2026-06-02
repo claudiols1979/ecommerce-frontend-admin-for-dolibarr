@@ -905,13 +905,15 @@ function OrderDetail() {
                           <MDBox
                             key={item.product?._id || item._id}
                             display="flex"
-                            alignItems="center"
+                            flexDirection={{ xs: "column", sm: "row" }}
+                            alignItems={{ xs: "flex-start", sm: "center" }}
                             justifyContent="space-between"
                             mb={1}
                             p={1}
                             borderBottom="1px solid #eee"
+                            gap={1}
                           >
-                            <MDBox display="flex" alignItems="center">
+                            <MDBox display="flex" alignItems="center" sx={{ flex: "1 1 auto", minWidth: 0 }}>
                               <MDBox
                                 component="img"
                                 src={"/placeholder.png"}
@@ -922,12 +924,13 @@ function OrderDetail() {
                                   objectFit: "cover",
                                   borderRadius: "md",
                                   mr: 1.5,
+                                  flexShrink: 0,
                                 }}
                                 onError={(e) => {
                                   e.target.src = "/placeholder.png";
                                 }}
                               />
-                              <MDTypography variant="button" fontWeight="medium">
+                              <MDTypography variant="button" fontWeight="medium" sx={{ wordBreak: "break-word" }}>
                                 {item.name} (Cód: {item.code}) - {item.quantity} x{" "}
                                 {Math.round(item.priceAtSale).toLocaleString("es-CR", {
                                   style: "currency",
@@ -956,7 +959,7 @@ function OrderDetail() {
                                 )}
                               </MDTypography>
                             </MDBox>
-                            <MDTypography variant="button" fontWeight="medium">
+                            <MDTypography variant="button" fontWeight="medium" sx={{ flexShrink: 0 }}>
                               {order?.taxRegime === "simplified"
                                 ? "Subtotal:"
                                 : "Subtotal sin iva:"}{" "}

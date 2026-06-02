@@ -109,11 +109,24 @@ function HeroCarousel() {
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox py={3}>
-        <MDBox display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <MDBox
+          display="flex"
+          flexDirection={{ xs: "column", sm: "row" }}
+          justifyContent="space-between"
+          alignItems={{ xs: "flex-start", sm: "center" }}
+          mb={3}
+          gap={2}
+        >
           <MDTypography variant="h4" fontWeight="medium">
             Administrador Hero Carousel
           </MDTypography>
-          <MDButton variant="gradient" color="info" onClick={handleCreateSlide} disabled={loading}>
+          <MDButton
+            variant="gradient"
+            color="info"
+            onClick={handleCreateSlide}
+            disabled={loading}
+            sx={{ width: { xs: "100%", sm: "auto" } }}
+          >
             Agregar nuevo
           </MDButton>
         </MDBox>

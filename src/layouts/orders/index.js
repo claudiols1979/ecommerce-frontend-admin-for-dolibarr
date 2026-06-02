@@ -293,7 +293,13 @@ function Orders() {
                     </Grid>
 
                     <Grid item xs={12} sm={8} md={3}>
-                      <MDBox display="flex" justifyContent="space-around" alignItems="center">
+                      <MDBox
+                        display="flex"
+                        flexDirection={{ xs: "column", sm: "row" }}
+                        justifyContent={{ xs: "flex-start", sm: "space-around" }}
+                        alignItems={{ xs: "flex-start", sm: "center" }}
+                        gap={1}
+                      >
                         <FormControlLabel
                           control={
                             <Switch
@@ -314,6 +320,7 @@ function Orders() {
                           size="small"
                           startIcon={<DeleteSweepIcon />}
                           onClick={() => setOpenCleanup(true)}
+                          sx={{ width: { xs: "100%", sm: "auto" } }}
                         >
                           Limpiar Carritos
                         </MDButton>

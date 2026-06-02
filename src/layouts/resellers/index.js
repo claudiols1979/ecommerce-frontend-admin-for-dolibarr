@@ -269,8 +269,10 @@ function Resellers() {
                 py={3}
                 px={2}
                 display="flex"
+                flexDirection={{ xs: "column", sm: "row" }}
                 justifyContent="space-between"
-                alignItems="center"
+                alignItems={{ xs: "flex-start", sm: "center" }}
+                gap={2}
                 sx={{
                   background: "linear-gradient(135deg, #9b2fbe 0%, #c471ed 50%, #e056a0 100%)",
                   boxShadow: "0 4px 20px rgba(180, 60, 160, 0.5)",

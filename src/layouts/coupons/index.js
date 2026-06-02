@@ -191,13 +191,20 @@ function Coupons() {
                 borderRadius="lg"
                 coloredShadow="info"
                 display="flex"
+                flexDirection={{ xs: "column", sm: "row" }}
                 justifyContent="space-between"
-                alignItems="center"
+                alignItems={{ xs: "flex-start", sm: "center" }}
+                gap={2}
               >
                 <MDTypography variant="h6" color="white">
                   Gestión de Cupones
                 </MDTypography>
-                <MDButton variant="gradient" color="dark" onClick={() => handleOpenDialog()}>
+                <MDButton
+                  variant="gradient"
+                  color="dark"
+                  onClick={() => handleOpenDialog()}
+                  sx={{ width: { xs: "100%", sm: "auto" } }}
+                >
                   <Icon sx={{ fontWeight: "bold" }}>add</Icon>
                   &nbsp;Nuevo Cupón
                 </MDButton>
@@ -232,7 +239,6 @@ function Coupons() {
               value={formData.code}
               onChange={handleChange}
               fullWidth
-              sx={{ mb: 2 }}
             />
             <MDInput
               label="Porcentaje de Descuento (%)"
@@ -241,7 +247,6 @@ function Coupons() {
               value={formData.discountPercentage}
               onChange={handleChange}
               fullWidth
-              sx={{ mb: 2 }}
             />
             <MDInput
               label="Monto Mínimo de Pedido"
@@ -250,47 +255,54 @@ function Coupons() {
               value={formData.minOrderAmount}
               onChange={handleChange}
               fullWidth
-              sx={{ mb: 2 }}
             />
-            <MDBox display="flex" gap={2}>
-              <MDInput
-                label="Fecha Inicio"
-                name="startDate"
-                type="date"
-                value={formData.startDate}
-                onChange={handleChange}
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-              />
-              <MDInput
-                label="Fecha Expiración"
-                name="expiryDate"
-                type="date"
-                value={formData.expiryDate}
-                onChange={handleChange}
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-              />
-            </MDBox>
-            <MDBox display="flex" gap={2}>
-              <MDInput
-                label="Límite de Uso Global"
-                name="usageLimit"
-                type="number"
-                value={formData.usageLimit}
-                onChange={handleChange}
-                fullWidth
-                placeholder="Dejar vacío para ilimitado"
-              />
-              <MDInput
-                label="Límite Por Usuario"
-                name="limitPerUser"
-                type="number"
-                value={formData.limitPerUser}
-                onChange={handleChange}
-                fullWidth
-              />
-            </MDBox>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <MDInput
+                  label="Fecha Inicio"
+                  name="startDate"
+                  type="date"
+                  value={formData.startDate}
+                  onChange={handleChange}
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <MDInput
+                  label="Fecha Expiración"
+                  name="expiryDate"
+                  type="date"
+                  value={formData.expiryDate}
+                  onChange={handleChange}
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+            </Grid>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <MDInput
+                  label="Límite de Uso Global"
+                  name="usageLimit"
+                  type="number"
+                  value={formData.usageLimit}
+                  onChange={handleChange}
+                  fullWidth
+                  placeholder="Dejar vacío para ilimitado"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <MDInput
+                  label="Límite Por Usuario"
+                  name="limitPerUser"
+                  type="number"
+                  value={formData.limitPerUser}
+                  onChange={handleChange}
+                  fullWidth
+                />
+              </Grid>
+            </Grid>
 
             <MDBox display="flex" flexDirection="column">
               <FormControlLabel
