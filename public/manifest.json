@@ -1,15 +1,32 @@
 {
-  "short_name": "Admin Oriyinal",
-  "name": "Tienda Oriyinal Panel",
+  "short_name": "Oriyina⅃ Admin",
+  "name": "Oriyina⅃ — Panel de Administración",
+  "description": "Panel de administración de tienda e-commerce Oriyina⅃",
   "icons": [
     {
       "src": "favicon.png",
-      "sizes": "192x192 512x512",
+      "sizes": "76x76",
       "type": "image/png"
+    },
+    {
+      "src": "icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
   "start_url": ".",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
   "theme_color": "#9b2fbe",
-  "background_color": "#ffffff"
+  "background_color": "#ffffff",
+  "categories": ["business", "shopping"],
+  "lang": "es"
 }

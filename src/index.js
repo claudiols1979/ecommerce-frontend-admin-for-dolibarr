@@ -34,6 +34,9 @@ import { VariantProvider } from "contexts/VariantContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+// PWA service worker registration
+import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
+
 const container = document.getElementById("app");
 const root = createRoot(container);
 
@@ -69,3 +72,6 @@ root.render(
     </MaterialUIControllerProvider>
   </BrowserRouter>
 );
+
+// Register the service worker for PWA / offline support
+serviceWorkerRegistration.register();
