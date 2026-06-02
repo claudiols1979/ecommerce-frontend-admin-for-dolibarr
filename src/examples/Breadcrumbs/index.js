@@ -45,7 +45,7 @@ function Breadcrumbs({ icon, title, route, light }) {
             variant="body2"
             color={light ? "white" : "dark"}
             opacity={light ? 0.8 : 0.5}
-            sx={{ lineHeight: 0 }}
+            sx={{ lineHeight: 1 }}
           >
             <Icon
               sx={{
