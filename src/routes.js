@@ -55,11 +55,7 @@ const routes = [
     type: "collapse",
     name: "Panel",
     key: "dashboard",
-    icon: (
-      <Icon fontSize="large" sx={{ fontSize: "6rem", width: "6rem", height: "6rem" }}>
-        dashboard
-      </Icon>
-    ),
+    icon: <Icon sx={{ fontSize: "6rem" }}>dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
     // Roles with double quotes for Prettier compliance
