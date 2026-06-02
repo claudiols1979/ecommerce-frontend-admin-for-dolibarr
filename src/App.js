@@ -164,20 +164,35 @@ function MainAppContent() {
       display="flex"
       justifyContent="center"
       alignItems="center"
-      width="3.25rem"
-      height="3.25rem"
       bgColor="white"
       shadow="sm"
       borderRadius="50%"
       position="fixed"
-      right="2rem"
-      bottom="2rem"
       zIndex={99}
       color="dark"
-      sx={{ cursor: "pointer" }}
+      sx={{
+        cursor: "pointer",
+        width: { xs: "2.75rem", sm: "3rem", md: "3.25rem" },
+        height: { xs: "2.75rem", sm: "3rem", md: "3.25rem" },
+        right: { xs: "1rem", sm: "1.25rem", md: "1.5rem", lg: "2rem" },
+        bottom: { xs: "1rem", sm: "1.25rem", md: "1.5rem", lg: "2rem" },
+        transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
+        "&:hover": {
+          boxShadow: 4,
+          transform: "scale(1.08)",
+        },
+        "&:active": {
+          transform: "scale(0.94)",
+        },
+      }}
       onClick={handleConfiguratorOpen}
     >
-      <Icon fontSize="small" color="inherit">
+      <Icon
+        color="inherit"
+        sx={{
+          fontSize: { xs: "1rem", sm: "1.15rem", md: "1.2rem", lg: "1.25rem" },
+        }}
+      >
         settings
       </Icon>
     </MDBox>
